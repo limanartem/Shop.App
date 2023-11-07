@@ -1,0 +1,125 @@
+version: '2.23'
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: admin
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  mongodb-container:
+    image: mongo:latest
+    container_name: mongodb-container
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootPassword
+    ports:
+      - '27017:27017'
+    expose:
+      - '27017'
+    networks:
+      - app-network
+    volumes:
+      - mongodb-data3:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  cache:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    networks:
+      - app-network
+    command: redis-server --save 20 1 --loglevel warning --requirepass qwerty123
+    volumes: 
+      - cache:/data
+
+  rabbitmq:
+    build: ./rabbitmq
+    container_name: 'rabbitmq'
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=pass
+    ports:
+        - 5672
+        - 15672
+    networks:
+        - app-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  nodejs-api:
+    build:
+      context: ./webserver
+    container_name: webserver-container
+    ports:
+      - "3001:3001"
+    restart: on-failure
+    networks:
+      - app-network
+    depends_on:
+      mysql:
+        condition: service_started
+      cache:
+        condition: service_started
+      mongodb-container:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_USER: user1
+      DB_PASSWORD: qwerty123
+      DB_DATABASE: data
+      REDIS_HOST: cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: qwerty123
+      MONGODB_URL: mongodb://mongodb-container:27017/items
+      MONGO_DB_USERNAME: items_user
+      MONGO_DB_PASSWORD: qwerty123
+      MESSAGE_BROKER_URL: amqp://admin:pass@rabbitmq:5672
+    links:
+      - mysql
+      - cache
+      - rabbitmq
+
+
+  orders-processor:
+    build:
+      context: ./orders-processor
+    container_name: orders-processor-container
+    restart: on-failure
+    networks:
+      - app-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      MESSAGE_BROKER_URL: amqp://admin:pass@rabbitmq:5672
+
+  react-app:
+    build:
+      context: ./webui
+    container_name: webui-container
+    ports:
+      - "80:80"
+    depends_on:
+      - nodejs-api
+
+volumes:
+ cache:
+    driver: local
+ mongodb-data3:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

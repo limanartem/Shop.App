@@ -1,0 +1,21 @@
+{
+  "name": "orders-processor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "tsc": "tsc",
+    "start": "node ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/amqplib": "^0.10.3",
+    "@types/node": "^20.8.10",
+    "typescript": "^5.2.2",
+    "typescript-strict-plugin": "^2.2.1"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.3"
+  }
+}
