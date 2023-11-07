@@ -82,6 +82,28 @@ services:
       MONGO_DB_PASSWORD: qwerty123
       MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
 
+  shop.app.catalog.api:
+    build:
+      context: ./shop.app.catalog.api
+    ports:
+      - "5002:5002"
+    restart: on-failure
+    networks:
+      - app-network
+    depends_on:
+      shop.app.catalog.db:
+        condition: service_started
+      shop.app.cache:
+        condition: service_started
+    environment:
+      DB_HOST: mysql
+      DB_USER: user1
+      DB_PASSWORD: qwerty123
+      DB_DATABASE: data
+      REDIS_HOST: cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: qwerty123
+
 
   shop.app.orders.processing:
     build:
@@ -99,11 +121,15 @@ services:
     build:
       context: ./shop.app.web
     ports:
-      - "80:80"
+      - "3000:3000"
+    networks:
+      - app-network
     environment:
-      ORDERS_API_URL: http://shop.app.orders.api:3001
+      REACT_APP_ORDERS_API_URL: http://localhost:3001
+      REACT_APP_CATALOG_API_URL: http://localhost:5002
     depends_on:
       - shop.app.orders.api
+      - shop.app.catalog.api
 
 volumes:
  cache:

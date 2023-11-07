@@ -1,33 +1,34 @@
 import { ProductCategory, ProductItem } from '../model';
 
-export const getProducts = async (_catagory?: string | null): Promise<ProductItem[]> => {
-  return Promise.resolve([
-    {
-      id: '1235',
-      title: 'Samsung 17"',
-      description: 'Some description',
-      price: 400.5,
-      currency: '$',
-    },
-    {
-      id: '894651',
-      title: 'Bosch dishwasher',
-      description: 'Some description <b>with tags</b>',
-      price: 330.75,
-      currency: '$',
-    },
-  ]);
+const { REACT_APP_CATALOG_API_URL } = process.env;
+
+export const getProducts = async (_category?: string | null): Promise<ProductItem[]> => {
+  console.log(process.env);
+  console.log(`Fetching products from ${`${REACT_APP_CATALOG_API_URL}/products`}`);
+
+  const response = await fetch(`${REACT_APP_CATALOG_API_URL}/products`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    console.error({ status: response.status, statusText: response.statusText });
+    throw new Error('Unable to get products!');
+  }
+
+  return await response.json();
 };
 
 export const getCategories = async (): Promise<ProductCategory[]> => {
-  return Promise.resolve([
-    {
-      id: '1',
-      title: 'Electronics',
-    },
-    {
-      id: '2',
-      title: 'Clothes',
-    },
-  ]);
+  console.log(`Fetching product categories from ${`${REACT_APP_CATALOG_API_URL}/productCategories`}`);
+
+  const response = await fetch(`${REACT_APP_CATALOG_API_URL}/productCategories`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    console.error({ status: response.status, statusText: response.statusText });
+    throw new Error('Unable to get product categories!');
+  }
+
+  return await response.json();
 };

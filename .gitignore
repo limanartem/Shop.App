@@ -9,6 +9,9 @@ coverage
 # production
 build
 dist
+obj
+bin
+publish 
 
 # misc
 
