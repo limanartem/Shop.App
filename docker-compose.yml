@@ -1,8 +1,7 @@
 version: '2.23'
 services:
-  mysql:
+  shop.app.catalog.db:
     image: mysql:latest
-    container_name: mysql-container
     environment:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_DATABASE: admin
@@ -11,9 +10,8 @@ services:
     networks:
       - app-network
 
-  mongodb-container:
+  shop.app.orders.db:
     image: mongo:latest
-    container_name: mongodb-container
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootPassword
@@ -27,9 +25,8 @@ services:
       - mongodb-data3:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
-  cache:
+  shop.app.cache:
     image: redis:latest
-    container_name: redis
     restart: always
     ports:
       - '6379:6379'
@@ -39,9 +36,8 @@ services:
     volumes: 
       - cache:/data
 
-  rabbitmq:
-    build: ./rabbitmq
-    container_name: 'rabbitmq'
+  shop.app.messagebroker:
+    build: ./shop.app.messageBroker
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=pass
@@ -56,23 +52,22 @@ services:
       timeout: 30s
       retries: 3
 
-  nodejs-api:
+  shop.app.orders.api:
     build:
-      context: ./webserver
-    container_name: webserver-container
+      context: ./shop.app.orders.api
     ports:
       - "3001:3001"
     restart: on-failure
     networks:
       - app-network
     depends_on:
-      mysql:
+      shop.app.catalog.db:
         condition: service_started
-      cache:
+      shop.app.cache:
         condition: service_started
-      mongodb-container:
+      shop.app.orders.db:
         condition: service_started
-      rabbitmq:
+      shop.app.messagebroker:
         condition: service_healthy
     environment:
       DB_HOST: mysql
@@ -82,37 +77,31 @@ services:
       REDIS_HOST: cache
       REDIS_PORT: 6379
       REDIS_PASSWORD: qwerty123
-      MONGODB_URL: mongodb://mongodb-container:27017/items
+      MONGODB_URL: mongodb://shop.app.orders.db:27017/items
       MONGO_DB_USERNAME: items_user
       MONGO_DB_PASSWORD: qwerty123
-      MESSAGE_BROKER_URL: amqp://admin:pass@rabbitmq:5672
-    links:
-      - mysql
-      - cache
-      - rabbitmq
+      MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
 
 
-  orders-processor:
+  shop.app.orders.processing:
     build:
-      context: ./orders-processor
-    container_name: orders-processor-container
+      context: ./shop.app.orders.processing
     restart: on-failure
     networks:
       - app-network
     depends_on:
-      rabbitmq:
+      shop.app.messagebroker:
         condition: service_healthy
     environment:
-      MESSAGE_BROKER_URL: amqp://admin:pass@rabbitmq:5672
+      MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
 
-  react-app:
+  shop.app.web:
     build:
-      context: ./webui
-    container_name: webui-container
+      context: ./shop.app.web
     ports:
       - "80:80"
     depends_on:
-      - nodejs-api
+      - shop.app.orders.api
 
 volumes:
  cache:
