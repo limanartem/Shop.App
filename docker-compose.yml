@@ -100,6 +100,8 @@ services:
       context: ./shop.app.web
     ports:
       - "80:80"
+    environment:
+      ORDERS_API_URL: http://shop.app.orders.api:3001
     depends_on:
       - shop.app.orders.api
 
