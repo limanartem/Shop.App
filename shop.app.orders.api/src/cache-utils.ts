@@ -1,4 +1,4 @@
-import { RedisClientType, createClient } from "redis";
+import { RedisClientType, createClient } from 'redis';
 
 const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } = process.env;
 
@@ -15,7 +15,7 @@ const getRedisClient = async () => {
     url: `redis://${REDIS_HOST}:${REDIS_PORT}`,
     password: REDIS_PASSWORD,
   })
-    .on("error", (err) => console.log("Redis Client Error", err))
+    .on('error', (err) => console.log('Redis Client Error', err))
     .connect()) as RedisClientType;
   return redisClient;
 };
@@ -29,15 +29,15 @@ export const get = async (key: string): Promise<string> => {
 export const update = async (key: string, data: string): Promise<void> => {
   const client = await getRedisClient();
   if (data == null) {
-    console.log(`Removing "${key}" from cache`)
+    console.log(`Removing "${key}" from cache`);
     await client.del(key);
   } else {
     await client.set(key, data);
   }
 };
 
-process.on("exit", async () => {
-  console.log("Exiting app.");
+process.on('exit', async () => {
+  console.log('Exiting app.');
 
   if (redisClient) {
     await redisClient.disconnect();

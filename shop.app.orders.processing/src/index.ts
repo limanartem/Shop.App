@@ -1,6 +1,6 @@
-import amqp from "amqplib";
-import { Worker } from "worker_threads";
-import path from "path";
+import amqp from 'amqplib';
+import { Worker } from 'worker_threads';
+import path from 'path';
 
 const { MESSAGE_BROKER_URL } = process.env;
 
@@ -10,10 +10,10 @@ const { MESSAGE_BROKER_URL } = process.env;
   const channel = await connection.createChannel();
   console.log(`Connected to message broker!`);
   channel.prefetch(10);
-  const queue = "orders.new";
+  const queue = 'orders.new';
 
-  process.once("SIGINT", async () => {
-    console.log("got sigint, closing connection");
+  process.once('SIGINT', async () => {
+    console.log('got sigint, closing connection');
     await channel.close();
     await connection.close();
     process.exit(0);
@@ -25,9 +25,9 @@ const { MESSAGE_BROKER_URL } = process.env;
     async (message) => {
       console.log(`Order received, messageId: ${message.properties.messageId}.`);
       const data = JSON.parse(Buffer.from(message.content).toString());
-      new Worker(path.join(__dirname, "workers/order-worker.js"), {
+      new Worker(path.join(__dirname, 'workers/order-worker.js'), {
         workerData: { ...data },
-      }).on("message", async (workerData) => {
+      }).on('message', async (workerData) => {
         console.log(`Order processed for messageId ${message.properties.messageId}!`);
         console.log({ message: workerData });
         await channel.ack(message);
@@ -35,7 +35,7 @@ const { MESSAGE_BROKER_URL } = process.env;
     },
     {
       noAck: false,
-      consumerTag: "orders_consumer",
-    }
+      consumerTag: 'orders_consumer',
+    },
   );
 })();

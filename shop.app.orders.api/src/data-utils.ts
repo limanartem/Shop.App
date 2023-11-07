@@ -1,5 +1,5 @@
-import { get as getCache, update as updateCache } from "./cache-utils";
-import { fetchDocument, updateDocument } from "./mongodb-client";
+import { get as getCache, update as updateCache } from './cache-utils';
+import { fetchDocument, updateDocument } from './mongodb-client';
 
 export const fetchItem = async (id: string): Promise<any | null> => {
   const cachedValue = await getCache(id);
