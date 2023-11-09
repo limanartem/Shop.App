@@ -99,8 +99,8 @@ services:
       shop.app.cache:
         condition: service_started
     environment:
-      DB_HOST: mysql
-      DB_USER: user1
+      DB_HOST: shop.app.catalog.db
+      DB_USER: catalogReader
       DB_PASSWORD: qwerty123
       DB_DATABASE: Catalog
       REDIS_HOST: cache
