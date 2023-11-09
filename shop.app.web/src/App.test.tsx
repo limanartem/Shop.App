@@ -1,9 +1,23 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { render, screen, cleanup, within } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+describe('<App />', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('should contain appBar', () => {
+    render(<App />);
+    const appBarElement = screen.getByTestId('appBar');
+    expect(appBarElement).toBeInTheDocument();
+  });
+
+  it('should contain search within appBar', () => {
+    render(<App />);
+    const appBarElement = screen.getByTestId('appBar');
+    const search = within(appBarElement).getByTestId('appBar-search');
+    expect(search).toBeInTheDocument();
+  });
 });
