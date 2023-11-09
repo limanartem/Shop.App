@@ -9,6 +9,9 @@ services:
       - "3306:3306"
     networks:
       - app-network
+    volumes:
+      - "./shop.app.catalog.db/shop.db.init.schema.sql:/docker-entrypoint-initdb.d/1.sql"
+      - "./shop.app.catalog.db/shop.db.init.data.sql:/docker-entrypoint-initdb.d/2.sql"  
 
   shop.app.orders.db:
     image: mongo:latest
@@ -99,7 +102,7 @@ services:
       DB_HOST: mysql
       DB_USER: user1
       DB_PASSWORD: qwerty123
-      DB_DATABASE: data
+      DB_DATABASE: Catalog
       REDIS_HOST: cache
       REDIS_PORT: 6379
       REDIS_PASSWORD: qwerty123

@@ -1,3 +1,9 @@
+using Shop.App.Catalog.Api.Db;
+using Microsoft.EntityFrameworkCore;
+using Shop.App.Catalog.Api.Services;
+using Shop.App.Catalog.Api.Interfaces;
+using System.Text.Json.Serialization;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
@@ -9,24 +15,48 @@ builder.Services.AddCors(options =>
   });
 });
 
-var app = builder.Build();
-
-app.MapGet("/products", () =>
+builder.Services.AddDbContext<AppDbContext>();
+builder.Services.AddScoped<ICatalogService, CatalogService>();
+builder.Services.ConfigureHttpJsonOptions(options =>
 {
-  return new[] {
-    new { id = "1", title = "Sofa", category = "1" },
-    new { id = "2", title = "Cupboard", category = "1" },
-  };
+  // options.SerializerOptions.MaxDepth = 2;
+  // options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 });
 
-app.MapGet("/productCategories", () =>
+
+var app = builder.Build();
+
+app.MapGet("/products", async (context) =>
 {
-  return new[] {
-    new { id = "1", title = "For your house" },
-    new { id = "2", title = "Electronics" },
-    new { id = "3", title = "Kids" },
-    new { id = "4", title = "Clothes" },
-  };
+  await context.Response.WriteAsJsonAsync(
+    context.RequestServices
+    .GetService<ICatalogService>()?
+    .Products()
+    .Select(product => new
+    {
+      product.Id,
+      product.Title,
+      product.Description,
+      product.Price,
+      product.Currency,
+      product.CategoryId
+    }).ToList()
+    );
+});
+
+app.MapGet("/productCategories", async (context) =>
+{
+  await context.Response.WriteAsJsonAsync(
+    context.RequestServices
+    .GetService<ICatalogService>()?
+    .Categories()
+    .Select(category => new
+    {
+      category.Id,
+      Title = category.Name,
+      category.ParentCategoryId
+    }).ToList()
+    );
 });
 
 

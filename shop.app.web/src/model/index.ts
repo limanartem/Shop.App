@@ -11,5 +11,6 @@ export type ProductItem = {
 
 export type ProductCategory = {
   id: string,
+  parentCategoryId: string
   title: string
 }
