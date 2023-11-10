@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Shop.App.Catalog.Api.Services;
 using Shop.App.Catalog.Api.Interfaces;
 using System.Text.Json.Serialization;
+using Shop.App.Catalog.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -28,10 +29,21 @@ var app = builder.Build();
 
 app.MapGet("/products", async (context) =>
 {
+  var categoryId = context.Request.Query["categoryid"];
+  var service = context.RequestServices
+    .GetService<ICatalogService>();
+
+  if (service == null)
+  {
+    throw new NullReferenceException($"Not able to resolve {typeof(ICatalogService)} from service container");
+  }
+
+  var products = string.IsNullOrEmpty(categoryId)
+    ? service.Products()
+    : await service.Products(int.Parse(categoryId));
+    
   await context.Response.WriteAsJsonAsync(
-    context.RequestServices
-    .GetService<ICatalogService>()?
-    .Products()
+    products?
     .Select(product => new
     {
       product.Id,

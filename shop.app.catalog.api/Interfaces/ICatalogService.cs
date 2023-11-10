@@ -5,5 +5,6 @@ namespace Shop.App.Catalog.Api.Interfaces {
   {
      IQueryable<Category> Categories();
      IQueryable<Product> Products();
+     Task<IQueryable<Product>> Products(int categoryId);
   }
 }
