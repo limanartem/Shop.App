@@ -1,22 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getProducts, getCategories } from '../../services/catalog-service';
 import { ProductCategory, ProductItem } from '../../model';
 import {
-  Button,
-  TableContainer,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Paper,
   Select,
   MenuItem,
   InputLabel,
   Box,
-  Typography
+  List,
+  ListItem,
 } from '@mui/material';
+import ProductCard from './ProductCard';
+import CategoryBreadcrumbs from './CategoryBreadcrumbs';
 
 function Catalog() {
   const { search } = useLocation();
@@ -29,7 +24,7 @@ function Catalog() {
 
   useEffect(() => {
     console.log('getProducts');
-    getProducts(category).then((products) => {
+    getProducts(selectedCategory).then((products) => {
       setProducts(products);
     });
   }, [category, selectedCategory]);
@@ -42,9 +37,7 @@ function Catalog() {
 
   return (
     <Box>
-      <Typography variant="h2" gutterBottom>
-      Products Page
-      </Typography>
+      <CategoryBreadcrumbs currentCategoryId={selectedCategory} categories={categories} />
       <InputLabel variant="standard" htmlFor="uncontrolled-native">
         Category
       </InputLabel>
@@ -59,30 +52,13 @@ function Catalog() {
           </MenuItem>
         ))}
       </Select>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Price</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {products.map((row) => (
-              <TableRow key={row.title} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell component="th" scope="row">
-                  {row.title}
-                </TableCell>
-                <TableCell>
-                  <div dangerouslySetInnerHTML={{ __html: row.description }}></div>
-                </TableCell>
-                <TableCell>{row.price}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <List>
+        {products.map((row) => (
+          <ListItem>
+            <ProductCard item={row} />
+          </ListItem>
+        ))}
+      </List>
     </Box>
   );
 }

@@ -2,11 +2,11 @@ import { ProductCategory, ProductItem } from '../model';
 
 const { REACT_APP_CATALOG_API_URL } = process.env;
 
-export const getProducts = async (_category?: string | null): Promise<ProductItem[]> => {
+export const getProducts = async (category?: string | null): Promise<ProductItem[]> => {
   console.log(process.env);
   console.log(`Fetching products from ${`${REACT_APP_CATALOG_API_URL}/products`}`);
 
-  const response = await fetch(`${REACT_APP_CATALOG_API_URL}/products`, {
+  const response = await fetch(`${REACT_APP_CATALOG_API_URL}/products?categoryId=${category}`, {
     method: 'GET',
   });
 

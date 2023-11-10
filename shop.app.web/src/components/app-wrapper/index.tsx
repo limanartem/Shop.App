@@ -17,6 +17,8 @@ import {
   Tooltip,
   Avatar,
   InputBase,
+  CardMedia,
+  Card,
 } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -155,8 +157,12 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
           >
             <MenuIcon />
           </IconButton>
+          <Card sx={{ mr: 2 }}>
+            <CardMedia component="img" image="/shop-assets/logo/shop.app.logo.png" style={{ width: '48px' }} />
+          </Card>
+
           <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-            Dashboard
+            AI-Powered eCommerce
           </Typography>
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <Search data-testid="appBar-search">
