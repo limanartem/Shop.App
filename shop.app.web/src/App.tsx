@@ -8,6 +8,8 @@ import { CssBaseline, Toolbar } from '@mui/material';
 import { amber } from '@mui/material/colors';
 import AppWrapper from './components/app-wrapper';
 import CategoryContextProvider from './components/context-providers/CategoryContextProvider';
+import { Provider } from 'react-redux';
+import { store } from './app/store';
 
 function App() {
   const defaultTheme = createTheme({
@@ -20,20 +22,22 @@ function App() {
   });
 
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <CategoryContextProvider>
-          <AppWrapper>
-            <Toolbar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/catalog" element={<Catalog />} />
-            </Routes>
-          </AppWrapper>
-        </CategoryContextProvider>
-      </BrowserRouter>
-    </ThemeProvider>
+    <Provider store={ store } >
+      <ThemeProvider theme={defaultTheme}>
+        <CssBaseline />
+        <BrowserRouter>
+          <CategoryContextProvider>
+            <AppWrapper>
+              <Toolbar />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/catalog" element={<Catalog />} />
+              </Routes>
+            </AppWrapper>
+          </CategoryContextProvider>
+        </BrowserRouter>
+      </ThemeProvider>
+    </Provider>
   );
 }
 
