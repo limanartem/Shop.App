@@ -24,8 +24,8 @@ const getSubCategories = (id: number | null, categories: ProductCategory[]): Ren
 
 const data = (categories: ProductCategory[]): RenderTree => {
   return {
-    id: 'root',
-    name: '',
+    id: '',
+    name: 'All',
     children: getSubCategories(null, categories),
   };
 };
@@ -52,7 +52,7 @@ export default function CategoriesTreeView({ categories }: { categories: Product
   );
 
   const [selected, setSelected] = useState<string | null>(globalSelectedCategory || '');
-  const [expanded, setExpanded] = useState<string[]>([]);
+  const [expanded, setExpanded] = useState<string[]>(['']);
   const handleToggle = (_: SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds);
   };
@@ -60,21 +60,21 @@ export default function CategoriesTreeView({ categories }: { categories: Product
   useEffect(() => {
     if (globalSelectedCategory) {
       const path = getCategoryPath(categories, Number.parseInt(globalSelectedCategory));
-      setExpanded(path.map((category) => category.id.toString()));
+      setExpanded([''].concat(path.map((category) => category.id.toString())));
       setSelected(globalSelectedCategory);
     }
   }, [globalSelectedCategory, categories]);
 
   const renderTree = (nodes?: RenderTree[]) => {
     return nodes?.map((node) => (
-      <TreeItem key={node.id} nodeId={node.id} label={node.name}>
+      <TreeItem key={node.id} nodeId={node.id} label={node.name} >
         {Array.isArray(node.children) ? renderTree(node.children) : null}
       </TreeItem>
     ));
   };
 
   return (
-    <Box sx={{ minHeight: 110, flexGrow: 1, maxWidth: 300 }}>
+    <Box sx={{  flexGrow: 1, maxWidth: 300 }}>
       <TreeView
         aria-expanded={true}
         expanded={expanded}
@@ -87,7 +87,7 @@ export default function CategoriesTreeView({ categories }: { categories: Product
           setGlobalSelectedCategory(nodeIds);
         }}
       >
-        {renderTree(data(categories).children)}
+        {renderTree([data(categories)])}
       </TreeView>
     </Box>
   );

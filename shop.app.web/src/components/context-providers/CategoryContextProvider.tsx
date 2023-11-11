@@ -8,7 +8,6 @@ export const GlobalSelectedCategoryContext = createContext({
   setGlobalSelectedCategory: (_: string) => {},
 } as { globalSelectedCategory: string | null; setGlobalSelectedCategory: Dispatch<SetStateAction<string | null>> });
 
-
 function CategoryContextProvider({ children }: { children?: React.ReactNode }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryFromParam = searchParams.get('category');
@@ -26,7 +25,10 @@ function CategoryContextProvider({ children }: { children?: React.ReactNode }) {
     if (globalSelectedCategory && globalSelectedCategory !== categoryFromParam) {
       console.log('AppNavigation:globalSelectedCategory', globalSelectedCategory);
       setSearchParams({ category: globalSelectedCategory });
-    } 
+    } else if (globalSelectedCategory === '') {
+      searchParams.delete('category');
+      setSearchParams(searchParams);
+    }
   }, [globalSelectedCategory]);
 
   return (

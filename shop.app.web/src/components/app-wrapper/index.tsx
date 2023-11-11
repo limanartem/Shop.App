@@ -248,13 +248,20 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
         <List component="nav">
           <ListItemButton
             alignItems="flex-start"
-            onClick={() => setCategoryExpanded(!categoryExpanded)}
+            onClick={() => {
+              if (!open) {
+                setOpen(true);
+                setCategoryExpanded(true);
+              } else {
+                setCategoryExpanded(!categoryExpanded);
+              }
+            }}
             sx={{
               pb: open ? 0 : 2.5,
               '&:hover, &:focus': { '& svg': { opacity: open ? 1 : 0 } },
             }}
           >
-             <ListItemIcon>
+            <ListItemIcon>
               <ShoppingCartIcon />
             </ListItemIcon>
             <ListItemText primary="Categories" />
@@ -267,9 +274,9 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
               }}
             />
           </ListItemButton>
-          {categoryExpanded && (
+          {open && categoryExpanded && (
             <ListItem>
-              <CategoriesTreeView categories={categories} / >
+              <CategoriesTreeView categories={categories} />
             </ListItem>
           )}
           <ListItemButton>
