@@ -1,7 +1,7 @@
 import { useCallback, useContext } from 'react';
 import { Breadcrumbs, Button, Link } from '@mui/material';
 import { ProductCategory } from '../../model';
-import { GlobalSelectedCategoryContext } from '../../App';
+import { GlobalSelectedCategoryContext } from '../../CategoryContextProvider';
 
 const findCategoryById = (categories: ProductCategory[], categoryId: number) => {
   return categories.find((category) => category.id === categoryId);

@@ -4,8 +4,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { TreeView } from '@mui/x-tree-view/TreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { ProductCategory } from '../../model';
-import { GlobalSelectedCategoryContext } from '../../App';
 import { SyntheticEvent, useContext, useEffect, useState } from 'react';
+import { GlobalSelectedCategoryContext } from '../../CategoryContextProvider';
 
 interface RenderTree {
   id: string;

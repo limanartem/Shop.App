@@ -1,9 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { GlobalSelectedCategoryContext } from './App';
+import { Dispatch, SetStateAction, createContext } from 'react';
 
-function AppNavigation({ children }: { children?: React.ReactNode }) {
+export const GlobalSelectedCategoryContext = createContext({
+  globalSelectedCategory: null,
+  setGlobalSelectedCategory: (_: string) => {},
+} as { globalSelectedCategory: string | null; setGlobalSelectedCategory: Dispatch<SetStateAction<string | null>> });
+
+
+function CategoryContextProvider({ children }: { children?: React.ReactNode }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryFromParam = searchParams.get('category');
 
@@ -32,4 +38,4 @@ function AppNavigation({ children }: { children?: React.ReactNode }) {
   );
 }
 
-export default AppNavigation;
+export default CategoryContextProvider;

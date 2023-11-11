@@ -5,7 +5,7 @@ import { ProductCategory, ProductItem } from '../../model';
 import { Box, List, ListItem } from '@mui/material';
 import ProductCard from './ProductCard';
 import CategoryBreadcrumbs from './CategoryBreadcrumbs';
-import { GlobalSelectedCategoryContext } from '../../App';
+import { GlobalSelectedCategoryContext } from '../../CategoryContextProvider';
 
 function Catalog() {
   const [products, setProducts] = useState<ProductItem[]>([]);

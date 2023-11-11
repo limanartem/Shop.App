@@ -7,13 +7,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Toolbar } from '@mui/material';
 import { amber } from '@mui/material/colors';
 import AppWrapper from './components/app-wrapper';
-import { Dispatch, SetStateAction, createContext } from 'react';
-import AppNavigation from './AppNavigation';
-
-export const GlobalSelectedCategoryContext = createContext({
-  globalSelectedCategory: null,
-  setGlobalSelectedCategory: (_: string) => {},
-} as { globalSelectedCategory: string | null; setGlobalSelectedCategory: Dispatch<SetStateAction<string | null>> });
+import CategoryContextProvider from './CategoryContextProvider';
 
 function App() {
   const defaultTheme = createTheme({
@@ -29,7 +23,7 @@ function App() {
     <ThemeProvider theme={defaultTheme}>
       <CssBaseline />
       <BrowserRouter>
-        <AppNavigation>
+        <CategoryContextProvider>
           <AppWrapper>
             <Toolbar />
             <Routes>
@@ -37,7 +31,7 @@ function App() {
               <Route path="/catalog" element={<Catalog />} />
             </Routes>
           </AppWrapper>
-        </AppNavigation>
+        </CategoryContextProvider>
       </BrowserRouter>
     </ThemeProvider>
   );
