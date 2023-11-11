@@ -264,7 +264,7 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
             <ListItemIcon>
               <ShoppingCartIcon />
             </ListItemIcon>
-            <ListItemText primary="Categories" />
+            <ListItemText primary="Products" />
             <KeyboardArrowDown
               sx={{
                 mr: -1,
@@ -279,18 +279,7 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
               <CategoriesTreeView categories={categories} />
             </ListItem>
           )}
-          <ListItemButton>
-            <ListItemIcon>
-              <DashboardIcon />
-            </ListItemIcon>
-            <ListItemText primary="Dashboard" />
-          </ListItemButton>
-          <ListItemButton>
-            <ListItemIcon>
-              <ShoppingCartIcon />
-            </ListItemIcon>
-            <ListItemText primary="Orders" />
-          </ListItemButton>
+          
           <Divider sx={{ my: 1 }} />
         </List>
       </Drawer>

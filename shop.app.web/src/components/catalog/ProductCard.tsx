@@ -8,6 +8,9 @@ import {
   Menu,
   MenuItem,
   Grid,
+  InputLabel,
+  Select,
+  ButtonGroup,
 } from '@mui/material';
 import { ProductItem } from '../../model';
 
@@ -36,14 +39,14 @@ const ProductCard = ({ item }: { item: ProductItem }) => {
 
   return (
     <Card style={{ display: 'flex', width: '100%' }}>
-      <Grid container >
+      <Grid container>
         <Grid item xs={12} md={2}>
           <CardMedia
             component="img"
             height="160"
             image={`/shop-assets/products/thumbnails/${id}-1.png`}
             alt={title}
-            onError={(e: any) => e.target.src = '/shop-assets/products/no-product-image.png'}
+            onError={(e: any) => (e.target.src = '/shop-assets/products/no-product-image.png')}
           />
         </Grid>
         <Grid item xs={12} md={10}>
@@ -59,17 +62,20 @@ const ProductCard = ({ item }: { item: ProductItem }) => {
             <Typography variant="h6">
               {price} {currency}
             </Typography>
-            <Button variant="contained" onClick={handleOpenMenu}>
-              Add to Cart
-            </Button>
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-              <MenuItem onClick={() => handleQuantityChange(1)}>1</MenuItem>
-              <MenuItem onClick={() => handleQuantityChange(2)}>2</MenuItem>
-              <MenuItem onClick={() => handleQuantityChange(3)}>3</MenuItem>
-            </Menu>
-            <Button variant="outlined" onClick={addToCart}>
-              Add {quantity} to Cart
-            </Button>
+            <ButtonGroup size='small' sx={{ maxHeight: 35}}>
+              <Select
+                value={quantity}
+                label="Quantity"
+                onChange={(e) => setQuantity(Number.parseInt(e.target.value as string))}
+              >
+                <MenuItem value={1}>1</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+                <MenuItem value={3}>3</MenuItem>
+              </Select>
+              <Button variant="contained" onClick={addToCart}>
+                Add {quantity} to Cart
+              </Button>
+            </ButtonGroup>
           </CardContent>
         </Grid>
       </Grid>
