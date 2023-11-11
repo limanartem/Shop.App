@@ -7,7 +7,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Toolbar } from '@mui/material';
 import { amber } from '@mui/material/colors';
 import AppWrapper from './components/app-wrapper';
-import CategoryContextProvider from './CategoryContextProvider';
+import CategoryContextProvider from './components/context-providers/CategoryContextProvider';
 
 function App() {
   const defaultTheme = createTheme({

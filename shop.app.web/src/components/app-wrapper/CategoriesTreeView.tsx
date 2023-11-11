@@ -5,7 +5,7 @@ import { TreeView } from '@mui/x-tree-view/TreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { ProductCategory } from '../../model';
 import { SyntheticEvent, useContext, useEffect, useState } from 'react';
-import { GlobalSelectedCategoryContext } from '../../CategoryContextProvider';
+import { GlobalSelectedCategoryContext } from '../context-providers/CategoryContextProvider';
 
 interface RenderTree {
   id: string;
