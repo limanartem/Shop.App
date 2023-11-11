@@ -30,7 +30,7 @@ const ProductCard = ({ item }: { item: ProductItem }) => {
   };
 
   const addToCart = () => {
-    // Add your logic to add the product to the cart with the selected quantity
+    // Add logic to add the product to the cart with the selected quantity
     console.log(`Added ${quantity} ${title} to the cart`);
   };
 
@@ -66,7 +66,6 @@ const ProductCard = ({ item }: { item: ProductItem }) => {
               <MenuItem onClick={() => handleQuantityChange(1)}>1</MenuItem>
               <MenuItem onClick={() => handleQuantityChange(2)}>2</MenuItem>
               <MenuItem onClick={() => handleQuantityChange(3)}>3</MenuItem>
-              {/* Add more quantity options as needed */}
             </Menu>
             <Button variant="outlined" onClick={addToCart}>
               Add {quantity} to Cart

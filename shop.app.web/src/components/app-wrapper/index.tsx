@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import {
@@ -19,6 +19,7 @@ import {
   InputBase,
   CardMedia,
   Card,
+  ListItem,
 } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -28,6 +29,10 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
+import CategoriesTreeView from './CategoriesTreeView';
+import { ProductCategory } from '../../model';
+import { getCategories } from '../../services/catalog-service';
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 
 const drawerWidth: number = 240;
 
@@ -124,8 +129,11 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [open, setOpen] = React.useState(true);
+  const [categoryExpanded, setCategoryExpanded] = React.useState(true);
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -136,6 +144,12 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  useEffect(() => {
+    getCategories().then((categories) => {
+      setCategories(categories);
+    });
+  }, []);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -158,7 +172,11 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
             <MenuIcon />
           </IconButton>
           <Card sx={{ mr: 2 }}>
-            <CardMedia component="img" image="/shop-assets/logo/shop.app.logo.png" style={{ width: '48px' }} />
+            <CardMedia
+              component="img"
+              image="/shop-assets/logo/shop.app.logo.png"
+              style={{ width: '48px' }}
+            />
           </Card>
 
           <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
@@ -228,6 +246,32 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
         </Toolbar>
         <Divider />
         <List component="nav">
+          <ListItemButton
+            alignItems="flex-start"
+            onClick={() => setCategoryExpanded(!categoryExpanded)}
+            sx={{
+              pb: open ? 0 : 2.5,
+              '&:hover, &:focus': { '& svg': { opacity: open ? 1 : 0 } },
+            }}
+          >
+             <ListItemIcon>
+              <ShoppingCartIcon />
+            </ListItemIcon>
+            <ListItemText primary="Categories" />
+            <KeyboardArrowDown
+              sx={{
+                mr: -1,
+                opacity: 0,
+                transform: categoryExpanded ? 'rotate(-180deg)' : 'rotate(0)',
+                transition: '0.2s',
+              }}
+            />
+          </ListItemButton>
+          {categoryExpanded && (
+            <ListItem>
+              <CategoriesTreeView categories={categories} / >
+            </ListItem>
+          )}
           <ListItemButton>
             <ListItemIcon>
               <DashboardIcon />

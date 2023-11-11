@@ -1,6 +1,7 @@
-import React from 'react';
-import { Breadcrumbs, Link, Typography } from '@mui/material';
+import { useCallback, useContext } from 'react';
+import { Breadcrumbs, Button, Link } from '@mui/material';
 import { ProductCategory } from '../../model';
+import { GlobalSelectedCategoryContext } from '../../App';
 
 const findCategoryById = (categories: ProductCategory[], categoryId: number) => {
   return categories.find((category) => category.id === categoryId);
@@ -20,20 +21,30 @@ const getCategoryPath = (categories: ProductCategory[], categoryId: number) => {
 
 const CategoryBreadcrumbs = ({
   categories,
-  currentCategoryId,
 }: {
   categories: ProductCategory[];
-  currentCategoryId: string | null;
 }) => {
-  const categoryPath = currentCategoryId
-    ? getCategoryPath(categories, Number.parseInt(currentCategoryId))
-    : [];
+  const { globalSelectedCategory, setGlobalSelectedCategory } = useContext(
+    GlobalSelectedCategoryContext,
+  );
+
+  const categoryPath = useCallback(() => {
+    return globalSelectedCategory
+      ? getCategoryPath(categories, Number.parseInt(globalSelectedCategory))
+      : [];
+  }, [categories, globalSelectedCategory]);
 
   return (
-    <Breadcrumbs aria-label="breadcrumb">
-      {categoryPath.map((category) => (
-        <Link key={category.id} color="inherit" href="#">
-          {category.title}
+    <Breadcrumbs>
+      {categoryPath().map((category) => (
+        <Link key={category.id} color="inherit">
+          <Button
+            onClick={() => {
+              setGlobalSelectedCategory(category.id.toString());
+            }}
+          >
+            {category.title}
+          </Button>
         </Link>
       ))}
     </Breadcrumbs>

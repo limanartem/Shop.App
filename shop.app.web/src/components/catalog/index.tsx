@@ -1,33 +1,23 @@
-import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useContext, useEffect, useState } from 'react';
 import { getProducts, getCategories } from '../../services/catalog-service';
 import { ProductCategory, ProductItem } from '../../model';
-import {
-  Select,
-  MenuItem,
-  InputLabel,
-  Box,
-  List,
-  ListItem,
-} from '@mui/material';
+import { Box, List, ListItem } from '@mui/material';
 import ProductCard from './ProductCard';
 import CategoryBreadcrumbs from './CategoryBreadcrumbs';
+import { GlobalSelectedCategoryContext } from '../../App';
 
 function Catalog() {
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
-  const category = params.get('category');
-
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(category);
+  const { globalSelectedCategory } = useContext(GlobalSelectedCategoryContext);
 
   useEffect(() => {
-    console.log('getProducts');
-    getProducts(selectedCategory).then((products) => {
+    console.log('Catalog:globalSelectedCategory', globalSelectedCategory);
+    getProducts(globalSelectedCategory).then((products) => {
       setProducts(products);
     });
-  }, [category, selectedCategory]);
+  }, [globalSelectedCategory]);
 
   useEffect(() => {
     getCategories().then((categories) => {
@@ -37,24 +27,10 @@ function Catalog() {
 
   return (
     <Box>
-      <CategoryBreadcrumbs currentCategoryId={selectedCategory} categories={categories} />
-      <InputLabel variant="standard" htmlFor="uncontrolled-native">
-        Category
-      </InputLabel>
-      <Select
-        value={selectedCategory}
-        label="Category"
-        onChange={(event) => setSelectedCategory(event.target.value)}
-      >
-        {categories.map((category) => (
-          <MenuItem value={category.id} key={category.id}>
-            {category.title}
-          </MenuItem>
-        ))}
-      </Select>
+      <CategoryBreadcrumbs categories={categories} />
       <List>
         {products.map((row) => (
-          <ListItem>
+          <ListItem key={row.id}>
             <ProductCard item={row} />
           </ListItem>
         ))}
