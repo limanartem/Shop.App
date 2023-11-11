@@ -1,41 +1,50 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   Card,
   CardContent,
   CardMedia,
   Typography,
   Button,
-  Menu,
   MenuItem,
   Grid,
-  InputLabel,
   Select,
   ButtonGroup,
+  Tooltip,
+  Badge,
 } from '@mui/material';
 import { ProductItem } from '../../model';
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import { addToCart, removeFromCart } from '../../app/shopping-cart/shoppingCartReducer';
+import AddShoppingCart from '@mui/icons-material/AddShoppingCart';
+import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 
-const ProductCard = ({ item }: { item: ProductItem }) => {
-  const { id, title, description, price, currency } = item;
-  const [anchorEl, setAnchorEl] = useState(null);
+const ProductCard = ({ product }: { product: ProductItem }) => {
+  const { id, title, description, price, currency } = product;
   const [quantity, setQuantity] = useState(1);
+  const items = useAppSelector((state) => state.shoppingCart.items);
+  const dispatch = useAppDispatch();
 
-  const handleOpenMenu = (event: any) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
-
-  const handleQuantityChange = (newQuantity: number) => {
-    setQuantity(newQuantity);
-    handleCloseMenu();
-  };
-
-  const addToCart = () => {
-    // Add logic to add the product to the cart with the selected quantity
+  const handleAddToCart = () => {
+    dispatch(addToCart({ product, quantity }));
     console.log(`Added ${quantity} ${title} to the cart`);
   };
+  const handleRemoveFromCart = () => {
+    dispatch(removeFromCart(product));
+    console.log(`Removed ${title} from the cart`);
+  };
+
+  const isProductInCart = useCallback(
+    () => items.some((item) => item.productId === product.id),
+    [items, product],
+  );
+
+  const itemsInCart = useCallback(
+    () =>
+      items
+        .filter((item) => item.productId === product.id)
+        .reduce((acc, curr) => acc + curr.quantity, 0),
+    [items, product],
+  );
 
   return (
     <Card style={{ display: 'flex', width: '100%' }}>
@@ -62,19 +71,35 @@ const ProductCard = ({ item }: { item: ProductItem }) => {
             <Typography variant="h6">
               {price} {currency}
             </Typography>
-            <ButtonGroup size='small' sx={{ maxHeight: 35}}>
+            <ButtonGroup size="small" sx={{ maxHeight: 35 }}>
               <Select
                 value={quantity}
                 label="Quantity"
+                style={{ minWidth: '56px' }}
                 onChange={(e) => setQuantity(Number.parseInt(e.target.value as string))}
               >
                 <MenuItem value={1}>1</MenuItem>
                 <MenuItem value={2}>2</MenuItem>
                 <MenuItem value={3}>3</MenuItem>
               </Select>
-              <Button variant="contained" onClick={addToCart}>
-                Add {quantity} to Cart
-              </Button>
+              <Tooltip title={`Add ${quantity} to Cart`}>
+                <Button variant="contained" style={{ width: '56px' }} onClick={handleAddToCart}>
+                  <AddShoppingCart fontSize="small" />
+                </Button>
+              </Tooltip>
+              {isProductInCart() && (
+                <Tooltip title="Remove from Cart">
+                  <Badge badgeContent={itemsInCart()} color="success">
+                    <Button
+                      variant="outlined"
+                      style={{ width: '56px' }}
+                      onClick={handleRemoveFromCart}
+                    >
+                      <RemoveShoppingCartIcon fontSize="small" />
+                    </Button>
+                  </Badge>
+                </Tooltip>
+              )}
             </ButtonGroup>
           </CardContent>
         </Grid>

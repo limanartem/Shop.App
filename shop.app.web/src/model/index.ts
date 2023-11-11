@@ -14,3 +14,8 @@ export type ProductCategory = {
   parentCategoryId: number
   title: string
 }
+
+export type ShoppingCartItem = {
+  productId: string;
+  quantity: number;
+};

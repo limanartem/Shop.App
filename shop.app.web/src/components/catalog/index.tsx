@@ -40,7 +40,7 @@ function Catalog() {
       <List>
         {products.map((row) => (
           <ListItem key={row.id}>
-            <ProductCard item={row} />
+            <ProductCard product={row} />
           </ListItem>
         ))}
       </List>
