@@ -56,8 +56,7 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
           <List sx={{ width: '100%' }}>
             {items &&
               items?.map((item) => (
-                <>
-                  <ListItem alignItems="flex-start">
+                  <ListItem alignItems="flex-start" key={item.product.id}>
                     <Card style={{ display: 'flex', width: '100%' }}>
                       <Grid container direction="row" justifyContent="flex-end" alignItems="center">
                         <Grid item xs={12} md={2}>
@@ -95,7 +94,6 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
                       </Grid>
                     </Card>
                   </ListItem>
-                </>
               ))}
           </List>
         )}
