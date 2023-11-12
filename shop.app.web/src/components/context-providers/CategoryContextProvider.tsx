@@ -23,10 +23,14 @@ function CategoryContextProvider({ children }: { children?: React.ReactNode }) {
   ); */
 
   useEffect(() => {
-    if (globalSelectedCategory && globalSelectedCategory !== categoryFromParam) {
+    if (
+      globalSelectedCategory &&
+      globalSelectedCategory !== '-1' &&
+      globalSelectedCategory !== categoryFromParam
+    ) {
       console.log('AppNavigation:globalSelectedCategory', globalSelectedCategory);
       navigate(`/catalog?category=${globalSelectedCategory}`);
-    } else if (globalSelectedCategory === '') {
+    } else if (globalSelectedCategory === '' || globalSelectedCategory === '-1') {
       navigate('/catalog');
     }
   }, [globalSelectedCategory]);

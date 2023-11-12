@@ -2,23 +2,19 @@ import {
   Box,
   Button,
   ButtonGroup,
-  Card,
-  CardContent,
-  CardMedia,
   Grid,
   List,
   ListItem,
   Popover,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import React, { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { getProductImage, ProductFallbackImage } from '../../utils/product-utils';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
-import { clearCart, removeFromCart } from '../../app/reducers/shoppingCartReducer';
-import { ProductItem } from '../../model';
+import { clearCart } from '../../app/reducers/shoppingCartReducer';
+import { useNavigate } from 'react-router-dom';
+import { CartProductCard } from './CartProductCard';
 
 interface ShoppingCartPopupProps {
   open: boolean;
@@ -29,11 +25,7 @@ interface ShoppingCartPopupProps {
 export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopupProps) {
   const items = useAppSelector((state) => state.shoppingCart.items);
   const dispatch = useAppDispatch();
-
-  const handleRemoveFromCart = (product: ProductItem) => {
-    dispatch(removeFromCart(product));
-    console.log(`Removed ${product.title} from the cart`);
-  };
+  const navigate = useNavigate();
 
   const hasItems = useCallback(() => items.length > 0, [items]);
 
@@ -56,44 +48,9 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
           <List sx={{ width: '100%' }}>
             {items &&
               items?.map((item) => (
-                  <ListItem alignItems="flex-start" key={item.product.id}>
-                    <Card style={{ display: 'flex', width: '100%' }}>
-                      <Grid container direction="row" justifyContent="flex-end" alignItems="center">
-                        <Grid item xs={12} md={2}>
-                          <CardMedia
-                            component="img"
-                            height="56"
-                            image={getProductImage(item.product)}
-                            alt={item.product.title}
-                            onError={(e: any) => (e.target.src = ProductFallbackImage)}
-                          />
-                        </Grid>
-                        <Grid item xs={12} md={8}>
-                          <CardContent style={{ flex: 1, padding: '5px' }}>
-                            <Typography variant="caption" component="div">
-                              {item.product.title}
-                            </Typography>
-                            <Typography variant="body2">
-                              {item.product.price.toFixed(2)} x {item.quantity} (
-                              {(item.product.price * item.quantity).toFixed(2)}){' '}
-                              {item.product.currency}
-                            </Typography>
-                          </CardContent>
-                        </Grid>
-                        <Grid item xs={12} md={2}>
-                          <Tooltip title="Remove from Cart">
-                            <Button
-                              variant="outlined"
-                              style={{ height: '24px', minWidth: '24px', maxWidth: '24px' }}
-                              onClick={() => handleRemoveFromCart(item.product)}
-                            >
-                              <RemoveShoppingCartIcon fontSize="small" />
-                            </Button>
-                          </Tooltip>
-                        </Grid>
-                      </Grid>
-                    </Card>
-                  </ListItem>
+                <ListItem alignItems="flex-start" key={item.product.id}>
+                  <CartProductCard item={item} flow="shoppingCart" />
+                </ListItem>
               ))}
           </List>
         )}
@@ -115,7 +72,13 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
             </Grid>
             <Grid item textAlign="right" marginTop={1}>
               <ButtonGroup size="small" variant="text" disabled={items.length === 0}>
-                <Button variant="contained">
+                <Button
+                  variant="contained"
+                  onClick={(e) => {
+                    navigate('checkout');
+                    onClose?.(e);
+                  }}
+                >
                   <ShoppingCartCheckoutIcon fontSize="small" />
                   Checkout
                 </Button>{' '}

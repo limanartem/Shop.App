@@ -3,7 +3,7 @@ import { Breadcrumbs, Button, Link } from '@mui/material';
 import { ProductCategory } from '../../model';
 import { GlobalSelectedCategoryContext } from '../context-providers/CategoryContextProvider';
 
-const findCategoryById = (categories: ProductCategory[], categoryId: number) => {
+const findCategoryById = (categories: ProductCategory[], categoryId?: number) => {
   return categories.find((category) => category.id === categoryId);
 };
 
@@ -16,14 +16,10 @@ const getCategoryPath = (categories: ProductCategory[], categoryId: number) => {
     currentCategory = findCategoryById(categories, currentCategory.parentCategoryId);
   }
 
-  return path;
+  return [{ id: -1, title: 'All' }].concat(path);
 };
 
-const CategoryBreadcrumbs = ({
-  categories,
-}: {
-  categories: ProductCategory[];
-}) => {
+const CategoryBreadcrumbs = ({ categories }: { categories: ProductCategory[] }) => {
   const { globalSelectedCategory, setGlobalSelectedCategory } = useContext(
     GlobalSelectedCategoryContext,
   );
@@ -35,10 +31,12 @@ const CategoryBreadcrumbs = ({
   }, [categories, globalSelectedCategory]);
 
   return (
-    <Breadcrumbs>
+    <Breadcrumbs style={{marginLeft: 16 }}>
       {categoryPath().map((category) => (
-        <Link key={category.id} color="inherit">
+        <Link key={category.id} color="inherit" padding={0} margin={0}>
           <Button
+            style={{ padding: 0, margin: 0, minWidth: 0}}
+            variant="text"
             onClick={() => {
               setGlobalSelectedCategory(category.id.toString());
             }}

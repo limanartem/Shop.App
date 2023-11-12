@@ -4,13 +4,15 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './components/home';
 import Catalog from './components/catalog';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { CssBaseline, Toolbar } from '@mui/material';
+import { Box, CssBaseline } from '@mui/material';
 import { amber } from '@mui/material/colors';
 import AppWrapper from './components/app-wrapper';
 import CategoryContextProvider from './components/context-providers/CategoryContextProvider';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
 import { AuthRoutes, AuthWrapper } from './components/auth/AuthWrapper';
+import { SessionAuth } from 'supertokens-auth-react/recipe/session';
+import { CheckOut } from './components/check-out';
 
 function App() {
   const defaultTheme = createTheme({
@@ -30,12 +32,21 @@ function App() {
           <BrowserRouter>
             <CategoryContextProvider>
               <AppWrapper>
-                <Toolbar />
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/catalog" element={<Catalog />} />
-                  {AuthRoutes()}
-                </Routes>
+                <Box padding={1}>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/catalog" element={<Catalog />} />
+                    <Route
+                      path="/checkout"
+                      element={
+                        <SessionAuth>
+                          <CheckOut />
+                        </SessionAuth>
+                      }
+                    />
+                    {AuthRoutes()}
+                  </Routes>
+                </Box>
               </AppWrapper>
             </CategoryContextProvider>
           </BrowserRouter>

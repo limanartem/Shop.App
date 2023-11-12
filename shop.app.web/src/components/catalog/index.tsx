@@ -16,10 +16,12 @@ function Catalog() {
   useEffect(() => {
     console.log('Catalog:globalSelectedCategory', globalSelectedCategory);
     setProductsLoading(true);
-    getProducts(globalSelectedCategory).then((products) => {
-      setProducts(products);
-      setProductsLoading(false);
-    });
+    getProducts(globalSelectedCategory === '-1' ? null : globalSelectedCategory).then(
+      (products) => {
+        setProducts(products);
+        setProductsLoading(false);
+      },
+    );
   }, [globalSelectedCategory]);
 
   useEffect(() => {

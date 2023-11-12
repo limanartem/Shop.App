@@ -38,8 +38,6 @@ import { useNavigate } from 'react-router-dom';
 
 const drawerWidth: number = 240;
 
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -342,6 +340,7 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
           overflow: 'auto',
         }}
       >
+        <Toolbar />
         {children}
       </Box>
     </Box>

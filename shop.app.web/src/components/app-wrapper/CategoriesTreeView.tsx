@@ -8,7 +8,7 @@ import { SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { GlobalSelectedCategoryContext } from '../context-providers/CategoryContextProvider';
 
 interface RenderTree {
-  id: string;
+  id: number;
   name: string;
   children?: RenderTree[];
 }
@@ -17,20 +17,20 @@ const getSubCategories = (id: number | null, categories: ProductCategory[]): Ren
   categories
     .filter((category) => category.parentCategoryId === id)
     .map((category) => ({
-      id: category.id.toString(),
+      id: category.id,
       name: category.title,
       children: getSubCategories(category.id, categories),
     }));
 
 const data = (categories: ProductCategory[]): RenderTree => {
   return {
-    id: '',
+    id: -1,
     name: 'All',
     children: getSubCategories(null, categories),
   };
 };
 
-const findCategoryById = (categories: ProductCategory[], categoryId: number) => {
+const findCategoryById = (categories: ProductCategory[], categoryId?: number) => {
   return categories.find((category) => category.id === categoryId);
 };
 
@@ -51,8 +51,8 @@ export default function CategoriesTreeView({ categories }: { categories: Product
     GlobalSelectedCategoryContext,
   );
 
-  const [selected, setSelected] = useState<string | null>(globalSelectedCategory || '');
-  const [expanded, setExpanded] = useState<string[]>(['']);
+  const [selected, setSelected] = useState<string | null>(globalSelectedCategory || '-1');
+  const [expanded, setExpanded] = useState<string[]>(['-1']);
   const handleToggle = (_: SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds);
   };
@@ -60,14 +60,14 @@ export default function CategoriesTreeView({ categories }: { categories: Product
   useEffect(() => {
     if (globalSelectedCategory) {
       const path = getCategoryPath(categories, Number.parseInt(globalSelectedCategory));
-      setExpanded([''].concat(path.map((category) => category.id.toString())));
+      setExpanded(['-1'].concat(path.map((category) => category.id.toString())));
       setSelected(globalSelectedCategory);
     }
   }, [globalSelectedCategory, categories]);
 
   const renderTree = (nodes?: RenderTree[]) => {
     return nodes?.map((node) => (
-      <TreeItem key={node.id} nodeId={node.id} label={node.name} >
+      <TreeItem key={node.id} nodeId={node.id.toString()} label={node.name} >
         {Array.isArray(node.children) ? renderTree(node.children) : null}
       </TreeItem>
     ));
