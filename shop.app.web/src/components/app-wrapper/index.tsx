@@ -20,6 +20,7 @@ import {
   CardMedia,
   Card,
   ListItem,
+  Button,
 } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -32,6 +33,8 @@ import { getCategories } from '../../services/catalog-service';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import { useAppSelector } from '../../app/hooks';
 import { ShoppingCartPopup } from '../shopping-cart/ShoppingCartPopup';
+import { doesSessionExist, signOut } from 'supertokens-auth-react/recipe/session';
+import { useNavigate } from 'react-router-dom';
 
 const drawerWidth: number = 240;
 
@@ -131,10 +134,12 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [open, setOpen] = React.useState(true);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [showCartPopup, setShowCartPopup] = React.useState(false);
   const [anchorElShoppingCart, setAnchorElShoppingCart] = React.useState<null | HTMLElement>(null);
   const [categoryExpanded, setCategoryExpanded] = React.useState(true);
   const items = useAppSelector((state) => state.shoppingCart.items);
+  const navigate = useNavigate();
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -151,9 +156,15 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
     getCategories().then((categories) => {
       setCategories(categories);
     });
+
+    const getIsLoggedIn = async () => {
+      setIsLoggedIn(await doesSessionExist());
+    };
+
+    getIsLoggedIn();
   }, []);
 
-/*   useEffect(() => {
+  /*   useEffect(() => {
     if (!items.length) {
       setShowCartPopup(false);
       setAnchorElShoppingCart(null);
@@ -203,12 +214,15 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
               color="inherit"
               onClick={(e) => {
                 //if (items.length) {
-                  setAnchorElShoppingCart(e.currentTarget);
-                  setShowCartPopup(true);
+                setAnchorElShoppingCart(e.currentTarget);
+                setShowCartPopup(true);
                 //}
               }}
             >
-              <Badge badgeContent={items.reduce((count, item) => count + item.quantity, 0) } color="success">
+              <Badge
+                badgeContent={items.reduce((count, item) => count + item.quantity, 0)}
+                color="success"
+              >
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>
@@ -218,33 +232,50 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
               onClose={() => setShowCartPopup(false)}
             />
             <Box sx={{ flexGrow: 0, pl: 1 }}>
-              <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Max Muster" sx={{ bgcolor: 'primary.light' }} />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
+              {isLoggedIn && (
+                <>
+                  <Tooltip title="Open settings">
+                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                      <Avatar alt="Max Muster" sx={{ bgcolor: 'primary.light' }} />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    sx={{ mt: '45px' }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                  >
+                    <MenuItem
+                      onClick={async () => {
+                        await signOut();
+                        document.location.reload();
+                      }}
+                    >
+                      <Typography textAlign="center">Sign Out</Typography>
+                    </MenuItem>
+                  </Menu>
+                </>
+              )}
+              {!isLoggedIn && (
+                <Button
+                  variant="text"
+                  color="inherit"
+                  onClick={() => navigate('auth')}
+                  sx={{ mt: 0.5 }}
+                >
+                  Log In
+                </Button>
+              )}
             </Box>
           </Box>
         </Toolbar>

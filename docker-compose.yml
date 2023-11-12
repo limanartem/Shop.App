@@ -1,4 +1,5 @@
 version: '2.23'
+# TODO: Use init-env.sh to create a .env file with random credentials
 services:
   shop.app.catalog.db:
     image: mysql:latest
@@ -8,10 +9,77 @@ services:
     ports:
       - "3306:3306"
     networks:
-      - app-network
+      - app-private-network
     volumes:
       - "./shop.app.catalog.db/shop.db.init.schema.sql:/docker-entrypoint-initdb.d/1.sql"
       - "./shop.app.catalog.db/shop.db.init.data.sql:/docker-entrypoint-initdb.d/2.sql"  
+
+  shop.app.auth.db:
+    image: 'postgres:latest'
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: qwerty123
+      POSTGRES_DB: supertokens_db
+    # No need to expose ports
+    ports:
+       - 5431:5432
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - shop.app.auth.db_volume:/var/lib/postgresql/data
+    networks:
+      - app-private-network
+
+  shop.app.auth.core:
+    image: registry.supertokens.io/supertokens/supertokens-postgresql
+    depends_on:
+      shop.app.auth.db:
+        condition: service_healthy
+    # No need to expose ports
+    ports:
+       - 3567:3567
+    # Use init-env.sh to create a .env file with random postgres credentials
+    # environment:
+    #   POSTGRESQL_CONNECTION_URI: "postgresql://supertokens_user:password@supertoken_db:5432/supertokens_db"
+    environment:
+      POSTGRESQL_HOST: shop.app.auth.db
+      POSTGRESQL_USER: admin
+      POSTGRESQL_PASSWORD: qwerty123
+      POSTGRESQL_DATABASE_NAME: supertokens_db
+      POSTGRESQL_PORT: 5432
+    networks:
+      - app-private-network
+      - app-public-network
+    restart: unless-stopped
+    healthcheck:
+      test: >
+        bash -c 'exec 3<>/dev/tcp/127.0.0.1/3567 && echo -e "GET /hello HTTP/1.1\r\nhost: 127.0.0.1:3567\r\nConnection: close\r\n\r\n" >&3 && cat <&3 | grep "Hello"'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  shop.app.auth.api:
+    build:
+      context: ./shop.app.auth.api
+    ports:
+      - "3003:3003"
+    restart: on-failure
+    networks:
+      - app-private-network
+      - app-public-network
+    depends_on:
+      shop.app.auth.core
+        condition: service_healthy
+    environment:
+      AUTH_CORE_URL: shop.app.auth.core:3567
+      WEB_API_PORT: 3003
+      WEB_API_URL: shop.app.auth.api
+      WEB_UI_URL: shop.app.web:3000
+
 
   shop.app.orders.db:
     image: mongo:latest
@@ -20,10 +88,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: rootPassword
     ports:
       - '27017:27017'
-    expose:
-      - '27017'
     networks:
-      - app-network
+      - app-private-network
     volumes:
       - mongodb-data3:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
@@ -34,7 +100,7 @@ services:
     ports:
       - '6379:6379'
     networks:
-      - app-network
+      - app-private-network
     command: redis-server --save 20 1 --loglevel warning --requirepass qwerty123
     volumes: 
       - cache:/data
@@ -48,7 +114,7 @@ services:
         - 5672
         - 15672
     networks:
-        - app-network
+        - app-private-network
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 30s
@@ -62,7 +128,8 @@ services:
       - "3001:3001"
     restart: on-failure
     networks:
-      - app-network
+      - app-private-network
+      - app-public-network
     depends_on:
       shop.app.catalog.db:
         condition: service_started
@@ -92,7 +159,8 @@ services:
       - "5002:5002"
     restart: on-failure
     networks:
-      - app-network
+      - app-private-network
+      - app-public-network
     depends_on:
       shop.app.catalog.db:
         condition: service_started
@@ -113,7 +181,7 @@ services:
       context: ./shop.app.orders.processing
     restart: on-failure
     networks:
-      - app-network
+      - app-private-network
     depends_on:
       shop.app.messagebroker:
         condition: service_healthy
@@ -126,7 +194,7 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - app-network
+      - app-public-network
     environment:
       REACT_APP_ORDERS_API_URL: http://localhost:3001
       REACT_APP_CATALOG_API_URL: http://localhost:5002
@@ -139,7 +207,13 @@ volumes:
     driver: local
  mongodb-data3:
     driver: local
+ shop.app.auth.db_volume:
+    driver: local
 
 networks:
-  app-network:
+  app-private-network:
     driver: bridge
+  app-public-network:
+    driver: bridge
+
+  

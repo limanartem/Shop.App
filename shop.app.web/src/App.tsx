@@ -10,6 +10,7 @@ import AppWrapper from './components/app-wrapper';
 import CategoryContextProvider from './components/context-providers/CategoryContextProvider';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
+import { AuthRoutes, AuthWrapper } from './components/auth/AuthWrapper';
 
 function App() {
   const defaultTheme = createTheme({
@@ -22,21 +23,24 @@ function App() {
   });
 
   return (
-    <Provider store={ store } >
-      <ThemeProvider theme={defaultTheme}>
-        <CssBaseline />
-        <BrowserRouter>
-          <CategoryContextProvider>
-            <AppWrapper>
-              <Toolbar />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/catalog" element={<Catalog />} />
-              </Routes>
-            </AppWrapper>
-          </CategoryContextProvider>
-        </BrowserRouter>
-      </ThemeProvider>
+    <Provider store={store}>
+      <AuthWrapper>
+        <ThemeProvider theme={defaultTheme}>
+          <CssBaseline />
+          <BrowserRouter>
+            <CategoryContextProvider>
+              <AppWrapper>
+                <Toolbar />
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/catalog" element={<Catalog />} />
+                  {AuthRoutes()}
+                </Routes>
+              </AppWrapper>
+            </CategoryContextProvider>
+          </BrowserRouter>
+        </ThemeProvider>
+      </AuthWrapper>
     </Provider>
   );
 }

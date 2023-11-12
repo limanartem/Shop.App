@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Dispatch, SetStateAction, createContext } from 'react';
 
@@ -9,8 +9,9 @@ export const GlobalSelectedCategoryContext = createContext({
 } as { globalSelectedCategory: string | null; setGlobalSelectedCategory: Dispatch<SetStateAction<string | null>> });
 
 function CategoryContextProvider({ children }: { children?: React.ReactNode }) {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const categoryFromParam = searchParams.get('category');
+  const navigate = useNavigate();
 
   const [globalSelectedCategory, setGlobalSelectedCategory] = useState<string | null>(
     categoryFromParam,
@@ -24,10 +25,9 @@ function CategoryContextProvider({ children }: { children?: React.ReactNode }) {
   useEffect(() => {
     if (globalSelectedCategory && globalSelectedCategory !== categoryFromParam) {
       console.log('AppNavigation:globalSelectedCategory', globalSelectedCategory);
-      setSearchParams({ category: globalSelectedCategory });
+      navigate(`/catalog?category=${globalSelectedCategory}`);
     } else if (globalSelectedCategory === '') {
-      searchParams.delete('category');
-      setSearchParams(searchParams);
+      navigate('/catalog');
     }
   }, [globalSelectedCategory]);
 

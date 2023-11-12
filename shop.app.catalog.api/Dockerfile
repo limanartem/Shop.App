@@ -2,16 +2,23 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 
 # Below is required in order to properly restore nuget packages
+
+#COPY *.cer .
+#ADD *.cer /usr/local/share/ca-certificates/.
+#ADD *.cer /etc/ssl/certs/.
+
 RUN apt-get install -y wget
 RUN apt-get install curl -y
 RUN apt-get install ca-certificates
 RUN curl https://api.nuget.org/v3/index.json --insecure
+
 
 # Set the working directory
 WORKDIR /app
 
 # Copy the application code into the container
 COPY  . ./
+
 
 RUN dotnet restore --interactive
 
