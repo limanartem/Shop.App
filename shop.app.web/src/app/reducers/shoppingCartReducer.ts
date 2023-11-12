@@ -16,15 +16,23 @@ export const shoppingCartSlice = createSlice({
   reducers: {
     addToCart: (state, action: PayloadAction<{ product: ProductItem; quantity: number }>) => {
       const { product, quantity } = action.payload;
-      state.items.push({ productId: product.id, quantity });
+      const existingItem = state.items.find((item) => item.product.id === product.id);
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        state.items.push({ product, quantity });
+      }
     },
     removeFromCart: (state, action: PayloadAction<ProductItem>) => {
-      state.items = state.items.filter((item) => item.productId !== action.payload.id);
+      state.items = state.items.filter((item) => item.product.id !== action.payload.id);
     },
+    clearCart: (state) => {
+      state.items = [];
+    }
   },
 });
 
-export const { addToCart, removeFromCart } = shoppingCartSlice.actions;
+export const { addToCart, removeFromCart, clearCart } = shoppingCartSlice.actions;
 export const selectShoppingCart = (state: RootState) => state.shoppingCart.items;
 
 export default shoppingCartSlice.reducer;

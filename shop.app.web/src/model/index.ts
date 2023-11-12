@@ -16,6 +16,6 @@ export type ProductCategory = {
 }
 
 export type ShoppingCartItem = {
-  productId: string;
+  product: ProductItem;
   quantity: number;
 };

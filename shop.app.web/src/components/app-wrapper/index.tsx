@@ -23,16 +23,15 @@ import {
 } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
-import MailIcon from '@mui/icons-material/Mail';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
 import CategoriesTreeView from './CategoriesTreeView';
 import { ProductCategory } from '../../model';
 import { getCategories } from '../../services/catalog-service';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import { useAppSelector } from '../../app/hooks';
+import { ShoppingCartPopup } from '../shopping-cart/ShoppingCartPopup';
 
 const drawerWidth: number = 240;
 
@@ -132,7 +131,10 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [open, setOpen] = React.useState(true);
+  const [showCartPopup, setShowCartPopup] = React.useState(false);
+  const [anchorElShoppingCart, setAnchorElShoppingCart] = React.useState<null | HTMLElement>(null);
   const [categoryExpanded, setCategoryExpanded] = React.useState(true);
+  const items = useAppSelector((state) => state.shoppingCart.items);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -150,6 +152,13 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
       setCategories(categories);
     });
   }, []);
+
+/*   useEffect(() => {
+    if (!items.length) {
+      setShowCartPopup(false);
+      setAnchorElShoppingCart(null);
+    }
+  }, [items]); */
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -189,17 +198,26 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
               </SearchIconWrapper>
               <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
             </Search>
-            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
+            <IconButton
+              size="large"
+              color="inherit"
+              onClick={(e) => {
+                //if (items.length) {
+                  setAnchorElShoppingCart(e.currentTarget);
+                  setShowCartPopup(true);
+                //}
+              }}
+            >
+              <Badge badgeContent={items.reduce((count, item) => count + item.quantity, 0) } color="success">
+                <ShoppingCartIcon />
               </Badge>
             </IconButton>
-            <IconButton color="inherit" sx={{ mr: 2 }}>
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <Box sx={{ flexGrow: 0 }}>
+            <ShoppingCartPopup
+              open={showCartPopup}
+              anchorEl={anchorElShoppingCart}
+              onClose={() => setShowCartPopup(false)}
+            />
+            <Box sx={{ flexGrow: 0, pl: 1 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar alt="Max Muster" sx={{ bgcolor: 'primary.light' }} />
@@ -279,7 +297,7 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
               <CategoriesTreeView categories={categories} />
             </ListItem>
           )}
-          
+
           <Divider sx={{ my: 1 }} />
         </List>
       </Drawer>

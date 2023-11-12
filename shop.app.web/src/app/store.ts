@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import ShoppingCartReducer from './shopping-cart/shoppingCartReducer';
+import ShoppingCartReducer from './reducers/shoppingCartReducer';
 
 const loadFromLocalStorage = () => {
   const state = localStorage.getItem('shop.app.state');

@@ -14,9 +14,10 @@ import {
 } from '@mui/material';
 import { ProductItem } from '../../model';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { addToCart, removeFromCart } from '../../app/shopping-cart/shoppingCartReducer';
+import { addToCart, removeFromCart } from '../../app/reducers/shoppingCartReducer';
 import AddShoppingCart from '@mui/icons-material/AddShoppingCart';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
+import { ProductFallbackImage, getProductImage } from '../../utils/product-utils';
 
 const ProductCard = ({ product }: { product: ProductItem }) => {
   const { id, title, description, price, currency } = product;
@@ -28,20 +29,21 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
     dispatch(addToCart({ product, quantity }));
     console.log(`Added ${quantity} ${title} to the cart`);
   };
+  
   const handleRemoveFromCart = () => {
     dispatch(removeFromCart(product));
     console.log(`Removed ${title} from the cart`);
   };
 
   const isProductInCart = useCallback(
-    () => items.some((item) => item.productId === product.id),
+    () => items.some((item) => item.product.id === product.id),
     [items, product],
   );
 
   const itemsInCart = useCallback(
     () =>
       items
-        .filter((item) => item.productId === product.id)
+        .filter((item) => item.product.id === product.id)
         .reduce((acc, curr) => acc + curr.quantity, 0),
     [items, product],
   );
@@ -53,9 +55,9 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
           <CardMedia
             component="img"
             height="160"
-            image={`/shop-assets/products/thumbnails/${id}-1.png`}
+            image={getProductImage(product)}
             alt={title}
-            onError={(e: any) => (e.target.src = '/shop-assets/products/no-product-image.png')}
+            onError={(e: any) => (e.target.src = ProductFallbackImage)}
           />
         </Grid>
         <Grid item xs={12} md={10}>
