@@ -34,7 +34,9 @@ const initAuth = (onHandleEvent: (context: OnHandleEventContext) => void) =>
           providers: [Google.init(), Facebook.init(), Apple.init()],
         },
       }),
-      Session.init(),
+      Session.init({
+        tokenTransferMethod: 'header'
+      }),
     ],
   });
 

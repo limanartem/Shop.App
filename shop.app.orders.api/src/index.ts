@@ -1,3 +1,5 @@
-import { start } from './express-server';
+import { start } from './express/server';
 
-start();
+start().listen(3001, () => {
+  console.log('Server is running on port 3001');
+});

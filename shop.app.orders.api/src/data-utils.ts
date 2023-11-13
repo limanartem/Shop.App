@@ -1,5 +1,6 @@
 import { get as getCache, update as updateCache } from './cache-utils';
-import { fetchDocument, updateDocument } from './mongodb-client';
+import { OrderRequestPayload } from './model';
+import { fetchDocument, insertDocument, updateDocument } from './mongodb-client';
 
 export const fetchItem = async (id: string): Promise<any | null> => {
   const cachedValue = await getCache(id);
@@ -22,4 +23,22 @@ export const updateItem = async (id: string, data: any): Promise<void> => {
   await updateDocument(id, data);
   console.log('Invalidating cache..');
   await updateCache(id, null);
+};
+
+export const createOrder = async (
+  userId: string,
+  order: OrderRequestPayload,
+): Promise<ReturnType<typeof insertDocument>> => {
+  const result = await insertDocument(
+    {
+      userId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      status: 'pending',
+      ...order,
+    },
+    'orders',
+  );
+
+  return result;
 };

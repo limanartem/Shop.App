@@ -1,11 +1,11 @@
-db = db.getSiblingDB('items');
+db = db.getSiblingDB('shop.app.orders.db');
 db.createUser({
-  user: 'items_user',
+  user: 'ordersWriteUser',
   pwd: 'qwerty123',
   roles: [
     {
       role: 'readWrite',
-      db: 'items',
+      db: 'orders',
     },
   ],
 });
