@@ -1,5 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
 import ShoppingCartReducer from './reducers/shoppingCartReducer';
+import SearchReducer from './reducers/searchReducer';
+import CheckoutReducer from './reducers/checkOutReducer';
+import { checkOutCompleteMiddleware, shoppingCartUpdatesMiddleware } from './middlewares/listeners';
 
 const loadFromLocalStorage = () => {
   const state = localStorage.getItem('shop.app.state');
@@ -17,8 +20,14 @@ const saveToLocalStorage = () => {
 export const store = configureStore({
   reducer: {
     shoppingCart: ShoppingCartReducer,
+    search: SearchReducer,
+    checkout: CheckoutReducer,
   },
   preloadedState: loadFromLocalStorage(),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware()
+      .prepend(checkOutCompleteMiddleware())
+      .prepend(shoppingCartUpdatesMiddleware()),
 });
 
 store.subscribe(saveToLocalStorage);

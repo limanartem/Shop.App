@@ -1,25 +1,39 @@
-import { useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Box, Button, ButtonGroup, List, ListItem, Typography } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
 import { CartProductCard } from '../shopping-cart/CartProductCard';
+import {
+  previousStep,
+  confirmItems,
+  setPayment,
+  setShipping,
+  placeOrder,
+  CHECKOUT_FLOW_STEPS,
+} from '../../app/reducers/checkOutReducer';
 
 export function CheckOut() {
   const [activeStep, setActiveStep] = useState(0);
+  const dispatch = useAppDispatch();
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    dispatch(previousStep());
   };
 
   const items = useAppSelector((state) => state.shoppingCart.items);
+  const flowStep = useAppSelector((state) => state.checkout.flowStep);
   const hasItems = useCallback(() => items.length > 0, [items]);
+
+  useEffect(() => {
+    setActiveStep(flowStep != null ? CHECKOUT_FLOW_STEPS.indexOf(flowStep) : 0);
+  }, [flowStep]);
 
   return (
     <>
@@ -31,7 +45,7 @@ export function CheckOut() {
       {hasItems() && (
         <Box>
           <Stepper activeStep={activeStep} orientation="vertical">
-            <Step key="items">
+            <Step key="confirmItems">
               <StepLabel>Confirm items to check-out</StepLabel>
               <StepContent>
                 <List sx={{ width: '100%' }}>
@@ -46,7 +60,7 @@ export function CheckOut() {
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={handleNext}
+                      onClick={() => dispatch(confirmItems())}
                       style={{ minWidth: 80 }}
                     >
                       Continue
@@ -55,7 +69,7 @@ export function CheckOut() {
                 </Box>
               </StepContent>
             </Step>
-            <Step key="shippingAddress">
+            <Step key="shipping">
               <StepLabel>Shipping Address</StepLabel>
               <StepContent>
                 <Typography>Shipping Address</Typography>
@@ -64,7 +78,7 @@ export function CheckOut() {
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={handleNext}
+                      onClick={() => dispatch(setShipping({}))}
                       style={{ minWidth: '120px' }}
                     >
                       Continue
@@ -85,7 +99,7 @@ export function CheckOut() {
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={handleNext}
+                      onClick={() => dispatch(setPayment({}))}
                       style={{ minWidth: 80 }}
                     >
                       Continue
@@ -106,7 +120,7 @@ export function CheckOut() {
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={handleNext}
+                      onClick={() => dispatch(placeOrder())}
                       style={{ minWidth: 80 }}
                     >
                       Complete
