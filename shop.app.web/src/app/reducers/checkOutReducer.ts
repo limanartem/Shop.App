@@ -1,18 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
+import { PersistentState } from '../persistance/local-storage';
 
 type OrderPaymentInfo = {};
 type ShippingAddress = {};
 type FlowStep = 'confirmItems' | 'shipping' | 'payment' | 'review';
 export const CHECKOUT_FLOW_STEPS: FlowStep[] = ['confirmItems', 'shipping', 'payment', 'review'];
 
-interface CheckOutState {
+interface CheckOutState extends PersistentState {
   flowStep?: FlowStep;
   payment: OrderPaymentInfo;
   shipping: ShippingAddress;
 }
 
 const initialState: CheckOutState = {
+  persistent: true,
   flowStep: 'confirmItems',
   payment: {},
   shipping: {},

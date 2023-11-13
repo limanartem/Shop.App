@@ -13,6 +13,26 @@ import { store } from './app/store';
 import { AuthRoutes, AuthWrapper } from './components/auth/AuthWrapper';
 import { SessionAuth } from 'supertokens-auth-react/recipe/session';
 import { CheckOut } from './components/check-out';
+import { useAppDispatch, useAppSelector } from './app/hooks';
+import {
+  DataLoadingState,
+  fetchCategories,
+  selectCategoriesStatus,
+} from './app/reducers/categoriesReducer';
+import { useEffect } from 'react';
+
+function InitializeDataWrapper({ children }: { children?: React.ReactNode }) {
+  const categoriesStatus = useAppSelector(selectCategoriesStatus);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (categoriesStatus === DataLoadingState.idle) {
+      dispatch(fetchCategories() as any);
+    }
+  }, [categoriesStatus, dispatch]);
+
+  return <>{children}</>;
+}
 
 function App() {
   const defaultTheme = createTheme({
@@ -26,32 +46,34 @@ function App() {
 
   return (
     <Provider store={store}>
-      <AuthWrapper>
-        <ThemeProvider theme={defaultTheme}>
-          <CssBaseline />
-          <BrowserRouter>
-            <CategoryContextProvider>
-              <AppWrapper>
-                <Box padding={1}>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/catalog" element={<Catalog />} />
-                    <Route
-                      path="/checkout"
-                      element={
-                        <SessionAuth>
-                          <CheckOut />
-                        </SessionAuth>
-                      }
-                    />
-                    {AuthRoutes()}
-                  </Routes>
-                </Box>
-              </AppWrapper>
-            </CategoryContextProvider>
-          </BrowserRouter>
-        </ThemeProvider>
-      </AuthWrapper>
+      <InitializeDataWrapper>
+        <AuthWrapper>
+          <ThemeProvider theme={defaultTheme}>
+            <CssBaseline />
+            <BrowserRouter>
+              <CategoryContextProvider>
+                <AppWrapper>
+                  <Box padding={1}>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/catalog" element={<Catalog />} />
+                      <Route
+                        path="/checkout"
+                        element={
+                          <SessionAuth>
+                            <CheckOut />
+                          </SessionAuth>
+                        }
+                      />
+                      {AuthRoutes()}
+                    </Routes>
+                  </Box>
+                </AppWrapper>
+              </CategoryContextProvider>
+            </BrowserRouter>
+          </ThemeProvider>
+        </AuthWrapper>
+      </InitializeDataWrapper>
     </Provider>
   );
 }

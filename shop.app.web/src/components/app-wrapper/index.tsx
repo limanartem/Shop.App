@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import {
@@ -28,13 +28,12 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
 import CategoriesTreeView from './CategoriesTreeView';
-import { ProductCategory } from '../../model';
-import { getCategories } from '../../services/catalog-service';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import { useAppSelector } from '../../app/hooks';
 import { ShoppingCartPopup } from '../shopping-cart/ShoppingCartPopup';
 import { doesSessionExist, signOut } from 'supertokens-auth-react/recipe/session';
 import { useNavigate } from 'react-router-dom';
+import { selectCategories } from '../../app/reducers/categoriesReducer';
 
 const drawerWidth: number = 240;
 
@@ -129,13 +128,14 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
-  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const categories = useAppSelector(selectCategories);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [open, setOpen] = React.useState(true);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [showCartPopup, setShowCartPopup] = React.useState(false);
   const [anchorElShoppingCart, setAnchorElShoppingCart] = React.useState<null | HTMLElement>(null);
   const [categoryExpanded, setCategoryExpanded] = React.useState(true);
+  
   const items = useAppSelector((state) => state.shoppingCart.items);
   const navigate = useNavigate();
 
@@ -151,23 +151,12 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    getCategories().then((categories) => {
-      setCategories(categories);
-    });
-
     const getIsLoggedIn = async () => {
       setIsLoggedIn(await doesSessionExist());
     };
 
     getIsLoggedIn();
   }, []);
-
-  /*   useEffect(() => {
-    if (!items.length) {
-      setShowCartPopup(false);
-      setAnchorElShoppingCart(null);
-    }
-  }, [items]); */
 
   return (
     <Box sx={{ display: 'flex' }}>

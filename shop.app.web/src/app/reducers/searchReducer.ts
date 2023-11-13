@@ -1,13 +1,16 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
+const searchParams = new URLSearchParams(document.location.search)
+
 interface SearchState {
   category?: string | null;
 }
 
 const initialState: SearchState = {
-  category: null,
+  category: searchParams.get('category'),
 };
+
 
 export const searchSlice = createSlice({
   name: 'search',

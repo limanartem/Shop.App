@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ProductItem, ShoppingCartItem } from '../../model';
 import { RootState } from '../store';
+import { PersistentState } from '../persistance/local-storage';
 
-interface ShoppingCartState {
+interface ShoppingCartState extends PersistentState {
   items: ShoppingCartItem[];
 }
 
 const initialState: ShoppingCartState = {
+  persistent: true,
   items: [],
 };
 
