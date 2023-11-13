@@ -29,11 +29,12 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
 import CategoriesTreeView from './CategoriesTreeView';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
-import { useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { ShoppingCartPopup } from '../shopping-cart/ShoppingCartPopup';
-import { doesSessionExist, signOut } from 'supertokens-auth-react/recipe/session';
+import { signOut } from 'supertokens-auth-react/recipe/session';
 import { useNavigate } from 'react-router-dom';
 import { selectCategories } from '../../app/reducers/categoriesReducer';
+import { selectUser, setUser } from '../../app/reducers/authReducer';
 
 const drawerWidth: number = 240;
 
@@ -129,13 +130,15 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
   const categories = useAppSelector(selectCategories);
+  const user = useAppSelector(selectUser);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [open, setOpen] = React.useState(true);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [showCartPopup, setShowCartPopup] = React.useState(false);
   const [anchorElShoppingCart, setAnchorElShoppingCart] = React.useState<null | HTMLElement>(null);
   const [categoryExpanded, setCategoryExpanded] = React.useState(true);
-  
+  const dispatch = useAppDispatch();
+
   const items = useAppSelector((state) => state.shoppingCart.items);
   const navigate = useNavigate();
 
@@ -151,12 +154,8 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const getIsLoggedIn = async () => {
-      setIsLoggedIn(await doesSessionExist());
-    };
-
-    getIsLoggedIn();
-  }, []);
+    setIsLoggedIn(user != null);
+  }, [user]);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -245,6 +244,7 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
                     <MenuItem
                       onClick={async () => {
                         await signOut();
+                        dispatch(setUser(null));
                         document.location.reload();
                       }}
                     >

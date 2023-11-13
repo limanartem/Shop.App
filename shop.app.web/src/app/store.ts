@@ -3,6 +3,7 @@ import ShoppingCartReducer from './reducers/shoppingCartReducer';
 import SearchReducer from './reducers/searchReducer';
 import CheckoutReducer from './reducers/checkOutReducer';
 import CategoriesReducer from './reducers/categoriesReducer';
+import AuthReducer from './reducers/authReducer';
 import { checkOutCompleteMiddleware, shoppingCartUpdatesMiddleware } from './middlewares/listeners';
 import { loadFromLocalStorage, saveToLocalStorage } from './persistance/local-storage';
 
@@ -12,6 +13,7 @@ export const store = configureStore({
     search: SearchReducer,
     checkout: CheckoutReducer,
     categories: CategoriesReducer,
+    auth: AuthReducer
   },
   preloadedState: loadFromLocalStorage(),
   middleware: (getDefaultMiddleware) =>

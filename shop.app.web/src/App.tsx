@@ -19,7 +19,7 @@ import {
   fetchCategories,
   selectCategoriesStatus,
 } from './app/reducers/categoriesReducer';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function InitializeDataWrapper({ children }: { children?: React.ReactNode }) {
   const categoriesStatus = useAppSelector(selectCategoriesStatus);
@@ -35,6 +35,8 @@ function InitializeDataWrapper({ children }: { children?: React.ReactNode }) {
 }
 
 function App() {
+  const [authInitialized, setAuthInitialized] = useState(false);
+
   const defaultTheme = createTheme({
     palette: {
       primary: {
@@ -47,7 +49,11 @@ function App() {
   return (
     <Provider store={store}>
       <InitializeDataWrapper>
-        <AuthWrapper>
+        <AuthWrapper
+          onAuthInitialized={() => {
+            setAuthInitialized(true);
+          }}
+        >
           <ThemeProvider theme={defaultTheme}>
             <CssBaseline />
             <BrowserRouter>
@@ -65,7 +71,7 @@ function App() {
                           </SessionAuth>
                         }
                       />
-                      {AuthRoutes()}
+                      {authInitialized && AuthRoutes()}
                     </Routes>
                   </Box>
                 </AppWrapper>
