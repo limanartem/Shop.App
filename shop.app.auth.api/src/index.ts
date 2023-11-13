@@ -2,9 +2,10 @@ import express from 'express';
 import Session from 'supertokens-node/recipe/session';
 import ThirdPartyEmailPassword from 'supertokens-node/recipe/thirdpartyemailpassword';
 import cors from 'cors';
-import supertokens from 'supertokens-node';
-import { middleware } from 'supertokens-node/framework/express';
-import { errorHandler } from "supertokens-node/framework/express";
+import supertokens, { getUser } from 'supertokens-node';
+import { SessionRequest, middleware } from 'supertokens-node/framework/express';
+import { errorHandler } from 'supertokens-node/framework/express';
+import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 
 const {
   AUTH_CORE_URL = 'localhost:3567',
@@ -48,9 +49,13 @@ app.use(
 
 app.use(middleware());
 
-// Routes
+app.get('/user', verifySession(), async (req: SessionRequest, res) => {
+  const userId = req.session!.getUserId();
+  const user = await getUser(userId);
+  res.send(user);
+});
 
-app.use(errorHandler())
+app.use(errorHandler());
 
 app.use((err: any, req: any, res: any, next: any) => {
   console.error('Error occurred!');
