@@ -33,6 +33,6 @@ export const shoppingCartSlice = createSlice({
 });
 
 export const { addToCart, removeFromCart, clearCart } = shoppingCartSlice.actions;
-export const selectShoppingCart = (state: RootState) => state.shoppingCart.items;
+export const selectItems = (state: RootState) => state.shoppingCart.items;
 
 export default shoppingCartSlice.reducer;

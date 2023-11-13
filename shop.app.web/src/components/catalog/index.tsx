@@ -1,17 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getProducts, getCategories } from '../../services/catalog-service';
 import { ProductCategory, ProductItem } from '../../model';
 import { Backdrop, Box, CircularProgress, List, ListItem } from '@mui/material';
 import ProductCard from './ProductCard';
 import CategoryBreadcrumbs from './CategoryBreadcrumbs';
-import { GlobalSelectedCategoryContext } from '../context-providers/CategoryContextProvider';
+import { useAppSelector } from '../../app/hooks';
+import { selectCategory } from '../../app/reducers/searchReducer';
 
 function Catalog() {
   const [productsLoading, setProductsLoading] = useState(false);
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
-  const { globalSelectedCategory } = useContext(GlobalSelectedCategoryContext);
+  const globalSelectedCategory = useAppSelector(selectCategory);
 
   useEffect(() => {
     console.log('Catalog:globalSelectedCategory', globalSelectedCategory);

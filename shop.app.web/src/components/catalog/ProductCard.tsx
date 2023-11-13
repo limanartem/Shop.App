@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { ProductItem } from '../../model';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { addToCart, removeFromCart } from '../../app/reducers/shoppingCartReducer';
+import { addToCart, removeFromCart, selectItems } from '../../app/reducers/shoppingCartReducer';
 import AddShoppingCart from '@mui/icons-material/AddShoppingCart';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import { ProductFallbackImage, getProductImage } from '../../utils/product-utils';
@@ -22,7 +22,7 @@ import { ProductFallbackImage, getProductImage } from '../../utils/product-utils
 const ProductCard = ({ product }: { product: ProductItem }) => {
   const { id, title, description, price, currency } = product;
   const [quantity, setQuantity] = useState(1);
-  const items = useAppSelector((state) => state.shoppingCart.items);
+  const items = useAppSelector(selectItems);
   const dispatch = useAppDispatch();
 
   const handleAddToCart = () => {

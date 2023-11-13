@@ -4,8 +4,9 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { TreeView } from '@mui/x-tree-view/TreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { ProductCategory } from '../../model';
-import { SyntheticEvent, useContext, useEffect, useState } from 'react';
-import { GlobalSelectedCategoryContext } from '../context-providers/CategoryContextProvider';
+import { SyntheticEvent, useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { selectCategory, setCategory } from '../../app/reducers/searchReducer';
 
 interface RenderTree {
   id: number;
@@ -47,9 +48,8 @@ const getCategoryPath = (categories: ProductCategory[], categoryId: number) => {
 };
 
 export default function CategoriesTreeView({ categories }: { categories: ProductCategory[] }) {
-  const { globalSelectedCategory, setGlobalSelectedCategory } = useContext(
-    GlobalSelectedCategoryContext,
-  );
+  const globalSelectedCategory = useAppSelector(selectCategory);
+  const dispatch = useAppDispatch();
 
   const [selected, setSelected] = useState<string | null>(globalSelectedCategory || '-1');
   const [expanded, setExpanded] = useState<string[]>(['-1']);
@@ -84,7 +84,7 @@ export default function CategoriesTreeView({ categories }: { categories: Product
         onNodeToggle={handleToggle}
         onNodeSelect={(_, nodeIds) => {
           setSelected(nodeIds);
-          setGlobalSelectedCategory(nodeIds);
+          dispatch(setCategory(nodeIds));
         }}
       >
         {renderTree([data(categories)])}
