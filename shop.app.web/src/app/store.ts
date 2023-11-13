@@ -4,7 +4,7 @@ import SearchReducer from './reducers/searchReducer';
 import CheckoutReducer from './reducers/checkOutReducer';
 import CategoriesReducer from './reducers/categoriesReducer';
 import AuthReducer from './reducers/authReducer';
-import { checkOutCompleteMiddleware, shoppingCartUpdatesMiddleware } from './middlewares/listeners';
+import middlewares from './middlewares/listeners';
 import { loadFromLocalStorage, saveToLocalStorage } from './persistance/local-storage';
 
 export const store = configureStore({
@@ -13,13 +13,10 @@ export const store = configureStore({
     search: SearchReducer,
     checkout: CheckoutReducer,
     categories: CategoriesReducer,
-    auth: AuthReducer
+    auth: AuthReducer,
   },
   preloadedState: loadFromLocalStorage(),
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware()
-      .prepend(checkOutCompleteMiddleware())
-      .prepend(shoppingCartUpdatesMiddleware()),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().prepend(middlewares),
 });
 
 store.subscribe(() => saveToLocalStorage(store));

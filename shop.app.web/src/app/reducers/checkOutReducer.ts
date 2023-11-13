@@ -40,8 +40,10 @@ export const checkOutSlice = createSlice({
       state.shipping = action.payload;
       state.flowStep = 'review';
     },
-    reset: (state) => {
+    resetCheckout: (state) => {
       state.flowStep = 'confirmItems';
+      state.payment = {};
+      state.shipping = {};
     },
     placeOrder: (state) => {
       state.flowStep = 'confirmItems';
@@ -53,6 +55,6 @@ export const checkOutSlice = createSlice({
 
 export const selectPayment = (state: RootState) => state.checkout.payment;
 export const selectShipping = (state: RootState) => state.checkout.shipping;
-export const { previousStep, confirmItems, setPayment, setShipping, placeOrder, reset } =
+export const { previousStep, confirmItems, setPayment, setShipping, placeOrder, resetCheckout } =
   checkOutSlice.actions;
 export default checkOutSlice.reducer;

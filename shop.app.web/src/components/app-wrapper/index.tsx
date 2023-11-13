@@ -35,6 +35,7 @@ import { signOut } from 'supertokens-auth-react/recipe/session';
 import { useNavigate } from 'react-router-dom';
 import { selectCategories } from '../../app/reducers/categoriesReducer';
 import { selectUser, setUser } from '../../app/reducers/authReducer';
+import { resetCheckout } from '../../app/reducers/checkOutReducer';
 
 const drawerWidth: number = 240;
 
@@ -243,8 +244,10 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
                   >
                     <MenuItem
                       onClick={async () => {
+                        // TODO: handle in a better place
                         await signOut();
                         dispatch(setUser(null));
+                        dispatch(resetCheckout());
                         document.location.reload();
                       }}
                     >

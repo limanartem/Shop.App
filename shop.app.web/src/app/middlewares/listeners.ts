@@ -1,8 +1,8 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit';
-import { placeOrder, reset } from '../reducers/checkOutReducer';
+import { placeOrder, resetCheckout } from '../reducers/checkOutReducer';
 import { clearCart, addToCart, removeFromCart } from '../reducers/shoppingCartReducer';
 
-export const checkOutCompleteMiddleware = () => {
+const checkOutCompleteMiddleware = () => {
   const listener = createListenerMiddleware();
   listener.startListening({
     actionCreator: placeOrder,
@@ -13,14 +13,17 @@ export const checkOutCompleteMiddleware = () => {
   return listener.middleware;
 };
 
-export const shoppingCartUpdatesMiddleware = () =>
+const shoppingCartUpdatesMiddleware = () =>
   [addToCart, removeFromCart].map((cartAction) => {
     const middleware = createListenerMiddleware();
     middleware.startListening({
       actionCreator: cartAction,
       effect: async (action, listenerApi) => {
-        listenerApi.dispatch(reset());
+        listenerApi.dispatch(resetCheckout());
       },
     });
     return middleware.middleware;
   });
+
+const middlewares = [...shoppingCartUpdatesMiddleware(), checkOutCompleteMiddleware()];
+export default middlewares;

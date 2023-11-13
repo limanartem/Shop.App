@@ -13,13 +13,16 @@ import { OnHandleEventContext } from 'supertokens-auth-react/lib/build/recipe/em
 import { useAppDispatch } from '../../app/hooks';
 import { setUser } from '../../app/reducers/authReducer';
 import { useEffect, useState } from 'react';
+import { getUserAsync } from '../../services/auth';
+
+const { REACT_APP_AUTH_API_URL = 'http://localhost:3003' } = process.env;
 
 const initAuth = (onHandleEvent: (context: OnHandleEventContext) => void) =>
   SuperTokens.init({
     appInfo: {
       // TODO: use env vars
       appName: 'Shop.App',
-      apiDomain: 'localhost:3003',
+      apiDomain: REACT_APP_AUTH_API_URL,
       websiteDomain: 'localhost:3002',
       apiBasePath: '/auth',
       websiteBasePath: '/auth',
@@ -51,6 +54,16 @@ export function AuthWrapper({ children, onAuthInitialized }: AuthWrapperProps) {
       }
     });
 
+    const checkAuthentication = async () => {
+      const isLogged = await Session.doesSessionExist();
+
+      if (isLogged) {
+        const user = await getUserAsync();
+        dispatch(setUser(user));
+      }
+    };
+
+    checkAuthentication();
     onAuthInitialized();
     setAuthInitialized(true);
   }, []);
