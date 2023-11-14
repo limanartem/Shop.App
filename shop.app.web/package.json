@@ -2,6 +2,7 @@
   "name": "shop.app.web",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/",
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
@@ -22,6 +23,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "dev": "chmod +x ./scripts/update-env.sh && ./scripts/update-env.sh && cp env-config.js ./public/ && react-scripts start",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "jest",

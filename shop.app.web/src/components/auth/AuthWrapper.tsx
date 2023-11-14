@@ -23,7 +23,7 @@ const initAuth = (onHandleEvent: (context: OnHandleEventContext) => void) =>
       // TODO: use env vars
       appName: 'Shop.App',
       apiDomain: REACT_APP_AUTH_API_URL,
-      websiteDomain: 'localhost:3002',
+      websiteDomain: window.location.host,
       apiBasePath: '/auth',
       websiteBasePath: '/auth',
     },

@@ -44,14 +44,14 @@ export const insertDocument = async <T extends object>(
   collection: DbCollection,
 ): Promise<{ id: string }> => {
   console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
-  const id = uuidv4();
   const client = getClient();
   await client.connect();
-  console.log(`Inserting new item in ${collection}...`);
-  await client
+  console.log(`Inserting new item in ${collection} collection...`, data);
+  const result = await client
     .db('shop.app.orders.db')
     .collection(collection)
-    .insertOne({ id, ...data });
+    .insertOne({ ...data });
   await client.close();
-  return { id };
+
+  return { id: result.insertedId.toString() };
 };

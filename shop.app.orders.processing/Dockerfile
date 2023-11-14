@@ -1,11 +1,11 @@
-
-FROM node:18
+FROM node:21.1.0-slim
+ENV NODE_ENV=production
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --omit=dev
 
 COPY . .
 

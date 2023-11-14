@@ -11,6 +11,6 @@ db.createUser({
 });
 
 db.createCollection('customers');
-db.createCollection('orders');
+db.createCollection('orders').createIndex({ userId: 1 });
 db.createCollection('payments');
 db.createCollection('shipments');

@@ -3,9 +3,9 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 
 # Below is required in order to properly restore nuget packages
 
-#COPY *.cer .
-#ADD *.cer /usr/local/share/ca-certificates/.
-#ADD *.cer /etc/ssl/certs/.
+COPY *.cer .
+ADD *.cer /usr/local/share/ca-certificates/.
+ADD *.cer /etc/ssl/certs/.
 
 RUN apt-get install -y wget
 RUN apt-get install curl -y

@@ -1,6 +1,8 @@
 version: '2.23'
 # TODO: Use init-env.sh to create a .env file with random credentials
 services:
+
+  # Shop's product database
   shop.app.catalog.db:
     image: mysql:latest
     environment:
@@ -14,13 +16,13 @@ services:
       - "./shop.app.catalog.db/shop.db.init.schema.sql:/docker-entrypoint-initdb.d/1.sql"
       - "./shop.app.catalog.db/shop.db.init.data.sql:/docker-entrypoint-initdb.d/2.sql"  
 
+  # Users database
   shop.app.auth.db:
     image: 'postgres:latest'
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: qwerty123
       POSTGRES_DB: supertokens_db
-    # No need to expose ports
     ports:
        - 5431:5432
     restart: unless-stopped
@@ -34,6 +36,7 @@ services:
     networks:
       - app-private-network
 
+  # User authentication core
   shop.app.auth.core:
     image: registry.supertokens.io/supertokens/supertokens-postgresql
     depends_on:
@@ -62,6 +65,7 @@ services:
       timeout: 5s
       retries: 5
 
+  # User authentication api
   shop.app.auth.api:
     build:
       context: ./shop.app.auth.api
@@ -72,15 +76,15 @@ services:
       - app-private-network
       - app-public-network
     depends_on:
-      shop.app.auth.core
+      shop.app.auth.core:
         condition: service_healthy
     environment:
       AUTH_CORE_URL: shop.app.auth.core:3567
       WEB_API_PORT: 3003
       WEB_API_URL: shop.app.auth.api
-      WEB_UI_URL: shop.app.web:3000
+      PUBLIC_WEB_UI_URL: localhost:3000 # need external domain for cors
 
-
+  # Shop orders database
   shop.app.orders.db:
     image: mongo:latest
     environment:
@@ -91,9 +95,10 @@ services:
     networks:
       - app-private-network
     volumes:
-      - mongodb-data3:/data/db
+      - mongodb-data4:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
+  # Shop cache service
   shop.app.cache:
     image: redis:latest
     restart: always
@@ -105,6 +110,7 @@ services:
     volumes: 
       - cache:/data
 
+  # Shop message broker
   shop.app.messagebroker:
     build: ./shop.app.messageBroker
     environment:
@@ -121,6 +127,7 @@ services:
       timeout: 30s
       retries: 3
 
+  # Shop orders API
   shop.app.orders.api:
     build:
       context: ./shop.app.orders.api
@@ -140,6 +147,7 @@ services:
       shop.app.messagebroker:
         condition: service_healthy
     environment:
+      WEB_SERVER_PORT: 3001
       DB_HOST: mysql
       DB_USER: user1
       DB_PASSWORD: qwerty123
@@ -147,11 +155,12 @@ services:
       REDIS_HOST: cache
       REDIS_PORT: 6379
       REDIS_PASSWORD: qwerty123
-      MONGODB_URL: mongodb://shop.app.orders.db:27017/items
-      MONGO_DB_USERNAME: items_user
+      MONGODB_URL: mongodb://shop.app.orders.db:27017/shop.app.orders.db
+      MONGO_DB_USERNAME: ordersWriteUser
       MONGO_DB_PASSWORD: qwerty123
       MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
 
+  # Shop products API
   shop.app.catalog.api:
     build:
       context: ./shop.app.catalog.api
@@ -176,7 +185,10 @@ services:
       REDIS_PASSWORD: qwerty123
 
 
-  shop.app.orders.processing:
+  # Orders workflow processing workers
+
+  # New orders processing - checking inventory availability
+  shop.app.orders.pending.processing:
     build:
       context: ./shop.app.orders.processing
     restart: on-failure
@@ -187,12 +199,46 @@ services:
         condition: service_healthy
     environment:
       MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
+      WORKER_TYPE: pending
+      MONGODB_URL: mongodb://shop.app.orders.db:27017/shop.app.orders.db
+      MONGO_DB_USERNAME: ordersWriteUser
+      MONGO_DB_PASSWORD: qwerty123
 
+  # Payment processing
+  shop.app.orders.payment.processing:
+    build:
+      context: ./shop.app.orders.processing
+    restart: on-failure
+    networks:
+      - app-private-network
+    depends_on:
+      shop.app.messagebroker:
+        condition: service_healthy
+    environment:
+      MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
+      WORKER_TYPE: payment
+
+  # Order shipping
+  shop.app.orders.dispatch.processing:
+    build:
+      context: ./shop.app.orders.processing
+    restart: on-failure
+    networks:
+      - app-private-network
+    depends_on:
+      shop.app.messagebroker:
+        condition: service_healthy
+    environment:
+      MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
+      WORKER_TYPE: dispatch
+
+
+  # Main shop frontend
   shop.app.web:
     build:
       context: ./shop.app.web
     ports:
-      - "3000:3000"
+      - "3000:80"
     networks:
       - app-public-network
     environment:
@@ -205,7 +251,7 @@ services:
 volumes:
  cache:
     driver: local
- mongodb-data3:
+ mongodb-data4:
     driver: local
  shop.app.auth.db_volume:
     driver: local

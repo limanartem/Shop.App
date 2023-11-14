@@ -13,6 +13,10 @@ obj
 bin
 publish 
 
+# dev
+/public/env-config.js
+env-config.js
+
 # misc
 
 npm-debug.log*
