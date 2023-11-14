@@ -6,8 +6,8 @@ services:
   shop.app.catalog.db:
     image: mysql:latest
     environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: admin
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: $MYSQL_DATABASE
     ports:
       - "3306:3306"
     networks:
@@ -20,9 +20,9 @@ services:
   shop.app.auth.db:
     image: 'postgres:latest'
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: qwerty123
-      POSTGRES_DB: supertokens_db
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
     ports:
        - 5431:5432
     restart: unless-stopped
@@ -49,11 +49,11 @@ services:
     # environment:
     #   POSTGRESQL_CONNECTION_URI: "postgresql://supertokens_user:password@supertoken_db:5432/supertokens_db"
     environment:
-      POSTGRESQL_HOST: shop.app.auth.db
-      POSTGRESQL_USER: admin
-      POSTGRESQL_PASSWORD: qwerty123
-      POSTGRESQL_DATABASE_NAME: supertokens_db
-      POSTGRESQL_PORT: 5432
+      POSTGRESQL_HOST: $POSTGRESQL_HOST
+      POSTGRESQL_USER: $POSTGRESQL_USER
+      POSTGRESQL_PASSWORD: $POSTGRESQL_PASSWORD
+      POSTGRESQL_DATABASE_NAME: $POSTGRES_DB
+      POSTGRESQL_PORT: $POSTGRESQL_PORT
     networks:
       - app-private-network
       - app-public-network
@@ -79,20 +79,20 @@ services:
       shop.app.auth.core:
         condition: service_healthy
     environment:
-      AUTH_CORE_URL: shop.app.auth.core:3567
+      AUTH_CORE_URL: $AUTH_CORE_URL
       WEB_API_PORT: 3003
       WEB_API_URL: shop.app.auth.api
-      PUBLIC_WEB_UI_URL: localhost:3000 # need external domain for cors
+      PUBLIC_WEB_UI_URL: $PUBLIC_WEB_UI_URL # need external domain for cors
 
   # Shop orders database
   shop.app.orders.db:
     image: mongo:latest
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootPassword
-      MONGO_DB_USERNAME: ordersWriteUser
-      MONGO_DB_PASSWORD: qwerty123
-      MONGO_INITDB_DATABASE: shop-app-orders-db
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_INITDB_ROOT_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_INITDB_ROOT_PASSWORD
+      MONGO_DB_USERNAME: $MONGO_DB_USERNAME
+      MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
+      MONGO_INITDB_DATABASE: $MONGO_INITDB_DATABASE
     ports:
       - '27017:27017'
     networks:
@@ -117,8 +117,8 @@ services:
   shop.app.messagebroker:
     build: ./shop.app.messageBroker
     environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=pass
+      - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
     ports:
         - 5672
         - 15672
@@ -151,18 +151,11 @@ services:
         condition: service_healthy
     environment:
       WEB_SERVER_PORT: 3001
-      DB_HOST: mysql
-      DB_USER: user1
-      DB_PASSWORD: qwerty123
-      DB_DATABASE: data
-      REDIS_HOST: cache
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: qwerty123
-      MONGODB_URL: mongodb://shop.app.orders.db:27017/shop-app-orders-db
-      MONGO_DB_USERNAME: ordersWriteUser
-      MONGO_DB_PASSWORD: qwerty123
-      MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
-      AUTH_CORE_URL: shop.app.auth.core:3567
+      MONGODB_URL: $MONGODB_URL
+      MONGO_DB_USERNAME: $MONGO_DB_USERNAME
+      MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
+      MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
+      AUTH_CORE_URL: $AUTH_CORE_URL
 
   # Shop products API
   shop.app.catalog.api:
@@ -180,10 +173,10 @@ services:
       shop.app.cache:
         condition: service_started
     environment:
-      DB_HOST: shop.app.catalog.db
-      DB_USER: catalogReader
-      DB_PASSWORD: qwerty123
-      DB_DATABASE: Catalog
+      DB_HOST: $DB_HOST
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_DATABASE: $DB_DATABASE
       REDIS_HOST: cache
       REDIS_PORT: 6379
       REDIS_PASSWORD: qwerty123
@@ -201,11 +194,11 @@ services:
       shop.app.messagebroker:
         condition: service_healthy
     environment:
-      MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
+      MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       WORKER_TYPE: pending
-      MONGODB_URL: mongodb://shop.app.orders.db:27017/shop.app.orders.db
-      MONGO_DB_USERNAME: ordersWriteUser
-      MONGO_DB_PASSWORD: qwerty123
+      MONGODB_URL: $MONGODB_URL
+      MONGO_DB_USERNAME: $MONGO_DB_USERNAME
+      MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
 
   # Payment processing
   shop.app.orders.payment.processing:
@@ -218,8 +211,11 @@ services:
       shop.app.messagebroker:
         condition: service_healthy
     environment:
-      MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
+      MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       WORKER_TYPE: payment
+      MONGODB_URL: $MONGODB_URL
+      MONGO_DB_USERNAME: $MONGO_DB_USERNAME
+      MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
 
   # Order shipping
   shop.app.orders.dispatch.processing:
@@ -232,8 +228,11 @@ services:
       shop.app.messagebroker:
         condition: service_healthy
     environment:
-      MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
+      MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       WORKER_TYPE: dispatch
+      MONGODB_URL: $MONGODB_URL
+      MONGO_DB_USERNAME: $MONGO_DB_USERNAME
+      MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
 
   # Main shop frontend
   shop.app.web:
@@ -244,8 +243,8 @@ services:
     networks:
       - app-public-network
     environment:
-      REACT_APP_ORDERS_API_URL: http://localhost:3001
-      REACT_APP_CATALOG_API_URL: http://localhost:5002
+      REACT_APP_ORDERS_API_URL: $REACT_APP_ORDERS_API_URL
+      REACT_APP_CATALOG_API_URL: $REACT_APP_CATALOG_API_URL
     depends_on:
       - shop.app.orders.api
       - shop.app.catalog.api
