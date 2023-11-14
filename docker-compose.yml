@@ -90,12 +90,15 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootPassword
+      MONGO_DB_USERNAME: ordersWriteUser
+      MONGO_DB_PASSWORD: qwerty123
+      MONGO_INITDB_DATABASE: shop-app-orders-db
     ports:
       - '27017:27017'
     networks:
       - app-private-network
     volumes:
-      - mongodb-data4:/data/db
+      - mongodb-data7:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   # Shop cache service
@@ -155,10 +158,11 @@ services:
       REDIS_HOST: cache
       REDIS_PORT: 6379
       REDIS_PASSWORD: qwerty123
-      MONGODB_URL: mongodb://shop.app.orders.db:27017/shop.app.orders.db
+      MONGODB_URL: mongodb://shop.app.orders.db:27017/shop-app-orders-db
       MONGO_DB_USERNAME: ordersWriteUser
       MONGO_DB_PASSWORD: qwerty123
       MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
+      AUTH_CORE_URL: shop.app.auth.core:3567
 
   # Shop products API
   shop.app.catalog.api:
@@ -183,7 +187,6 @@ services:
       REDIS_HOST: cache
       REDIS_PORT: 6379
       REDIS_PASSWORD: qwerty123
-
 
   # Orders workflow processing workers
 
@@ -232,7 +235,6 @@ services:
       MESSAGE_BROKER_URL: amqp://admin:pass@shop.app.messagebroker:5672
       WORKER_TYPE: dispatch
 
-
   # Main shop frontend
   shop.app.web:
     build:
@@ -251,7 +253,7 @@ services:
 volumes:
  cache:
     driver: local
- mongodb-data4:
+ mongodb-data7:
     driver: local
  shop.app.auth.db_volume:
     driver: local

@@ -12,7 +12,7 @@ export const initAuth = () => {
   supertokens.init({
     framework: 'express',
     supertokens: {
-      connectionURI: AUTH_CORE_URL!,
+      connectionURI: `http://${AUTH_CORE_URL!}`,
       // apiKey: <API_KEY(if configured)>,
     },
     appInfo: {

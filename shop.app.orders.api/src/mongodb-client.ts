@@ -33,7 +33,7 @@ export const updateDocument = async <T extends object>(id: string, data: T): Pro
   await client.connect();
   console.log('Updating item in db...');
   await client
-    .db('shop.app.orders.db')
+    .db()
     .collection('orders')
     .insertOne({ id, ...data });
   await client.close();
@@ -48,7 +48,7 @@ export const insertDocument = async <T extends object>(
   await client.connect();
   console.log(`Inserting new item in ${collection} collection...`, data);
   const result = await client
-    .db('shop.app.orders.db')
+    .db()
     .collection(collection)
     .insertOne({ ...data });
   await client.close();

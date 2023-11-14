@@ -36,7 +36,7 @@ const workerFile = `order-worker-${WORKER_TYPE}.js`;
   const routingKey = WORKER_TYPE;
 
   console.log(
-    `Ensuring ${exchange} exchange and ${queue} queue binding through ${routingKey} routing key configured...`,
+    `Ensuring "${exchange}" exchange and "${queue}" queue binding through "${routingKey}" routing key configured...`,
   );
   await channel.assertExchange(exchange, 'direct', { durable: true });
   await channel.assertQueue(queue, { durable: true });
@@ -62,5 +62,4 @@ const workerFile = `order-worker-${WORKER_TYPE}.js`;
       consumerTag: 'orders_consumer',
     },
   );
-  console.log(`Stopping processing messages from ${queue} queue...`);
 })();

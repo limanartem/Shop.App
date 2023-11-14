@@ -1,9 +1,5 @@
 import express from 'express';
-import { createOrder } from '../data-utils';
-import { SessionRequest, middleware, errorHandler } from 'supertokens-node/framework/express';
-import { verifySession } from 'supertokens-node/recipe/session/framework/express';
-import { OrderRequestPayload } from '../model';
-import { StatusCodes } from 'http-status-codes';
+import { middleware, errorHandler } from 'supertokens-node/framework/express';
 import { initAuth } from '../auth';
 import { routerFactory } from './routes';
 
@@ -16,7 +12,7 @@ export const start = () => {
 
   app.use('/', routerFactory());
 
-  //  app.use(errorHandler());
+  app.use(errorHandler());
 
   app.use((err: any, req: any, res: any, next: any) => {
     console.error('Error occurred!');

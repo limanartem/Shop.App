@@ -1,16 +1,23 @@
-db = db.getSiblingDB('shop.app.orders.db');
+console.log('Initializing database', process.env);
+
+db = db.getSiblingDB('admin');
+db.auth(
+    process.env.MONGO_INITDB_ROOT_USERNAME,
+    process.env.MONGO_INITDB_ROOT_PASSWORD,
+);
+
+db = db.getSiblingDB(process.env.MONGO_INITDB_DATABASE);
 db.createUser({
-  user: 'ordersWriteUser',
-  pwd: 'qwerty123',
-  roles: [
-    {
-      role: 'readWrite',
-      db: 'orders',
-    },
-  ],
+    user: process.env.MONGO_DB_USERNAME,
+    pwd: process.env.MONGO_DB_PASSWORD,
+    roles: [{
+        role: 'readWrite',
+        db: process.env.MONGO_INITDB_DATABASE,
+    }]
 });
 
 db.createCollection('customers');
-db.createCollection('orders').createIndex({ userId: 1 });
+db.createCollection('orders');
+db.orders.createIndex({ userId: 1 });
 db.createCollection('payments');
 db.createCollection('shipments');
