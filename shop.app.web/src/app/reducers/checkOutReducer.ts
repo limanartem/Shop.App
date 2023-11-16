@@ -1,15 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { PersistentState } from '../persistance/local-storage';
-import { CheckoutShippingInfo } from '../../model';
+import { CheckoutPaymentInfo, CheckoutShippingInfo } from '../../model';
 
-type OrderPaymentInfo = {};
 type FlowStep = 'confirmItems' | 'shipping' | 'payment' | 'review';
 export const CHECKOUT_FLOW_STEPS: FlowStep[] = ['confirmItems', 'shipping', 'payment', 'review'];
 
 interface CheckOutState extends PersistentState {
   flowStep?: FlowStep;
-  payment: OrderPaymentInfo;
+  payment: CheckoutPaymentInfo;
   shipment: CheckoutShippingInfo;
 }
 
@@ -32,7 +31,7 @@ export const checkOutSlice = createSlice({
     confirmCheckoutItems: (state) => {
       state.flowStep = 'shipping';
     },
-    setCheckoutPayment: (state, action: PayloadAction<OrderPaymentInfo>) => {
+    setCheckoutPayment: (state, action: PayloadAction<CheckoutPaymentInfo>) => {
       state.payment = action.payload;
       state.flowStep = 'review';
     },
@@ -55,6 +54,12 @@ export const checkOutSlice = createSlice({
 
 export const selectPayment = (state: RootState) => state.checkout.payment;
 export const selectShipping = (state: RootState) => state.checkout.shipment;
-export const { previousStep, confirmCheckoutItems, setCheckoutPayment, setCheckoutShipping, placeOrder, resetCheckout } =
-  checkOutSlice.actions;
+export const {
+  previousStep,
+  confirmCheckoutItems,
+  setCheckoutPayment,
+  setCheckoutShipping,
+  placeOrder,
+  resetCheckout,
+} = checkOutSlice.actions;
 export default checkOutSlice.reducer;

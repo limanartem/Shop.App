@@ -13,9 +13,15 @@ export const routerFactory = () => {
   router.post('/orders', verifySession(), async (req: SessionRequest, res) => {
     try {
       const userId = req.session.getUserId();
+
+      if (req.body == null) {
+        throw new Error('Invalid order payload');
+      }
+
       const payload = Joi.attempt(req.body, OrderRequestPayloadSchema, {
         stripUnknown: true,
       }) as CreateOrderRequest;
+
 
       const order: Order = {
         ...payload,

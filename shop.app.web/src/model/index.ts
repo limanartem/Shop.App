@@ -21,10 +21,12 @@ export type ShoppingCartItem = {
   status?: string;
 };
 
-type OrderItem = ShoppingCartItem & {
+type CheckoutItem = {
   productId: string;
   quantity: number;
-};
+}
+
+type OrderItem = ShoppingCartItem & CheckoutItem;
 
 export type CheckoutShippingInfo  = {
   address?: string;
@@ -34,6 +36,22 @@ export type CheckoutShippingInfo  = {
   zip?: string;
   name?: string;
 }
+
+export type CreditCardDetails = {
+  number?: string;
+  name?: string;
+  cvc?: string;
+  expire?: string;
+};
+
+export type BankDetails = {
+  iban?: string;
+};
+
+export type CheckoutPaymentInfo = {
+  creditCard?: CreditCardDetails;
+  bank?: BankDetails;
+};
 
 type OrderShippingInfo = {
   address: string;
@@ -55,6 +73,12 @@ type OrderPaymentInfo = {
     iban: string;
   };
 };
+
+export type CreateOrder = {
+  items: CheckoutItem[];
+  payment: CheckoutPaymentInfo;
+  shipping: CheckoutShippingInfo;
+}
 
 export type Order = {
   id: string;

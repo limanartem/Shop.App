@@ -1,13 +1,4 @@
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Grid,
-  List,
-  ListItem,
-  Popover,
-  Typography,
-} from '@mui/material';
+import { Box, Button, ButtonGroup, Grid, List, ListItem, Popover, Typography } from '@mui/material';
 import React, { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
@@ -66,8 +57,8 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
                 <strong>Total:</strong>
                 {items
                   ?.reduce((acc, item) => acc + item.product.price * item.quantity, 0)
-                  .toFixed(2)}{' '}
-                {items?.[0]?.product.currency}{' '}
+                  .toFixed(2)}
+                {items?.[0]?.product.currency}
               </Typography>
             </Grid>
             <Grid item textAlign="right" marginTop={1}>
@@ -81,11 +72,11 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
                 >
                   <ShoppingCartCheckoutIcon fontSize="small" />
                   Checkout
-                </Button>{' '}
+                </Button>
                 <Button onClick={() => dispatch(clearCart())} variant="outlined">
                   <RemoveShoppingCartIcon fontSize="small" />
                   Clear All
-                </Button>{' '}
+                </Button>
               </ButtonGroup>
             </Grid>
           </Grid>
