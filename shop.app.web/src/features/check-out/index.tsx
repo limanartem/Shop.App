@@ -1,5 +1,12 @@
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { Box, Button, ButtonGroup, List, ListItem, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  List,
+  ListItem,
+  Typography,
+} from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -8,12 +15,12 @@ import StepContent from '@mui/material/StepContent';
 import { CartProductCard } from '../../components/shopping-cart/CartProductCard';
 import {
   previousStep,
-  confirmItems,
-  setPayment,
-  setShipping,
+  confirmCheckoutItems,
+  setCheckoutPayment,
   placeOrder,
   CHECKOUT_FLOW_STEPS,
 } from '../../app/reducers/checkOutReducer';
+import { StepShippingDetails } from './StepShippingDetails';
 
 export function CheckOut() {
   const [activeStep, setActiveStep] = useState(0);
@@ -24,12 +31,14 @@ export function CheckOut() {
   };
 
   const items = useAppSelector((state) => state.shoppingCart.items);
-  const flowStep = useAppSelector((state) => state.checkout.flowStep);
+  const { flowStep } = useAppSelector((state) => state.checkout);
   const hasItems = useCallback(() => items.length > 0, [items]);
+
 
   useEffect(() => {
     setActiveStep(flowStep != null ? CHECKOUT_FLOW_STEPS.indexOf(flowStep) : 0);
   }, [flowStep]);
+
 
   return (
     <>
@@ -56,7 +65,7 @@ export function CheckOut() {
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={() => dispatch(confirmItems())}
+                      onClick={() => dispatch(confirmCheckoutItems())}
                       style={{ minWidth: 80 }}
                     >
                       Continue
@@ -68,22 +77,7 @@ export function CheckOut() {
             <Step key="shipping">
               <StepLabel>Shipping Address</StepLabel>
               <StepContent>
-                <Typography>Shipping Address</Typography>
-                <Box textAlign="right" padding={2}>
-                  <ButtonGroup size="large">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => dispatch(setShipping({}))}
-                      style={{ minWidth: '120px' }}
-                    >
-                      Continue
-                    </Button>
-                    <Button disabled={false} onClick={handleBack} style={{ minWidth: '120px' }}>
-                      Back
-                    </Button>
-                  </ButtonGroup>
-                </Box>
+                <StepShippingDetails />
               </StepContent>
             </Step>
             <Step key="payment">
@@ -95,7 +89,7 @@ export function CheckOut() {
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={() => dispatch(setPayment({}))}
+                      onClick={() => dispatch(setCheckoutPayment({}))}
                       style={{ minWidth: 80 }}
                     >
                       Continue

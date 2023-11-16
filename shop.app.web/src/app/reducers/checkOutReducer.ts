@@ -1,23 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { PersistentState } from '../persistance/local-storage';
+import { CheckoutShippingInfo } from '../../model';
 
 type OrderPaymentInfo = {};
-type ShippingAddress = {};
 type FlowStep = 'confirmItems' | 'shipping' | 'payment' | 'review';
 export const CHECKOUT_FLOW_STEPS: FlowStep[] = ['confirmItems', 'shipping', 'payment', 'review'];
 
 interface CheckOutState extends PersistentState {
   flowStep?: FlowStep;
   payment: OrderPaymentInfo;
-  shipping: ShippingAddress;
+  shipment: CheckoutShippingInfo;
 }
 
 const initialState: CheckOutState = {
   persistent: true,
   flowStep: 'confirmItems',
   payment: {},
-  shipping: {},
+  shipment: {},
 };
 
 export const checkOutSlice = createSlice({
@@ -29,32 +29,32 @@ export const checkOutSlice = createSlice({
       if (currentIndex === 0) return;
       state.flowStep = CHECKOUT_FLOW_STEPS[currentIndex - 1];
     },
-    confirmItems: (state) => {
+    confirmCheckoutItems: (state) => {
       state.flowStep = 'shipping';
     },
-    setPayment: (state, action: PayloadAction<OrderPaymentInfo>) => {
+    setCheckoutPayment: (state, action: PayloadAction<OrderPaymentInfo>) => {
       state.payment = action.payload;
-      state.flowStep = 'payment';
-    },
-    setShipping: (state, action: PayloadAction<ShippingAddress>) => {
-      state.shipping = action.payload;
       state.flowStep = 'review';
+    },
+    setCheckoutShipping: (state, action: PayloadAction<CheckoutShippingInfo>) => {
+      state.shipment = action.payload;
+      state.flowStep = 'payment';
     },
     resetCheckout: (state) => {
       state.flowStep = 'confirmItems';
       state.payment = {};
-      state.shipping = {};
+      state.shipment = {};
     },
     placeOrder: (state) => {
       state.flowStep = 'confirmItems';
       state.payment = {};
-      state.shipping = {};
+      state.shipment = {};
     },
   },
 });
 
 export const selectPayment = (state: RootState) => state.checkout.payment;
-export const selectShipping = (state: RootState) => state.checkout.shipping;
-export const { previousStep, confirmItems, setPayment, setShipping, placeOrder, resetCheckout } =
+export const selectShipping = (state: RootState) => state.checkout.shipment;
+export const { previousStep, confirmCheckoutItems, setCheckoutPayment, setCheckoutShipping, placeOrder, resetCheckout } =
   checkOutSlice.actions;
 export default checkOutSlice.reducer;

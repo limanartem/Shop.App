@@ -1,30 +1,38 @@
 export type ProductItem = {
-  id: string,
-  title: string,
-  description: string,
-  price: number,
-  currency: string,
-  images?: string[],
-  capacity?: number,
-  category?: string
-}
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  currency: string;
+  images?: string[];
+  capacity?: number;
+  category?: string;
+};
 
 export type ProductCategory = {
-  id: number,
-  parentCategoryId?: number
-  title: string
-}
+  id: number;
+  parentCategoryId?: number;
+  title: string;
+};
 
 export type ShoppingCartItem = {
   product: ProductItem;
   quantity: number;
-  status?: string
+  status?: string;
 };
-
 
 type OrderItem = ShoppingCartItem & {
   productId: string;
   quantity: number;
+};
+
+export type CheckoutShippingInfo  = {
+  address?: string;
+  country?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  name?: string;
 }
 
 type OrderShippingInfo = {
@@ -34,7 +42,7 @@ type OrderShippingInfo = {
   state?: string;
   zip: string;
   name?: string;
-}
+};
 
 type OrderPaymentInfo = {
   creditCard?: {
@@ -46,7 +54,7 @@ type OrderPaymentInfo = {
   bank?: {
     iban: string;
   };
-}
+};
 
 export type Order = {
   id: string;
@@ -56,8 +64,8 @@ export type Order = {
   items: OrderItem[];
   shipping: OrderShippingInfo;
   payment: OrderPaymentInfo;
-}
+};
 
 export type OrdersResponse = {
   orders: Order[];
-}
+};
