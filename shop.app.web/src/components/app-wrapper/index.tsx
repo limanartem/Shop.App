@@ -27,15 +27,15 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
-import CategoriesTreeView from './CategoriesTreeView';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { ShoppingCartPopup } from '../shopping-cart/ShoppingCartPopup';
+import { ShoppingCartPopup } from '../../features/shopping-cart/ShoppingCartPopup';
 import { signOut } from 'supertokens-auth-react/recipe/session';
 import { useNavigate } from 'react-router-dom';
 import { selectCategories } from '../../app/reducers/categoriesReducer';
 import { selectUser, setUser } from '../../app/reducers/authReducer';
 import { resetCheckout } from '../../app/reducers/checkOutReducer';
+import { CategoriesTreeView } from '..';
 
 const drawerWidth: number = 240;
 

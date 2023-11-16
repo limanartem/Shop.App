@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getOrdersAsync } from '../../services/order-service';
 import { Order } from '../../model';
-import { DateTime } from '../../components/DateTime';
 import {
   Accordion,
   AccordionSummary,
@@ -15,9 +14,9 @@ import {
   Grid,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { CartProductCard } from '../../components/shopping-cart/CartProductCard';
-import { StatusIndicator } from '../../components/shopping-cart/StatusIndicator';
+import { StatusIndicator } from '../shopping-cart/StatusIndicator';
 import { OrderProgressIndicator } from './OrderProgressIndicator';
+import { DateTime, OrderedProductCard } from '../../components';
 
 export function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -160,7 +159,7 @@ export function Orders() {
                       <List>
                         {order.items.map((item, index) => (
                           <ListItem alignItems="flex-start" key={item.product.id}>
-                            <CartProductCard flow="orderDetails" item={item} />
+                            <OrderedProductCard flow="orderDetails" item={item} />
                           </ListItem>
                         ))}
                       </List>

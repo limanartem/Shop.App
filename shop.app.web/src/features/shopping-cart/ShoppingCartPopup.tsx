@@ -5,7 +5,7 @@ import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { clearCart } from '../../app/reducers/shoppingCartReducer';
 import { useNavigate } from 'react-router-dom';
-import { CartProductCard } from './CartProductCard';
+import { OrderedProductCard } from '../../components';
 
 interface ShoppingCartPopupProps {
   open: boolean;
@@ -40,7 +40,7 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
             {items &&
               items?.map((item) => (
                 <ListItem alignItems="flex-start" key={item.product.id}>
-                  <CartProductCard item={item} flow="shoppingCart" />
+                  <OrderedProductCard item={item} flow="shoppingCart" />
                 </ListItem>
               ))}
           </List>

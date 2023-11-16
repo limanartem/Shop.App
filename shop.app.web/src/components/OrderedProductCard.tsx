@@ -1,11 +1,11 @@
-import { ShoppingCartItem } from '../../model';
+import { ShoppingCartItem } from '../model';
 import { Button, Card, CardContent, CardMedia, Grid, Tooltip, Typography } from '@mui/material';
-import { useAppDispatch } from '../../app/hooks';
-import { getProductImage, ProductFallbackImage } from '../../utils/product-utils';
+import { useAppDispatch } from '../app/hooks';
+import { getProductImage, ProductFallbackImage } from '../utils/product-utils';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
-import { removeFromCart } from '../../app/reducers/shoppingCartReducer';
-import { ProductItem } from '../../model';
-import { StatusIndicator } from './StatusIndicator';
+import { removeFromCart } from '../app/reducers/shoppingCartReducer';
+import { ProductItem } from '../model';
+import { StatusIndicator } from '../features/shopping-cart/StatusIndicator';
 
 type Props = {
   item: ShoppingCartItem;
@@ -57,7 +57,7 @@ function ItemAction({ item, flow }: Props) {
   );
 }
 
-export function CartProductCard({ item, flow }: Props) {
+export function OrderedProductCard({ item, flow }: Props) {
   return (
     <Card style={{ display: 'flex', width: '100%' }}>
       <Grid container direction="row" justifyContent="flex-end" alignItems="center">

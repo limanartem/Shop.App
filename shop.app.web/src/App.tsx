@@ -7,10 +7,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, CssBaseline } from '@mui/material';
 import { amber } from '@mui/material/colors';
 import AppWrapper from './components/app-wrapper';
-import CategoryContextProvider from './components/context-providers/CategoryContextProvider';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
-import { AuthRoutes, AuthWrapper } from './components/auth/AuthWrapper';
 import { SessionAuth } from 'supertokens-auth-react/recipe/session';
 import { CheckOut } from './features/check-out';
 import { useAppDispatch, useAppSelector } from './app/hooks';
@@ -21,6 +19,7 @@ import {
 } from './app/reducers/categoriesReducer';
 import { useEffect, useState } from 'react';
 import { Orders } from './features/orders';
+import { AuthWrapper, CategoryContextProvider, AuthRoutes } from './components';
 
 function InitializeDataWrapper({ children }: { children?: React.ReactNode }) {
   const categoriesStatus = useAppSelector(selectCategoriesStatus);

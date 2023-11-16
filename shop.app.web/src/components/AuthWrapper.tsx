@@ -10,10 +10,10 @@ import { getSuperTokensRoutesForReactRouterDom } from 'supertokens-auth-react/ui
 import { ThirdPartyEmailPasswordPreBuiltUI } from 'supertokens-auth-react/recipe/thirdpartyemailpassword/prebuiltui';
 import * as reactRouterDom from 'react-router-dom';
 import { OnHandleEventContext } from 'supertokens-auth-react/lib/build/recipe/emailpassword';
-import { useAppDispatch } from '../../app/hooks';
-import { setUser } from '../../app/reducers/authReducer';
+import { useAppDispatch } from '../app/hooks';
+import { setUser } from '../app/reducers/authReducer';
 import { useEffect, useState } from 'react';
-import { getUserAsync } from '../../services/auth';
+import { getUserAsync } from '../services/auth';
 
 const { REACT_APP_AUTH_API_URL = 'http://localhost:3003' } = process.env;
 

@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useAppSelector } from '../../app/hooks';
-import { selectCategory } from '../../app/reducers/searchReducer';
+import { useAppSelector } from '../app/hooks';
+import { selectCategory } from '../app/reducers/searchReducer';
 
 function CategoryContextProvider({ children }: { children?: React.ReactNode }) {
   const [searchParams] = useSearchParams();
