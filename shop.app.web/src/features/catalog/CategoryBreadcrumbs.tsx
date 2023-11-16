@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Breadcrumbs, Button, Link } from '@mui/material';
 import { ProductCategory } from '../../model';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
@@ -20,28 +20,36 @@ const getCategoryPath = (categories: ProductCategory[], categoryId: number) => {
   return [{ id: -1, title: 'All' }].concat(path);
 };
 
-const CategoryBreadcrumbs = ({ categories }: { categories: ProductCategory[] }) => {
+const CategoryBreadcrumbs = ({
+  categories,
+  currentTotal,
+}: {
+  categories: ProductCategory[];
+  currentTotal: number;
+}) => {
   const globalSelectedCategory = useAppSelector(selectCategory);
   const dispatch = useAppDispatch();
+  const [categoryPath, setCategoryPath] = useState<{ id: number; title: string }[]>([]);
 
-  const categoryPath = useCallback(() => {
-    return globalSelectedCategory
+  useEffect(() => {
+    const path = globalSelectedCategory
       ? getCategoryPath(categories, Number.parseInt(globalSelectedCategory))
       : [];
+    setCategoryPath(path);
   }, [categories, globalSelectedCategory]);
 
   return (
-    <Breadcrumbs style={{marginLeft: 16 }}>
-      {categoryPath().map((category) => (
+    <Breadcrumbs style={{ marginLeft: 16 }}>
+      {categoryPath.map((category, index) => (
         <Link key={category.id} color="inherit" padding={0} margin={0}>
           <Button
-            style={{ padding: 0, margin: 0, minWidth: 0}}
+            style={{ padding: 0, margin: 0, minWidth: 0 }}
             variant="text"
             onClick={() => {
               dispatch(setCategory(category.id.toString()));
             }}
           >
-            {category.title}
+            {category.title} {index === categoryPath.length - 1 && `(${currentTotal})`}
           </Button>
         </Link>
       ))}

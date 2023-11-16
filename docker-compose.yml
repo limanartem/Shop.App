@@ -49,9 +49,9 @@ services:
     # environment:
     #   POSTGRESQL_CONNECTION_URI: "postgresql://supertokens_user:password@supertoken_db:5432/supertokens_db"
     environment:
-      POSTGRESQL_HOST: $POSTGRESQL_HOST
-      POSTGRESQL_USER: $POSTGRESQL_USER
-      POSTGRESQL_PASSWORD: $POSTGRESQL_PASSWORD
+      POSTGRESQL_HOST: shop.app.auth.db
+      POSTGRESQL_USER: $POSTGRES_USER
+      POSTGRESQL_PASSWORD: $POSTGRES_PASSWORD
       POSTGRESQL_DATABASE_NAME: $POSTGRES_DB
       POSTGRESQL_PORT: $POSTGRESQL_PORT
     networks:
@@ -82,7 +82,7 @@ services:
       AUTH_CORE_URL: $AUTH_CORE_URL
       WEB_API_PORT: 3003
       WEB_API_URL: shop.app.auth.api
-      PUBLIC_WEB_UI_URL: $PUBLIC_WEB_UI_URL # need external domain for cors
+      PUBLIC_WEB_UI_DOMAIN: $PUBLIC_WEB_UI_DOMAIN # need external domain for cors
 
   # Shop orders database
   shop.app.orders.db:
@@ -149,6 +149,8 @@ services:
         condition: service_started
       shop.app.messagebroker:
         condition: service_healthy
+      shop.app.catalog.api:
+        condition: service_started
     environment:
       WEB_SERVER_PORT: 3001
       MONGODB_URL: $MONGODB_URL
@@ -156,6 +158,7 @@ services:
       MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
       MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       AUTH_CORE_URL: $AUTH_CORE_URL
+      CATALOG_API_URL: http://shop.app.catalog.api:$CATALOG_API_PORT
 
   # Shop products API
   shop.app.catalog.api:
@@ -243,8 +246,8 @@ services:
     networks:
       - app-public-network
     environment:
-      REACT_APP_ORDERS_API_URL: $REACT_APP_ORDERS_API_URL
-      REACT_APP_CATALOG_API_URL: $REACT_APP_CATALOG_API_URL
+      REACT_APP_ORDERS_API_URL: $ORDERS_API_URL
+      REACT_APP_CATALOG_API_URL: $CATALOG_API_URL
     depends_on:
       - shop.app.orders.api
       - shop.app.catalog.api

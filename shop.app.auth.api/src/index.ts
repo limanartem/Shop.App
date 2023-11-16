@@ -11,7 +11,7 @@ const {
   AUTH_CORE_URL = 'localhost:3567',
   WEB_API_PORT = 3003,
   WEB_API_URL = 'localhost',
-  PUBLIC_WEB_UI_URL = 'localhost:3002',
+  PUBLIC_WEB_UI_DOMAIN = 'localhost:3002',
 } = process.env;
 
 console.log('Configuring auth api', process.env);
@@ -26,7 +26,7 @@ supertokens.init({
     // learn more about this on https://supertokens.com/docs/thirdpartyemailpassword/appinfo
     appName: 'Shop.App',
     apiDomain: `${WEB_API_URL}:${WEB_API_PORT}`,
-    websiteDomain: PUBLIC_WEB_UI_URL,
+    websiteDomain: PUBLIC_WEB_UI_DOMAIN,
     apiBasePath: '/auth',
     websiteBasePath: '/auth',
   },
@@ -42,7 +42,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: `http://${PUBLIC_WEB_UI_URL}`,
+    origin: `http://${PUBLIC_WEB_UI_DOMAIN}`,
     allowedHeaders: ['content-type', ...supertokens.getAllCORSHeaders()],
     methods: ['GET', 'PUT', 'POST', 'DELETE'],
     credentials: true,

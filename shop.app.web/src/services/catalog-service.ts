@@ -2,12 +2,25 @@ import { ProductCategory, ProductItem } from '../model';
 
 const { REACT_APP_CATALOG_API_URL } = process.env;
 
-export const getProducts = async (category?: string | null): Promise<ProductItem[]> => {
-  console.log(`Fetching products from ${`${REACT_APP_CATALOG_API_URL}/products?categoryId=${category}`}`);
-  
-  const response = await fetch(`${REACT_APP_CATALOG_API_URL}/products?categoryId=${category ? category : ''}`, {
-    method: 'GET',
-  });
+export const getProductsAsync = async ({
+  category,
+  ids,
+}: {
+  category?: string | null;
+  ids?: string[];
+}): Promise<ProductItem[]> => {
+  console.log(
+    `Fetching products from ${`${REACT_APP_CATALOG_API_URL}/products?categoryId=${category}`}`,
+  );
+
+  const response = !ids?.length
+    ? await fetch(`${REACT_APP_CATALOG_API_URL}/products?categoryId=${category ? category : ''}`, {
+        method: 'GET',
+      })
+    : await fetch(`${REACT_APP_CATALOG_API_URL}/products/search}`, {
+        method: 'POST',
+        body: JSON.stringify({ ids }),
+      });
 
   if (!response.ok) {
     console.error({ status: response.status, statusText: response.statusText });
@@ -17,7 +30,7 @@ export const getProducts = async (category?: string | null): Promise<ProductItem
   return await response.json();
 };
 
-export const getCategories = async (): Promise<ProductCategory[]> => {
+export const getCategoriesAsync = async (): Promise<ProductCategory[]> => {
   console.log(`Fetching categories from ${`${REACT_APP_CATALOG_API_URL}/productCategories`}`);
 
   const response = await fetch(`${REACT_APP_CATALOG_API_URL}/productCategories`, {

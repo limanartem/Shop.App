@@ -4,6 +4,8 @@ using Shop.App.Catalog.Api.Services;
 using Shop.App.Catalog.Api.Interfaces;
 using System.Text.Json.Serialization;
 using Shop.App.Catalog.Api.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -27,21 +29,15 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 var app = builder.Build();
 
-app.MapGet("/products", async (context) =>
+app.MapGet("/products", async (HttpContext context, [FromQuery] string? categoryId) =>
 {
-  var categoryId = context.Request.Query["categoryid"];
-  var service = context.RequestServices
-    .GetService<ICatalogService>();
-
-  if (service == null)
-  {
-    throw new NullReferenceException($"Not able to resolve {typeof(ICatalogService)} from service container");
-  }
+  var service = context.RequestServices.GetService<ICatalogService>()
+  ?? throw new NullReferenceException($"Not able to resolve {typeof(ICatalogService)} from service container");
 
   var products = string.IsNullOrEmpty(categoryId)
-    ? service.Products()
-    : await service.Products(int.Parse(categoryId));
-    
+  ? service.Products()
+  : await service.Products(int.Parse(categoryId));
+
   await context.Response.WriteAsJsonAsync(
     products?
     .Select(product => new
@@ -54,6 +50,25 @@ app.MapGet("/products", async (context) =>
       product.CategoryId
     }).ToList()
     );
+});
+
+app.MapPost("/products/search", async (HttpContext context, Guid[] ids) =>
+{
+  await context.Response.WriteAsJsonAsync(
+    context.RequestServices
+    .GetService<ICatalogService>()?
+    .Products(ids)
+    .Select(product => new
+    {
+      product.Id,
+      product.Title,
+      product.Description,
+      product.Price,
+      product.Currency,
+      product.CategoryId
+    }).ToList()
+    );
+
 });
 
 app.MapGet("/productCategories", async (context) =>

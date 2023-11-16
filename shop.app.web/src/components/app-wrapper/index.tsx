@@ -253,6 +253,14 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
                     >
                       <Typography textAlign="center">Sign Out</Typography>
                     </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        navigate('/orders');
+                        handleCloseUserMenu();
+                      }}
+                    >
+                      <Typography textAlign="center">Orders</Typography>
+                    </MenuItem>
                   </Menu>
                 </>
               )}

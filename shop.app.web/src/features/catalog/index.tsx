@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
-import { getProducts } from '../../services/catalog-service';
+import { getProductsAsync } from '../../services/catalog-service';
 import { ProductItem } from '../../model';
 import { Backdrop, Box, CircularProgress, List, ListItem } from '@mui/material';
 import ProductCard from './ProductCard';
@@ -19,18 +19,18 @@ function Catalog({ children }: { children?: React.ReactNode }) {
   useEffect(() => {
     console.log('Catalog:fetching products for globalSelectedCategory', globalSelectedCategory);
     setProductsLoading(true);
-    getProducts(globalSelectedCategory === '-1' ? null : globalSelectedCategory).then(
-      (products) => {
-        setProducts(products);
-        setProductsLoading(false);
-      },
-    );
+    getProductsAsync({
+      category: globalSelectedCategory === '-1' ? null : globalSelectedCategory,
+    }).then((products) => {
+      setProducts(products);
+      setProductsLoading(false);
+    });
   }, [globalSelectedCategory]);
 
   return (
     <>
       <Box>
-        <CategoryBreadcrumbs categories={categories} />
+        <CategoryBreadcrumbs categories={categories} currentTotal={products.length} />
         <Backdrop
           sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open={productsLoading}

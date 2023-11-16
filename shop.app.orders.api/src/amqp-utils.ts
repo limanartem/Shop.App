@@ -32,7 +32,7 @@ export const sendMessage = async (
   console.log(`Connected to message broker!`);
   await ensureQueueExchangeBinding(exchange, queue, routingKey, channel);
 
-  console.log(`Publishing message to ${exchange} exchange using ${routingKey} routing key`);
+  console.log(`Publishing message to "${exchange}" exchange using "${routingKey}" routing key`);
 
   await channel.publish(exchange, routingKey, Buffer.from(JSON.stringify(message)), {
     messageId: uuidv4(),

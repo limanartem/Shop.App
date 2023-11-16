@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Home from './components/home';
-import Catalog from './components/catalog';
+import Home from './features/home';
+import Catalog from './features/catalog';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, CssBaseline } from '@mui/material';
 import { amber } from '@mui/material/colors';
@@ -12,7 +12,7 @@ import { Provider } from 'react-redux';
 import { store } from './app/store';
 import { AuthRoutes, AuthWrapper } from './components/auth/AuthWrapper';
 import { SessionAuth } from 'supertokens-auth-react/recipe/session';
-import { CheckOut } from './components/check-out';
+import { CheckOut } from './features/check-out';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import {
   DataLoadingState,
@@ -20,6 +20,7 @@ import {
   selectCategoriesStatus,
 } from './app/reducers/categoriesReducer';
 import { useEffect, useState } from 'react';
+import { Orders } from './features/orders';
 
 function InitializeDataWrapper({ children }: { children?: React.ReactNode }) {
   const categoriesStatus = useAppSelector(selectCategoriesStatus);
@@ -68,6 +69,14 @@ function App() {
                         element={
                           <SessionAuth>
                             <CheckOut />
+                          </SessionAuth>
+                        }
+                      />
+                      <Route
+                        path="/orders"
+                        element={
+                          <SessionAuth>
+                            <Orders />
                           </SessionAuth>
                         }
                       />

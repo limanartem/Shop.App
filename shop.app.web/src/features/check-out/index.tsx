@@ -5,7 +5,7 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
-import { CartProductCard } from '../shopping-cart/CartProductCard';
+import { CartProductCard } from '../../components/shopping-cart/CartProductCard';
 import {
   previousStep,
   confirmItems,
@@ -18,10 +18,6 @@ import {
 export function CheckOut() {
   const [activeStep, setActiveStep] = useState(0);
   const dispatch = useAppDispatch();
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
 
   const handleBack = () => {
     dispatch(previousStep());

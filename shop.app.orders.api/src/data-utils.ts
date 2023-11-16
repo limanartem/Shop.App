@@ -1,6 +1,7 @@
 import { get as getCache, update as updateCache } from './cache-utils';
-import { OrderRequestPayload } from './model';
-import { fetchDocument, insertDocument, updateDocument } from './mongodb-client';
+import { ProductItem, Order, OrderItemEnhanced } from './model';
+import { fetchDocument, fetchDocuments, insertDocument, updateDocument } from './mongodb-client';
+const { CATALOG_API_URL } = process.env;
 
 export const fetchItem = async (id: string): Promise<any | null> => {
   const cachedValue = await getCache(id);
@@ -25,20 +26,33 @@ export const updateItem = async (id: string, data: any): Promise<void> => {
   await updateCache(id, null);
 };
 
-export const createOrder = async (
+export const createOrder = async (order: Order): Promise<ReturnType<typeof insertDocument>> =>
+  insertDocument(order);
+
+export const getOrders = async (
   userId: string,
-  order: OrderRequestPayload,
-): Promise<ReturnType<typeof insertDocument>> => {
-  const result = await insertDocument(
-    {
-      userId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      status: 'pending',
-      ...order,
-    },
-    'orders',
+): ReturnType<typeof fetchDocuments<Order<OrderItemEnhanced>>> => fetchDocuments({ userId });
+
+export const getProductDetails = async (productIds: string[]): Promise<ProductItem[]> => {
+  console.log(
+    `Fetching product details from "${CATALOG_API_URL}/products/search" for productIds`,
+    productIds,
   );
 
-  return result;
+  const response = await fetch(`${CATALOG_API_URL}/products/search`, {
+    method: 'POST',
+    body: JSON.stringify(productIds),
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Could not fetch products from catalog, error: ${response.status}: ${response.statusText}`,
+    );
+  }
+
+  return await response.json();
 };
