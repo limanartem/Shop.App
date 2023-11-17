@@ -82,6 +82,8 @@ services:
       WEB_API_PORT: 3003
       WEB_API_URL: shop.app.auth.api
       PUBLIC_WEB_UI_DOMAIN: $PUBLIC_WEB_UI_DOMAIN # need external domain for cors
+      API_USER_EMAIL : $API_USER_EMAIL
+      API_USER_PASSWORD : $API_USER_PASSWORD
 
   # Shop orders database
   shop.app.orders.db:
@@ -201,6 +203,10 @@ services:
       MONGODB_URL: $MONGODB_URL
       MONGO_DB_USERNAME: $MONGO_DB_USERNAME
       MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
+      AUTH_API_URL: $AUTH_API_URL_PRIVATE
+      API_USER_EMAIL : $API_USER_EMAIL
+      API_USER_PASSWORD : $API_USER_PASSWORD
+      ORDERS_API_URL: $ORDERS_API_URL_PRIVATE
 
   # Payment processing
   shop.app.orders.payment.processing:
@@ -218,6 +224,10 @@ services:
       MONGODB_URL: $MONGODB_URL
       MONGO_DB_USERNAME: $MONGO_DB_USERNAME
       MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
+      AUTH_API_URL: $AUTH_API_URL_PRIVATE
+      API_USER_EMAIL : $API_USER_EMAIL
+      API_USER_PASSWORD : $API_USER_PASSWORD
+      ORDERS_API_URL: $ORDERS_API_URL_PRIVATE
 
   # Order shipping
   shop.app.orders.dispatch.processing:
@@ -235,6 +245,10 @@ services:
       MONGODB_URL: $MONGODB_URL
       MONGO_DB_USERNAME: $MONGO_DB_USERNAME
       MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
+      AUTH_API_URL: $AUTH_API_URL_PRIVATE
+      API_USER_EMAIL : $API_USER_EMAIL
+      API_USER_PASSWORD : $API_USER_PASSWORD
+      ORDERS_API_URL: $ORDERS_API_URL_PRIVATE
 
   # Main shop frontend
   shop.app.web:
@@ -247,6 +261,7 @@ services:
     environment:
       REACT_APP_ORDERS_API_URL: $ORDERS_API_URL
       REACT_APP_CATALOG_API_URL: $CATALOG_API_URL
+      REACT_APP_AUTH_API_URL: $AUTH_API_URL
     depends_on:
       - shop.app.orders.api
       - shop.app.catalog.api

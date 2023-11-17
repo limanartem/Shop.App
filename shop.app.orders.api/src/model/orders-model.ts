@@ -2,11 +2,41 @@ import Joi from 'joi';
 import { ProductItem } from './catalog-model';
 import { Document } from 'mongodb';
 
-type OrderItem = {
+export type OrderItem = {
   productId: string;
   quantity: number;
-  status?: 'pending' | 'confirmed';
+  status?: Status;
 };
+
+export type OrderFlow = 'pending' | 'payment' | 'dispatch' | 'failed';
+
+export type Status =
+  | 'pending'
+  | 'confirmed'
+  | 'rejected'
+  | 'failed'
+  | 'paid'
+  | 'unavailable'
+  | 'dispatched'
+  | 'delivered';
+
+type UpdateStatusItem = {
+  status?: Status;
+};
+
+export const OrderStatuses: Status[] = [
+  'pending',
+  'confirmed',
+  'paid',
+  'rejected',
+  'dispatched',
+  'delivered',
+];
+
+
+export const OrderItemStatuses: Status[] = ['pending', 'confirmed'];
+export const PaymentStatuses: Status[] = ['pending', 'rejected', 'paid'];
+export const ShippingStatuses: Status[] = ['pending', 'dispatched', 'delivered'];
 
 export type OrderItemEnhanced = OrderItem & {
   product: ProductItem;
@@ -39,6 +69,10 @@ export interface CreateOrderRequest {
   payment: OrderPaymentInfo;
 }
 
+export interface UpdateOrderStatusRequest {
+  status: Status;
+}
+
 export interface Order<TItem extends OrderItem = OrderItem> extends Document {
   items: TItem[];
   shipping: OrderShippingInfo;
@@ -46,10 +80,15 @@ export interface Order<TItem extends OrderItem = OrderItem> extends Document {
   userId: string;
   createdAt: Date;
   updatedAt: Date;
-  status: 'pending';
+  status: Status;
 }
 
-export const OrderRequestPayloadSchema = Joi.object({
+export interface UpdateOrder extends UpdateOrderStatusRequest {
+  updatedAt: Date;
+  updatedBy: string;
+}
+
+export const CreateOrderRequestPayloadSchema = Joi.object({
   items: Joi.array()
     .items({
       productId: Joi.string().required(),
@@ -78,5 +117,11 @@ export const OrderRequestPayloadSchema = Joi.object({
         }).required(),
       }).required(),
     )
+    .required(),
+});
+
+export const UpdateOrderStatusRequestPayloadSchema = Joi.object({
+  status: Joi.string()
+    .valid(...OrderStatuses)
     .required(),
 });

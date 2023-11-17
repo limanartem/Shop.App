@@ -1,5 +1,5 @@
 import { get as getCache, update as updateCache } from './cache-utils';
-import { ProductItem, Order, OrderItemEnhanced } from './model';
+import { ProductItem, Order, OrderItemEnhanced, UpdateOrder, OrderItem } from './model';
 import { fetchDocument, fetchDocuments, insertDocument, updateDocument } from './mongodb-client';
 const { CATALOG_API_URL } = process.env;
 
@@ -28,6 +28,27 @@ export const updateItem = async (id: string, data: any): Promise<void> => {
 
 export const createOrder = async (order: Order): Promise<ReturnType<typeof insertDocument>> =>
   insertDocument(order);
+
+export const updateOrder = async (id: string, order: UpdateOrder): Promise<void> => {
+  await updateDocument(id, order);
+  //await updateCache(id, null);
+};
+
+export const updateOrderItem = async (
+  id: string,
+  productId: string,
+  order: UpdateOrder,
+): Promise<void> => {
+  const currentOrder = await fetchDocument(id);
+  const items = (currentOrder.items as OrderItem[]).map((item: OrderItem) => {
+    if (item.productId === productId) {
+      item.status = order.status;
+    }
+    return item;
+  });
+  await updateDocument(id, { items });
+  //await updateCache(id, null);
+};
 
 export const getOrders = async (
   userId: string,

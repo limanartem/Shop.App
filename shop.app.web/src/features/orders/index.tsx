@@ -20,8 +20,8 @@ import { OrderProgressIndicator } from './OrderProgressIndicator';
 import { DateTime, MainContentContainer, OrderedProductCard } from '../../components';
 
 function sortOrdersDesc(o2: Order, o1: Order): number {
-  const o1Date = new Date(o1.createdAt).getTime()
-  const o2Date = new Date(o2.createdAt).getTime()
+  const o1Date = new Date(o1.createdAt).getTime();
+  const o2Date = new Date(o2.createdAt).getTime();
   return o1Date - o2Date;
 }
 
@@ -35,7 +35,7 @@ export function Orders() {
 
   const calculateTotal = (order: Order) => {
     return order.items
-      .reduce((total: number, item) => total + item.product.price * item.quantity, 0)
+      .reduce((total: number, item) => total + (item.product?.price || 0) * item.quantity, 0)
       .toFixed(2);
   };
 
@@ -104,97 +104,96 @@ export function Orders() {
         <Card style={{ width: '100%' }}>
           <CardHeader title="Orders Archive" subheader="Your previously placed orders" />
           <CardContent style={{ paddingTop: 0 }}>
-            {orders
-              .sort(sortOrdersDesc)
-              .map((order, index) => (
-                <Accordion
-                  key={order.id}
-                  expanded={expandedOrderId === order.id}
-                  onChange={() => toggleAccordion(order.id)}
-                >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    {!(expandedOrderId === order.id) && (
-                      <>
-                        <Grid container justifyContent="flex-end">
-                          <Grid item xs={12} sm={10} textAlign="left">
-                            <Typography color="text.secondary" gutterBottom variant="body2">
-                              <StatusIndicator status={order.status} />
-                              &nbsp;Order placed on <DateTime date={order.createdAt} />
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={2} textAlign="right">
-                            <Typography color="text.secondary" variant="body2">
-                              <strong>Total:</strong> {calculateTotal(order)} USD
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      </>
-                    )}
-                    {expandedOrderId === order.id && (
-                      <Typography variant="subtitle1">Order Details</Typography>
-                    )}
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Grid container spacing={1}>
-                      <Grid item xs={12}>
-                        <OrderProgressIndicator orderStatus={order.status} />
-                      </Grid>
-                      <Grid item xs={4}>
-                        <SummaryCard title="Summary">
-                          <SummaryItem title="Placed">
-                            <DateTime date={order.createdAt} />
-                          </SummaryItem>
-                          <SummaryItem title="Status">
+            {orders.sort(sortOrdersDesc).map((order, index) => (
+              <Accordion
+                key={order.id}
+                expanded={expandedOrderId === order.id}
+                onChange={() => toggleAccordion(order.id)}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  {!(expandedOrderId === order.id) && (
+                    <>
+                      <Grid container justifyContent="flex-end">
+                        <Grid item xs={12} sm={10} textAlign="left">
+                          <Typography color="text.secondary" gutterBottom variant="body2">
                             <StatusIndicator status={order.status} />
-                          </SummaryItem>
-                        </SummaryCard>
+                            &nbsp;Order placed on <DateTime date={order.createdAt} />
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={2} textAlign="right">
+                          <Typography color="text.secondary" variant="body2">
+                            <strong>Total:</strong> {calculateTotal(order)} USD
+                          </Typography>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={4}>
-                        <SummaryCard title="Delivery Information">
-                          <SummaryItem title="Address">
-                            {order.shipping.address}, {order.shipping.city}, {order.shipping.zip},
-                            {order.shipping.country}
-                          </SummaryItem>
-                        </SummaryCard>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <SummaryCard title="Payment Information">
-                          <SummaryItem title={order.payment.creditCard ? 'Credit card' : 'IBAN'}>
-                            {order.payment.creditCard != null && (
-                              <>{maskCreditCardNumber(order.payment.creditCard.number)}</>
-                            )}
-                            {order.payment.bank != null && <>{maskIban(order.payment.bank.iban)}</>}
-                          </SummaryItem>
-                        </SummaryCard>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <SummaryCard title="Items summary" fixedHight={false}>
-                          <SummaryItem>
-                            <>
-                              <List>
-                                {order.items.map((item, index) => (
-                                  <ListItem alignItems="flex-start" key={item.product.id}>
-                                    <OrderedProductCard flow="orderDetails" item={item} />
-                                  </ListItem>
-                                ))}
-                              </List>
-                              <Box style={{ marginTop: 2 }}>
-                                <Typography color="text.secondary" variant="subtitle2">
-                                  <strong>Total:</strong> {calculateTotal(order)} USD
-                                </Typography>
-                              </Box>
-                            </>
-                          </SummaryItem>
-                        </SummaryCard>
-                      </Grid>
+                    </>
+                  )}
+                  {expandedOrderId === order.id && (
+                    <Typography variant="subtitle1">Order Details</Typography>
+                  )}
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12}>
+                      <OrderProgressIndicator orderStatus={order.status} />
                     </Grid>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
+                    <Grid item xs={4}>
+                      <SummaryCard title="Summary">
+                        <SummaryItem title="Placed">
+                          <DateTime date={order.createdAt} />
+                        </SummaryItem>
+                        <SummaryItem title="Status">
+                          <StatusIndicator status={order.status} />
+                        </SummaryItem>
+                      </SummaryCard>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <SummaryCard title="Delivery Information">
+                        <SummaryItem title="Address">
+                          {order.shipping.address}, {order.shipping.city}, {order.shipping.zip},
+                          {order.shipping.country}
+                        </SummaryItem>
+                      </SummaryCard>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <SummaryCard title="Payment Information">
+                        <SummaryItem title={order.payment.creditCard ? 'Credit card' : 'IBAN'}>
+                          {order.payment.creditCard != null && (
+                            <>{maskCreditCardNumber(order.payment.creditCard.number)}</>
+                          )}
+                          {order.payment.bank != null && <>{maskIban(order.payment.bank.iban)}</>}
+                        </SummaryItem>
+                      </SummaryCard>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <SummaryCard title="Items summary" fixedHight={false}>
+                        <SummaryItem>
+                          <>
+                            <List>
+                              {order.items.map((item, index) => (
+                                <ListItem alignItems="flex-start" key={item.product?.id}>
+                                  {item.product != null && (
+                                    <OrderedProductCard flow="orderDetails" item={item} />
+                                  )}
+                                </ListItem>
+                              ))}
+                            </List>
+                            <Box style={{ marginTop: 2 }}>
+                              <Typography color="text.secondary" variant="subtitle2">
+                                <strong>Total:</strong> {calculateTotal(order)} USD
+                              </Typography>
+                            </Box>
+                          </>
+                        </SummaryItem>
+                      </SummaryCard>
+                    </Grid>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+            ))}
           </CardContent>
         </Card>
       </MainContentContainer>
     </Grid>
   );
 }
-

@@ -3,6 +3,7 @@ import { middleware, errorHandler } from 'supertokens-node/framework/express';
 import { initAuth } from '../auth';
 import { routerFactory } from './order-routes';
 import cors from 'cors';
+import { StatusCodes } from 'http-status-codes';
 
 export const start = () => {
   initAuth();
@@ -27,7 +28,10 @@ export const start = () => {
     if (res.headersSent) {
       return next(err);
     }
-    res.setHeader('Content-Type', 'application/json').status(500).send({ error: err });
+    res
+      .setHeader('Content-Type', 'application/json')
+      .status(StatusCodes.BAD_REQUEST)
+      .send({ error: err });
   });
 
   return app;

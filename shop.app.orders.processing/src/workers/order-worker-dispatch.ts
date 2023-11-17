@@ -1,8 +1,27 @@
+import { updateOrderStatusAsync } from '../services/order-service';
 import { workerData, parentPort } from 'worker_threads';
 
-const workerName = __filename.replace(`${__dirname}/`, '')
+const workerName = __filename.replace(`${__dirname}/`, '');
 
 console.log(`"${workerName}}" worker started. Processing message`, workerData);
 
-setTimeout(() => parentPort.postMessage(workerData), 500);
+setTimeout(async () => {
+  try {
+    const { orderId } = workerData.data;
 
+    // Mimicking dispatching process
+    await updateOrderStatusAsync(orderId, 'dispatched');
+
+    parentPort.postMessage({ status: 'success' });
+
+    console.log(`"${workerName}" worker successfully finished processing message`, workerData);
+  } catch (error) {
+    console.error(error);
+
+    parentPort.postMessage({ status: 'error', errorMessage: error.toString() });
+
+    console.log(`"${workerName}" worker  finished processing message with error`, workerData);
+  } finally {
+    parentPort.close();
+  }
+}, 25000);

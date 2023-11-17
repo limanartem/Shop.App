@@ -84,7 +84,7 @@ export const updateDocument = async <T extends object>(
     const _id = ObjectId.createFromHexString(id);
     console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
     console.log('Updating item in db...', id, data, collection);
-    await client.db().collection(collection).updateOne({ _id }, data);
+    await client.db().collection(collection).updateOne({ _id }, { $set: data });
   });
 
 export const insertDocument = async <T extends object>(

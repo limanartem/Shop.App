@@ -1,5 +1,9 @@
+import { NextFunction, RequestHandler, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import supertokens from 'supertokens-node';
+import { SessionRequest } from 'supertokens-node/framework/express';
 import Session from 'supertokens-node/recipe/session';
+import UserRoles from 'supertokens-node/recipe/userroles';
 
 export const initAuth = () => {
   const {
@@ -24,6 +28,21 @@ export const initAuth = () => {
     },
     recipeList: [
       Session.init(), // initializes session features
+      UserRoles.init(),
     ],
   });
+};
+
+export const verifyUserRole = (
+  role: string,
+): ((req: SessionRequest, res: Response, next: NextFunction) => Promise<void>) => {
+  return async (req, res, next) => {
+    const userId = req.session.getUserId();
+    const roles = await UserRoles.getRolesForUser(req.session.getTenantId(), userId);
+    if (roles.roles.indexOf(role) > -1) {
+      next();
+    } else {
+      res.status(StatusCodes.FORBIDDEN).json({error: 'Action is not allowed for this user'});
+    }
+  };
 };

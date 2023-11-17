@@ -54,7 +54,12 @@ const workerFile = `order-worker-${WORKER_TYPE}.js`;
       }).on('message', async (result: WorkerResultPayload) => {
         console.log(`Order processed for messageId ${message.properties.messageId}!`);
         console.log({ message: result });
-        await channel.ack(message);
+
+        if (result.status === 'success') {
+          await channel.ack(message);
+        } else {
+          await channel.reject(message, true);
+        }
       });
     },
     {

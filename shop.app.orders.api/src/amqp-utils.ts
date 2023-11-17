@@ -1,8 +1,8 @@
 import amqp from 'amqplib';
 import { v4 as uuidv4 } from 'uuid';
+import { OrderFlow } from './model/orders-model';
 
 const { MESSAGE_BROKER_URL } = process.env;
-type OrderFlow = 'pending' | 'payment' | 'dispatch';
 
 const ensureQueueExchangeBinding = async (
   exchange: string,

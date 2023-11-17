@@ -68,7 +68,7 @@ export function StepShippingDetails() {
             <TextField
               label="Contact Phone Number"
               fullWidth
-              name="name"
+              name="phoneNumber"
               onChange={handleInputChange}
              
             />
