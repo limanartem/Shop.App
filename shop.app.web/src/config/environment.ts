@@ -1,0 +1,1 @@
+export const env = (window as any)._env_ || process.env;

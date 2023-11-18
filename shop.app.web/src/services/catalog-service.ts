@@ -1,6 +1,7 @@
 import { ProductCategory, ProductItem } from '../model';
+import { env } from '../config/environment';
 
-const { REACT_APP_CATALOG_API_URL } = process.env;
+const { REACT_APP_CATALOG_API_URL } = env;
 
 export const getProductsAsync = async ({
   category,

@@ -265,6 +265,7 @@ services:
     depends_on:
       - shop.app.orders.api
       - shop.app.catalog.api
+      - shop.app.auth.api
 
 volumes:
  cache:

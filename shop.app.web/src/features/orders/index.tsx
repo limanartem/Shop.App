@@ -137,7 +137,7 @@ export function Orders() {
                     <Grid item xs={12}>
                       <OrderProgressIndicator orderStatus={order.status} />
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item md={4} xs={12}>
                       <SummaryCard title="Summary">
                         <SummaryItem title="Placed">
                           <DateTime date={order.createdAt} />
@@ -147,7 +147,7 @@ export function Orders() {
                         </SummaryItem>
                       </SummaryCard>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item md={4} xs={12}>
                       <SummaryCard title="Delivery Information">
                         <SummaryItem title="Address">
                           {order.shipping.address}, {order.shipping.city}, {order.shipping.zip},
@@ -155,7 +155,7 @@ export function Orders() {
                         </SummaryItem>
                       </SummaryCard>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item md={4} xs={12}>
                       <SummaryCard title="Payment Information">
                         <SummaryItem title={order.payment.creditCard ? 'Credit card' : 'IBAN'}>
                           {order.payment.creditCard != null && (

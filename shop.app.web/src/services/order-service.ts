@@ -1,7 +1,8 @@
 import { CreateOrder, OrdersResponse } from '../model';
 import Session from 'supertokens-auth-react/recipe/session';
+import { env } from '../config/environment';
 
-const { REACT_APP_ORDERS_API_URL } = process.env;
+const { REACT_APP_ORDERS_API_URL } = env;
 
 export const getOrdersAsync = async (): Promise<OrdersResponse> => {
   console.log(`Fetching orders from ${REACT_APP_ORDERS_API_URL}/orders`);

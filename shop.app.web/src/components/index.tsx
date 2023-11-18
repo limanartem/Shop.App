@@ -10,9 +10,6 @@ export { DateTime, AuthWrapper, AuthRoutes, CategoriesTreeView, OrderedProductCa
 export const MainContentContainer = styled('div')(({ theme }) => ({
   width: '100%',
   [theme.breakpoints.up('md')]: {
-    width: '90%',
-  },
-  [theme.breakpoints.up('lg')]: {
-    width: '50%',
-  },
+    width: '700px',
+  }
 }));

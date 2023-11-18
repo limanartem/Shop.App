@@ -14,8 +14,9 @@ import { useAppDispatch } from '../app/hooks';
 import { setUser } from '../app/reducers/authReducer';
 import { useEffect, useState } from 'react';
 import { getUserAsync } from '../services/auth';
+import { env } from '../config/environment';
 
-const { REACT_APP_AUTH_API_URL = 'http://localhost:3003' } = process.env;
+const { REACT_APP_AUTH_API_URL = 'http://localhost:3003' } = env;
 
 const initAuth = (onHandleEvent: (context: OnHandleEventContext) => void) =>
   SuperTokens.init({

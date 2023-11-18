@@ -1,6 +1,7 @@
 import { User } from 'supertokens-web-js/types';
+import { env } from '../config/environment';
 
-const { REACT_APP_AUTH_API_URL = 'http://localhost:3003' } = process.env;
+const { REACT_APP_AUTH_API_URL = 'http://localhost:3003' } = env;
 
 export const getUserAsync = async (): Promise<User> => {
   console.log(`Fetching user from ${REACT_APP_AUTH_API_URL}`);
