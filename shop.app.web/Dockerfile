@@ -2,7 +2,7 @@
 FROM node:21.1.0-slim as builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm install
 COPY . .
 RUN npm run build
 
