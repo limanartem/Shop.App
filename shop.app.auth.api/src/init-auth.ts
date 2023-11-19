@@ -7,7 +7,7 @@ const {
   AUTH_CORE_URL = 'localhost:3567',
   WEB_API_PORT = 3003,
   WEB_API_URL = 'localhost',
-  PUBLIC_WEB_UI_DOMAIN = 'localhost:3002',
+  PUBLIC_WEB_UI_DOMAIN = 'localhost:3000',
   API_USER_EMAIL = 'apiUser@shop.app',
   API_USER_PASSWORD = 'Qwerty123',
 } = process.env;

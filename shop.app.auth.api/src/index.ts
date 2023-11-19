@@ -6,7 +6,7 @@ import { errorHandler } from 'supertokens-node/framework/express';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { initApiUser, initAuth } from './init-auth';
 
-const { WEB_API_PORT = 3003, PUBLIC_WEB_UI_DOMAIN = 'localhost:3002' } = process.env;
+const { WEB_API_PORT = 3003, PUBLIC_WEB_UI_DOMAIN = 'localhost:3000' } = process.env;
 
 initAuth();
 

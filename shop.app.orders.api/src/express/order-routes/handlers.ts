@@ -1,5 +1,5 @@
 import type { Response } from 'express';
-import { createOrder, getOrders, getProductDetails, updateOrder } from '../../data-utils';
+import { createOrder, getOrdersExpanded, getProductDetails, updateOrder } from '../../data-utils';
 import { SessionRequest } from 'supertokens-node/framework/express';
 import { CreateOrderRequest, Order, CreateOrderRequestPayloadSchema } from '../../model';
 import { StatusCodes } from 'http-status-codes';
@@ -105,7 +105,7 @@ export async function putOrderHandler(req: SessionRequest, res: Response) {
 export async function getOrdersHandler(req: SessionRequest, res: Response) {
   const userId = req.session.getUserId();
 
-  const orders = await getOrders(userId);
+  const orders = await getOrdersExpanded(userId);
 
   await Promise.all(
     orders.map(async (order) => {

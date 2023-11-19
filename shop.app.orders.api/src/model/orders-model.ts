@@ -2,11 +2,6 @@ import Joi from 'joi';
 import { ProductItem } from './catalog-model';
 import { Document } from 'mongodb';
 
-export type OrderItem = {
-  productId: string;
-  quantity: number;
-  status?: Status;
-};
 
 export type OrderFlow = 'pending' | 'payment' | 'dispatch' | 'failed';
 
@@ -37,6 +32,12 @@ export const OrderStatuses: Status[] = [
 export const OrderItemStatuses: Status[] = ['pending', 'confirmed'];
 export const PaymentStatuses: Status[] = ['pending', 'rejected', 'paid'];
 export const ShippingStatuses: Status[] = ['pending', 'dispatched', 'delivered'];
+
+export type OrderItem = {
+  productId: string;
+  quantity: number;
+  status?: Status;
+};
 
 export type OrderItemEnhanced = OrderItem & {
   product: ProductItem;
