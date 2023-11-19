@@ -54,6 +54,29 @@ export const getOrders = async (
   userId: string,
 ): ReturnType<typeof fetchDocuments<Order<OrderItemEnhanced>>> => fetchDocuments({ userId });
 
+export const getOrdersExpanded = async (
+  userId: string,
+): ReturnType<typeof getOrders> => {
+  const orders = await getOrders(userId);
+
+    await Promise.all(
+      orders.map(async (order) => {
+        const productIds = order.items?.map((i) => i.productId);
+        try {
+          const products = await getProductDetails(productIds);
+          order.items?.forEach((item) => {
+            item.product = products.find((p) => p.id === item.productId);
+          });
+        } catch (error) {
+          console.error('Error fetching product details', error, productIds);
+        }
+      }),
+    );
+
+    return orders;
+};
+
+
 export const getProductDetails = async (productIds: string[]): Promise<ProductItem[]> => {
   console.log(
     `Fetching product details from "${CATALOG_API_URL}/products/search" for productIds`,

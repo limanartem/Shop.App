@@ -1,4 +1,4 @@
-import { createOrder, getOrders, getProductDetails, updateOrder } from '../data-utils';
+import { createOrder, getOrdersExpanded, getProductDetails, updateOrder } from '../data-utils';
 import request from 'supertest';
 import { start } from '../express/server';
 import { StatusCodes } from 'http-status-codes';
@@ -14,7 +14,7 @@ import { OrderFlow, OrderStatuses, Status } from '../model/orders-model';
 
 jest.mock('../data-utils', () => ({
   createOrder: jest.fn(),
-  getOrders: jest.fn(),
+  getOrdersExpanded: jest.fn(),
   getProductDetails: jest.fn(),
   updateOrder: jest.fn(() => Promise.resolve()),
 }));
@@ -248,7 +248,7 @@ describe('order routes', () => {
       const expectedOrderId = ObjectId.createFromTime(Date.now());
 
       mockSession(expectedUserId);
-      (getOrders as jest.Mock).mockImplementation(() => [
+      (getOrdersExpanded as jest.Mock).mockImplementation(() => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -268,7 +268,7 @@ describe('order routes', () => {
           });
         });
 
-      expect(getOrders).toHaveBeenCalledWith(expectedUserId);
+      expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
     });
 
     it('enriches ordered items with product details', async () => {
@@ -285,7 +285,7 @@ describe('order routes', () => {
 
       (getProductDetails as jest.Mock).mockImplementation(() => Promise.resolve(expectedProducts));
       mockSession(expectedUserId);
-      (getOrders as jest.Mock).mockImplementation(() => [
+      (getOrdersExpanded as jest.Mock).mockImplementation(() => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -314,7 +314,7 @@ describe('order routes', () => {
           });
         });
 
-      expect(getOrders).toHaveBeenCalledWith(expectedUserId);
+      expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
       expect(getProductDetails).toHaveBeenCalledWith(expectedProducts.map((p) => p.id));
     });
 
@@ -327,7 +327,7 @@ describe('order routes', () => {
         Promise.reject('Error fetching products'),
       );
       mockSession(expectedUserId);
-      (getOrders as jest.Mock).mockImplementation(() => [
+      (getOrdersExpanded as jest.Mock).mockImplementation(() => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -355,7 +355,7 @@ describe('order routes', () => {
           });
         });
 
-      expect(getOrders).toHaveBeenCalledWith(expectedUserId);
+      expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
       expect(getProductDetails).toHaveBeenCalledWith(expectedProducts.map((id) => id));
     });
   });

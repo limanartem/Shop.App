@@ -4,6 +4,7 @@ import { initAuth } from '../auth';
 import { routerFactory } from './order-routes';
 import cors from 'cors';
 import { StatusCodes } from 'http-status-codes';
+import { useGraphql } from './graphql';
 
 export const start = () => {
   initAuth();
@@ -21,6 +22,7 @@ export const start = () => {
   app.use(middleware());
   app.use('/', routerFactory());
   app.use(errorHandler());
+  useGraphql(app);
 
   app.use((err: any, req: any, res: any, next: any) => {
     console.error('Error occurred!');
