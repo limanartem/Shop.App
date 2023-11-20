@@ -8,4 +8,4 @@ Prototype of the shop app implementation as a playground for integration of diff
 * `docker-compose up --build` - starts all containers and rebuilds them
 
 # Architecture Overview
-![Architecture Overview](media/Shop.App.Architecture.png)
+![Architecture Overview](media/Shop.App.Architecture_1.png)
