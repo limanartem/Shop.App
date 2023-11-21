@@ -16,16 +16,11 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
-import {
-  confirmCheckoutItems,
-  CHECKOUT_FLOW_STEPS,
-} from '../../app/reducers/checkOutReducer';
+import { confirmCheckoutItems, CHECKOUT_FLOW_STEPS } from '../../app/reducers/checkOutReducer';
 import { StepShippingDetails } from './StepShippingDetails';
 import { StepPaymentDetails } from './StepPaymentDetails';
 import { StepReview } from './StepReview';
 import { MainContentContainer, OrderedProductCard } from '../../components';
-
-
 
 export function CheckOut() {
   const [activeStep, setActiveStep] = useState(0);
@@ -40,7 +35,7 @@ export function CheckOut() {
   }, [flowStep]);
 
   return (
-    <>
+    <Box data-testid="feature-checkout"> 
       {!hasItems() && (
         <Typography variant="subtitle1" textAlign="center" margin={3}>
           The Cart is Empty
@@ -102,6 +97,6 @@ export function CheckOut() {
           </MainContentContainer>
         </Grid>
       )}
-    </>
+    </Box>
   );
 }

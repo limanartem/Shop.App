@@ -28,7 +28,7 @@ function Catalog({ children }: { children?: React.ReactNode }) {
   }, [globalSelectedCategory]);
 
   return (
-    <>
+    <Box data-testid="feature-catalog">
       <Box>
         <CategoryBreadcrumbs categories={categories} currentTotal={products.length} />
         <Backdrop
@@ -46,7 +46,7 @@ function Catalog({ children }: { children?: React.ReactNode }) {
         </List>
       </Box>
       {children}
-    </>
+    </Box>
   );
 }
 

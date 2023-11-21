@@ -76,6 +76,7 @@ export default function CategoriesTreeView({ categories }: { categories: Product
   return (
     <Box sx={{  flexGrow: 1, maxWidth: 300 }}>
       <TreeView
+        data-testid='categoriesTree'
         aria-expanded={true}
         expanded={expanded}
         selected={selected}

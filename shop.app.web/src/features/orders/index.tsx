@@ -99,7 +99,7 @@ export function Orders() {
   }
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container justifyContent="center" data-testid="feature-orders">
       <MainContentContainer>
         <Card style={{ width: '100%' }}>
           <CardHeader title="Orders Archive" subheader="Your previously placed orders" />
