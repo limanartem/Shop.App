@@ -40,7 +40,7 @@ export type OrderItem = {
 };
 
 export type OrderItemEnhanced = OrderItem & {
-  product: ProductItem;
+  product?: ProductItem;
 };
 
 type OrderShippingInfo = {

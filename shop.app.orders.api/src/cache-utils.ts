@@ -2,7 +2,7 @@ import { RedisClientType, createClient } from 'redis';
 
 const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } = process.env;
 
-let redisClient: RedisClientType;
+let redisClient: RedisClientType | null;
 
 const getRedisClient = async () => {
   if (redisClient) {
@@ -20,13 +20,13 @@ const getRedisClient = async () => {
   return redisClient;
 };
 
-export const get = async (key: string): Promise<string> => {
+export const get = async (key: string): Promise<string | null> => {
   const client = await getRedisClient();
   const value = await client.get(key);
   return value;
 };
 
-export const update = async (key: string, data: string): Promise<void> => {
+export const update = async (key: string, data: string | null): Promise<void> => {
   const client = await getRedisClient();
   if (data == null) {
     console.log(`Removing "${key}" from cache`);

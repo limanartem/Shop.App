@@ -20,7 +20,7 @@ enum DB_COLLECTION {
   PAYMENT = 'payment',
 }
 const getClient = () =>
-  new MongoClient(MONGODB_URL, {
+  new MongoClient(MONGODB_URL!, {
     auth: {
       username: MONGO_DB_USERNAME,
       password: MONGO_DB_PASSWORD,
@@ -66,13 +66,16 @@ export const fetchDocuments = async <DocumentType extends Document = Document>(
 export const fetchDocument = async (
   id: string,
   collection: DB_COLLECTION = DB_COLLECTION.ORDERS,
-): Promise<WithClearId<Document>> =>
+): Promise<WithClearId<Document> | null> =>
   usingClient(async (client) => {
     const _id = ObjectId.createFromHexString(id);
     console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
     console.log('Fetching item from db...', id, collection);
     const order = await client.db().collection(collection).findOne({ _id });
-    return mapToClearIdDocument(order);
+    if (order != null) {
+      return mapToClearIdDocument(order);
+    }
+    return null;
   });
 
 export const updateDocument = async <T extends object>(

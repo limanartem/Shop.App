@@ -58,6 +58,9 @@ const schema = buildSchema(`
 
 const root = {
   orders: async (_: any, req: SessionRequest) => {
+    if (req.session == null) {
+      throw new Error('No session found');
+    }
     const userId = req.session.getUserId();
 
     return await getOrdersExpanded(userId);
@@ -69,13 +72,10 @@ export const useGraphql = (app: Express) => {
   app.use('/graphql', verifySession());
   app.use(
     '/graphql',
-    graphqlHTTP((req: SessionRequest) => ({
+    graphqlHTTP(() => ({
       schema: schema,
       rootValue: root,
       graphiql: true,
-      context: {
-        session: req.session,
-      },
-    })),
+    }) as any),
   );
 };

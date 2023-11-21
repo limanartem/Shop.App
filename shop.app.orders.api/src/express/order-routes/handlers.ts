@@ -12,7 +12,6 @@ import {
   UpdateOrderStatusRequestPayloadSchema,
 } from '../../model/orders-model';
 
-
 const getOrderFlow = (status: Status): OrderFlow | null => {
   switch (status) {
     case 'pending':
@@ -49,7 +48,7 @@ export async function putOrderItemHandler(req: SessionRequest, res: Response) {
   await updateOrder(orderId, {
     ...payload,
     updatedAt: new Date(),
-    updatedBy: req.session.getUserId(),
+    updatedBy: req.session?.getUserId()!,
   });
 
   const orderFlow = getOrderFlow(payload.status);
@@ -84,7 +83,7 @@ export async function putOrderHandler(req: SessionRequest, res: Response) {
   await updateOrder(orderId, {
     ...payload,
     updatedAt: new Date(),
-    updatedBy: req.session.getUserId(),
+    updatedBy: req.session?.getUserId()!,
   });
 
   const orderFlow = getOrderFlow(payload.status);
@@ -103,6 +102,10 @@ export async function putOrderHandler(req: SessionRequest, res: Response) {
 }
 
 export async function getOrdersHandler(req: SessionRequest, res: Response) {
+  if (req.session == null) {
+    throw new Error('Undefined session');
+  }
+
   const userId = req.session.getUserId();
 
   const orders = await getOrdersExpanded(userId);
@@ -125,6 +128,10 @@ export async function getOrdersHandler(req: SessionRequest, res: Response) {
 }
 
 export async function postOrdersHandler(req: SessionRequest, res: Response) {
+  if (req.session == null) {
+    throw new Error('Undefined session');
+  }
+
   const userId = req.session.getUserId();
 
   if (req.body == null) {

@@ -37,8 +37,12 @@ export const verifyUserRole = (
   role: string,
 ): ((req: SessionRequest, res: Response, next: NextFunction) => Promise<void>) => {
   return async (req, res, next) => {
-    const userId = req.session.getUserId();
-    const roles = await UserRoles.getRolesForUser(req.session.getTenantId(), userId);
+    if (req.session == null){
+      res.status(StatusCodes.UNAUTHORIZED).json({error: 'User is not logged in'});
+      return;
+    }
+    
+    const roles = await UserRoles.getRolesForUser(req.session.getTenantId(), req.session?.getUserId());
     if (roles.roles.indexOf(role) > -1) {
       next();
     } else {

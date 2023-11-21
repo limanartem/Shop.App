@@ -415,7 +415,7 @@ describe('order routes', () => {
         ['paid', 'dispatch'],
       ])(
         'when setting order status to "%s" starts "%s" order workflow',
-        async (status: Status, flow: OrderFlow) => {
+        async (status: string, flow: string) => {
           const expectedOrderId = uuidv4();
 
           await request(start())

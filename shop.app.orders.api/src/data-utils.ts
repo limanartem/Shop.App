@@ -40,42 +40,41 @@ export const updateOrderItem = async (
   order: UpdateOrder,
 ): Promise<void> => {
   const currentOrder = await fetchDocument(id);
-  const items = (currentOrder.items as OrderItem[]).map((item: OrderItem) => {
-    if (item.productId === productId) {
-      item.status = order.status;
-    }
-    return item;
-  });
-  await updateDocument(id, { items });
-  //await updateCache(id, null);
+  if (currentOrder != null) {
+    const items = (currentOrder.items as OrderItem[]).map((item: OrderItem) => {
+      if (item.productId === productId) {
+        item.status = order.status;
+      }
+      return item;
+    });
+    await updateDocument(id, { items });
+    //await updateCache(id, null);
+  }
 };
 
 export const getOrders = async (
   userId: string,
 ): ReturnType<typeof fetchDocuments<Order<OrderItemEnhanced>>> => fetchDocuments({ userId });
 
-export const getOrdersExpanded = async (
-  userId: string,
-): ReturnType<typeof getOrders> => {
+export const getOrdersExpanded = async (userId: string): ReturnType<typeof getOrders> => {
   const orders = await getOrders(userId);
 
-    await Promise.all(
-      orders.map(async (order) => {
-        const productIds = order.items?.map((i) => i.productId);
-        try {
-          const products = await getProductDetails(productIds);
-          order.items?.forEach((item) => {
-            item.product = products.find((p) => p.id === item.productId);
-          });
-        } catch (error) {
-          console.error('Error fetching product details', error, productIds);
-        }
-      }),
-    );
+  await Promise.all(
+    orders.map(async (order) => {
+      const productIds = order.items?.map((i) => i.productId);
+      try {
+        const products = await getProductDetails(productIds);
+        order.items?.forEach((item) => {
+          item.product = products.find((p) => p.id === item.productId);
+        });
+      } catch (error) {
+        console.error('Error fetching product details', error, productIds);
+      }
+    }),
+  );
 
-    return orders;
+  return orders;
 };
-
 
 export const getProductDetails = async (productIds: string[]): Promise<ProductItem[]> => {
   console.log(
