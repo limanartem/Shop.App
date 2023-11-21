@@ -8,6 +8,12 @@
       "sourceMap": true,
       "outDir": "dist",
       "baseUrl": ".",
+      "strict": true,
+      "plugins": [
+        {
+          "name": "typescript-strict-plugin"
+        }
+      ],
       "paths": {
           "*": [
               "node_modules/*"

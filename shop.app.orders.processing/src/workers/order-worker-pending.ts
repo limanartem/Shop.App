@@ -6,6 +6,11 @@ const workerName = __filename.replace(`${__dirname}/`, '');
 console.log(`"${workerName}}" worker started. Processing message`, workerData);
 
 setTimeout(async () => {
+  if (parentPort == null) {
+    console.log('No parentPort opened');
+    return;
+  }
+
   try {
     const { orderId } = workerData.data;
 
@@ -18,7 +23,7 @@ setTimeout(async () => {
   } catch (error) {
     console.error(error);
 
-    parentPort.postMessage({ status: 'error', errorMessage: error.toString() });
+    parentPort.postMessage({ status: 'error', errorMessage: error?.toString() });
 
     console.log(`"${workerName}" worker  finished processing message with error`, workerData);
   } finally {

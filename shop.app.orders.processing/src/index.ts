@@ -33,7 +33,7 @@ const workerFile = `order-worker-${WORKER_TYPE}.js`;
   });
 
   const exchange = 'orders.events';
-  const routingKey = WORKER_TYPE;
+  const routingKey = WORKER_TYPE!;
 
   console.log(
     `Ensuring "${exchange}" exchange and "${queue}" queue binding through "${routingKey}" routing key configured...`,
@@ -47,6 +47,10 @@ const workerFile = `order-worker-${WORKER_TYPE}.js`;
   await channel.consume(
     queue,
     async (message) => {
+      if (message == null) {
+        return;
+      }
+
       console.log(`Order received, messageId: ${message.properties.messageId}.`);
       const data = JSON.parse(Buffer.from(message.content).toString());
       new Worker(path.join(__dirname, `workers/${workerFile}`), {
