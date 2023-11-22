@@ -37,9 +37,9 @@ function Catalog({ children }: { children?: React.ReactNode }) {
         >
           <CircularProgress color="inherit" />
         </Backdrop>
-        <List>
+        <List data-testid="list-products">
           {products.map((row) => (
-            <ListItem key={row.id}>
+            <ListItem key={row.id} data-testid={`product-${row.id}`}>
               <ProductCard product={row} />
             </ListItem>
           ))}

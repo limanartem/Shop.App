@@ -77,15 +77,18 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
               <Select
                 value={quantity}
                 label="Quantity"
+                aria-label="quantity"
                 style={{ minWidth: '56px' }}
                 onChange={(e) => setQuantity(Number.parseInt(e.target.value as string))}
+                data-testid="quantity-select"
+                inputProps={{ 'data-testid': 'quantity-select-input' }} 
               >
                 <MenuItem value={1}>1</MenuItem>
                 <MenuItem value={2}>2</MenuItem>
                 <MenuItem value={3}>3</MenuItem>
               </Select>
               <Tooltip title={`Add ${quantity} to Cart`}>
-                <Button variant="contained" style={{ width: '56px' }} onClick={handleAddToCart}>
+                <Button variant="contained" style={{ width: '56px' }} onClick={handleAddToCart} aria-label="add">
                   <AddShoppingCart fontSize="small" />
                 </Button>
               </Tooltip>
@@ -96,6 +99,7 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
                       variant="outlined"
                       style={{ width: '56px' }}
                       onClick={handleRemoveFromCart}
+                      aria-label="remove"
                     >
                       <RemoveShoppingCartIcon fontSize="small" />
                     </Button>
