@@ -28,7 +28,7 @@ const assertTotal = async (containerElement: HTMLElement, itemsInCart: ShoppingC
   );
 };
 
-describe('<CheckOut />', () => {
+describe('Feature Checkout', () => {
   let store: ReturnType<typeof buildStore>;
 
   beforeEach(async () => {

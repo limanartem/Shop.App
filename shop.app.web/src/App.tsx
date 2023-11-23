@@ -10,7 +10,7 @@ import AppWrapper from './components/app-wrapper';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
 import { SessionAuth } from 'supertokens-auth-react/recipe/session';
-import { CheckOut } from './features/check-out';
+import CheckOut from './features/check-out';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import {
   DataLoadingState,
@@ -18,7 +18,7 @@ import {
   selectCategoriesStatus,
 } from './app/reducers/categoriesReducer';
 import { useEffect, useState } from 'react';
-import { Orders } from './features/orders';
+import Orders from './features/orders';
 import { AuthWrapper, CategoryContextProvider, AuthRoutes } from './components';
 
 function InitializeDataWrapper({ children }: { children?: React.ReactNode }) {

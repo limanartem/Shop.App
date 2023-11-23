@@ -25,7 +25,7 @@ function sortOrdersDesc(o2: Order, o1: Order): number {
   return o1Date - o2Date;
 }
 
-export function Orders() {
+export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [expandedOrderId, setExpandedOrderId] = useState('');
 

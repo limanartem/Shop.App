@@ -73,7 +73,7 @@ export function OrderedProductCard({ item, flow }: Props) {
             <Typography variant="body2">
               {item.product.price.toFixed(2)} x {item.quantity} (
               {(item.product.price * item.quantity).toFixed(2)})
-              <strong>{item.product.currency}</strong>
+              <strong>&nbsp;{item.product.currency}</strong>
             </Typography>
           </CardContent>
         </Grid>

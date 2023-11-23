@@ -30,7 +30,7 @@ const setSelectValue = async (container: HTMLElement, selectTestId: string, valu
   await waitFor(() => selectInputValue.value === valueToSet);
 };
 
-describe('<Catalog />', () => {
+describe('Feature Catalog', () => {
   let store: ReturnType<typeof buildStore>;
 
   beforeEach(async () => {
