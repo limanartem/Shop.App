@@ -4,7 +4,8 @@
   "description": "Prototype of the shop app implementation as a playground for integration of different distributed components",
   "scripts": {
     "build": "tsc --build --verbose",
-    "start-web": "npm run start --workspace ./apps/shop.app.web"
+    "start-web": "npm run start --workspace ./apps/shop.app.web",
+    "test-web": "npm run test --workspace ./apps/shop.app.web"
   },
   "repository": {
     "type": "git",

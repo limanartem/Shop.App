@@ -1,4 +1,8 @@
-module.exports = {
+import { compilerOptions } from '../../tsconfig.json';
+import type { Config } from '@jest/types';
+import { pathsToModuleNameMapper } from 'ts-jest';
+
+const config: Config.InitialOptions = {
   // setupFiles: ['<rootDir>/src/.jest/setEnvVars.js'],
   // setupFilesAfterEnv: ['<rootDir>/src/.jest/test-setup.js'],
   preset: 'ts-jest',
@@ -22,6 +26,12 @@ module.exports = {
   roots: ['src/'],
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    ...pathsToModuleNameMapper(compilerOptions.paths, {
+      // This has to match the baseUrl defined in tsconfig.json.
+      prefix: '<rootDir>/../../',
+    }),
   },
   // runner: 'groups',
 };
+
+export default config;
