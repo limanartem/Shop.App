@@ -7,7 +7,7 @@ module.exports = {
     '^.+\\.tsx?$': 'ts-jest',
     // process `*.tsx` files with `ts-jest`
   },
-  collectCoverage: true,
+  // collectCoverage: true,
   coverageThreshold: {
     global: {
       branches: 85,

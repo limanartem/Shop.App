@@ -2,7 +2,7 @@ module.exports = {
   // setupFiles: ['<rootDir>/src/.jest/setEnvVars.js'],
   // setupFilesAfterEnv: ['<rootDir>/src/.jest/test-setup.js'],
   preset: 'ts-jest',
-  collectCoverage: true,
+  //collectCoverage: true,
   coverageThreshold: {
     global: {
       branches: 85,
