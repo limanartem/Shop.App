@@ -1,10 +1,10 @@
 {
-  "name": "shop.app.auth.api",
+  "name": "@shop.app/auth.api",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "start": "node ."
   },
   "author": "",

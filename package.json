@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Prototype of the shop app implementation as a playground for integration of different distributed components",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc --build --verbose"
   },
   "repository": {
     "type": "git",
@@ -16,7 +16,10 @@
     "url": "https://github.com/limanartem/Shop.App/issues"
   },
   "homepage": "https://github.com/limanartem/Shop.App#readme",
-  "workspaces":[
+  "workspaces": [
     "apps/*"
-  ]
+  ],
+  "devDependencies": {
+    "typescript": "^5.3.2"
+  }
 }
