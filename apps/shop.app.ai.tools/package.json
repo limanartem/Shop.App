@@ -1,10 +1,10 @@
 {
-  "name": "shop.ai.tools",
+  "name": "@shop.app/ai.tools",
   "version": "1.0.0",
   "type": "commonjs",
   "description": "",
   "scripts": {
-    "tsc": "tsc",
+    "build": "tsc --build",
     "generate": "tsc && node dist/generate-ai-product-images.js"
   },
   "author": "",

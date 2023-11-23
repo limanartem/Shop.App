@@ -13,8 +13,8 @@ services:
     networks:
       - app-private-network
     volumes:
-      - "./shop.app.catalog.db/shop.db.init.schema.sql:/docker-entrypoint-initdb.d/1.sql"
-      - "./shop.app.catalog.db/shop.db.init.data.sql:/docker-entrypoint-initdb.d/2.sql"  
+      - "./docker-support/shop.app.catalog.db/shop.db.init.schema.sql:/docker-entrypoint-initdb.d/1.sql"
+      - "./docker-support/shop.app.catalog.db/shop.db.init.data.sql:/docker-entrypoint-initdb.d/2.sql"  
 
   # Users database
   shop.app.auth.db:
@@ -67,7 +67,7 @@ services:
   # User authentication api
   shop.app.auth.api:
     build:
-      context: ./shop.app.auth.api
+      context: ./apps/shop.app.auth.api
     ports:
       - "3003:3003"
     restart: on-failure
@@ -85,6 +85,35 @@ services:
       API_USER_EMAIL : $API_USER_EMAIL
       API_USER_PASSWORD : $API_USER_PASSWORD
 
+  # Shop cache service
+  shop.app.cache:
+    image: redis:latest
+    restart: always
+    #ports:
+    #  - '6379:6379'
+    networks:
+      - app-private-network
+    command: redis-server --save 20 1 --loglevel warning --requirepass qwerty123
+    volumes: 
+      - cache:/data
+
+  # Shop message broker
+  shop.app.messagebroker:
+    build: ./docker-support/shop.app.messageBroker
+    environment:
+      - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
+    #ports:
+    #    - 5672
+    #    - 15672
+    networks:
+        - app-private-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
   # Shop orders database
   shop.app.orders.db:
     image: mongo:latest
@@ -100,41 +129,12 @@ services:
       - app-private-network
     volumes:
       - mongodb-data7:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-
-  # Shop cache service
-  shop.app.cache:
-    image: redis:latest
-    restart: always
-    #ports:
-    #  - '6379:6379'
-    networks:
-      - app-private-network
-    command: redis-server --save 20 1 --loglevel warning --requirepass qwerty123
-    volumes: 
-      - cache:/data
-
-  # Shop message broker
-  shop.app.messagebroker:
-    build: ./shop.app.messageBroker
-    environment:
-      - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
-      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
-    #ports:
-    #    - 5672
-    #    - 15672
-    networks:
-        - app-private-network
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 30s
-      timeout: 30s
-      retries: 3
+      - ./docker-support/shop.app.orders.db/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   # Shop orders API
   shop.app.orders.api:
     build:
-      context: ./shop.app.orders.api
+      context: ./apps/shop.app.orders.api
     ports:
       - "3001:3001"
     restart: on-failure
@@ -164,7 +164,7 @@ services:
   # Shop products API
   shop.app.catalog.api:
     build:
-      context: ./shop.app.catalog.api
+      context: ./apps/shop.app.catalog.api
     ports:
       - "5002:5002"
     restart: on-failure
@@ -190,7 +190,7 @@ services:
   # New orders processing - checking inventory availability
   shop.app.orders.pending.processing:
     build:
-      context: ./shop.app.orders.processing
+      context: ./apps/shop.app.orders.processing
     restart: on-failure
     networks:
       - app-private-network
@@ -211,7 +211,7 @@ services:
   # Payment processing
   shop.app.orders.payment.processing:
     build:
-      context: ./shop.app.orders.processing
+      context: ./apps/shop.app.orders.processing
     restart: on-failure
     networks:
       - app-private-network
@@ -232,7 +232,7 @@ services:
   # Order shipping
   shop.app.orders.dispatch.processing:
     build:
-      context: ./shop.app.orders.processing
+      context: ./apps/shop.app.orders.processing
     restart: on-failure
     networks:
       - app-private-network
@@ -253,7 +253,7 @@ services:
   # Main shop frontend
   shop.app.web:
     build:
-      context: ./shop.app.web
+      context: ./apps/shop.app.web
     ports:
       - "3000:80"
     networks:

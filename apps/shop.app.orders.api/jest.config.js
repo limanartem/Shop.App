@@ -2,12 +2,7 @@ module.exports = {
   // setupFiles: ['<rootDir>/src/.jest/setEnvVars.js'],
   // setupFilesAfterEnv: ['<rootDir>/src/.jest/test-setup.js'],
   preset: 'ts-jest',
-  testEnvironment: 'jest-environment-jsdom',
-  transform: {
-    '^.+\\.tsx?$': 'ts-jest',
-    // process `*.tsx` files with `ts-jest`
-  },
-  // collectCoverage: true,
+  //collectCoverage: true,
   coverageThreshold: {
     global: {
       branches: 85,
@@ -20,8 +15,7 @@ module.exports = {
   verbose: true,
   passWithNoTests: true,
   roots: ['src/'],
-  moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-  },
+  setupFiles: ['<rootDir>/src/.jest/globalSetup.ts'],
+
   // runner: 'groups',
 };
