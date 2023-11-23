@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x, 21.x]
+        node-version: [21.x]
 
     steps:
     - uses: actions/checkout@v3
@@ -22,8 +22,15 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Build
+    - name: Shop.App.Web Tests
       run: |
         cd shop.app.web
+        npm install
+        npm run test
+
+
+    - name: Shop.App.Orders Tests
+      run: |
+        cd shop.app.orders.api
         npm install
         npm run test
