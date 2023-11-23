@@ -1,0 +1,22 @@
+{
+  "name": "shop.app",
+  "version": "1.0.0",
+  "description": "Prototype of the shop app implementation as a playground for integration of different distributed components",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/limanartem/Shop.App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/limanartem/Shop.App/issues"
+  },
+  "homepage": "https://github.com/limanartem/Shop.App#readme",
+  "workspaces":[
+    "apps/*"
+  ]
+}
