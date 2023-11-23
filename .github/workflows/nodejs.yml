@@ -23,13 +23,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Shop.App.Web Tests
-        working-directory: ./shop.app.web
+        working-directory: ./apps/shop.app.web
         run: |
           npm install
           npm run test
 
       - name: Shop.App.Orders Tests
-        working-directory: ./shop.app.orders.api
+        working-directory: ./apps/shop.app.orders.api
         run: |
           npm install
           npm run test
