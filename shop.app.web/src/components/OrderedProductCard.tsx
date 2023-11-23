@@ -41,6 +41,7 @@ function ItemAction({ item, flow }: Props) {
         <Tooltip title="Remove from Cart">
           <Button
             variant="outlined"
+            aria-label='remove'
             style={
               flow === 'shoppingCart'
                 ? { height: '24px', minWidth: '24px', maxWidth: '24px' }

@@ -4,6 +4,7 @@ import Catalog from '.';
 import { Provider } from 'react-redux';
 import { getProductsAsync } from '../../services/catalog-service';
 import { randomUUID } from 'crypto';
+import { buildStore } from '../../app/store';
 
 jest.mock('../../services/catalog-service', () => ({
   getProductsAsync: jest.fn().mockResolvedValue([]),
@@ -30,11 +31,10 @@ const setSelectValue = async (container: HTMLElement, selectTestId: string, valu
 };
 
 describe('<Catalog />', () => {
-  let store: any;
+  let store: ReturnType<typeof buildStore>;
+
   beforeEach(async () => {
-    // Use clean store for each test run
-    jest.resetModules();
-    store = (await import('../../app/store')).store;
+    store = buildStore();
   });
 
   afterEach(() => {
@@ -45,9 +45,7 @@ describe('<Catalog />', () => {
   it('should contain main elements', async () => {
     render(
       <Provider store={store}>
-        <Catalog>
-          <></>
-        </Catalog>
+        <Catalog />
       </Provider>,
     );
     await expect(await screen.findByTestId('feature-catalog')).toBeInTheDocument();
@@ -99,9 +97,7 @@ describe('<Catalog />', () => {
     it('has list item for product', async () => {
       render(
         <Provider store={store}>
-          <Catalog>
-            <></>
-          </Catalog>
+          <Catalog />
         </Provider>,
       );
 
@@ -114,9 +110,7 @@ describe('<Catalog />', () => {
     it.each([1, 2, 3])('adds %s item(s) to the cart', async (quantity: Number) => {
       render(
         <Provider store={store}>
-          <Catalog>
-            <></>
-          </Catalog>
+          <Catalog />
         </Provider>,
       );
 
@@ -126,9 +120,7 @@ describe('<Catalog />', () => {
     it.each([1, 2, 3])('removes %s items from the cart', async (quantity: Number) => {
       render(
         <Provider store={store}>
-          <Catalog>
-            <></>
-          </Catalog>
+          <Catalog />
         </Provider>,
       );
 

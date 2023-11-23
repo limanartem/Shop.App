@@ -9,7 +9,7 @@ import { useAppSelector } from '../../app/hooks';
 import { selectCategory } from '../../app/reducers/searchReducer';
 import { selectCategories } from '../../app/reducers/categoriesReducer';
 
-function Catalog({ children }: { children?: React.ReactNode }) {
+function Catalog() {
   const [productsLoading, setProductsLoading] = useState(false);
   const [products, setProducts] = useState<ProductItem[]>([]);
   const categories = useAppSelector(selectCategories);
@@ -45,7 +45,6 @@ function Catalog({ children }: { children?: React.ReactNode }) {
           ))}
         </List>
       </Box>
-      {children}
     </Box>
   );
 }
