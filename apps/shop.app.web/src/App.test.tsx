@@ -29,7 +29,7 @@ jest.mock('./services/order-service', () => ({
   createOrdersAsync: jest.fn().mockResolvedValue(null),
 }));
 
-describe('<App />', () => {
+describe('App', () => {
   afterEach(() => {
     cleanup();
     jest.clearAllMocks();
