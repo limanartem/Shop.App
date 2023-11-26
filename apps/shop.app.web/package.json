@@ -25,7 +25,7 @@
   },
   "scripts": {
     "dev": "chmod +x ./scripts/update-env.sh && ./scripts/update-env.sh && cp env-config.js ./public/ && react-scripts start",
-    "start": "craco start",
+    "start": "react-scripts start",
     "build": "craco build",
     "test": "jest",
     "eject": "react-scripts eject"
@@ -54,10 +54,10 @@
     "@babel/preset-typescript": "^7.23.3",
     "@craco/craco": "^7.1.0",
     "@jest/transform": "^27.5.1",
-    "@testing-library/jest-dom": "^6.1.4",
+    "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.1.0",
     "@testing-library/user-event": "^14.5.1",
-    "@types/jest": "^29.5.8",
+    "@types/jest": "^27.5.2",
     "@types/luxon": "^3.3.5",
     "@types/react": "^18.2.37",
     "@types/react-redux": "^7.1.30",
@@ -67,8 +67,9 @@
     "jest-watch-typeahead": "^2.2.2",
     "luxon": "^3.4.4",
     "react-scripts": "^5.0.0",
-    "ts-jest": "^29.1.1",
+    "ts-jest": "27.1",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "typescript-strict-plugin": "^2.2.1"
-  }
+  },
+  "overrides": {}
 }
