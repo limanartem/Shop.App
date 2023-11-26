@@ -5,6 +5,7 @@ import { createOrdersAsync } from '../../services/order-service';
 import CircularProgress from '@mui/material/CircularProgress';
 import { FormEventHandler, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import config from '../../config';
 
 export function StepReview() {
   const dispatch = useAppDispatch();
@@ -42,8 +43,8 @@ export function StepReview() {
           setLoading(false);
           setTimeout(() => {
             dispatch(placeOrder());
-            navigate('/orders'); // Navigate to order id
-          }, 5000);
+            navigate(`/orders/${result.id}`);
+          }, config.checkout.DelayAfterCompletion);
         } else {
           setError('Something went wrong');
         }

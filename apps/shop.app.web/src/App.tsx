@@ -20,6 +20,7 @@ import {
 import { useEffect, useState } from 'react';
 import Orders from './features/orders';
 import { AuthWrapper, CategoryContextProvider, AuthRoutes } from './components';
+import { OrderPage } from './features/orders/OrderDetails';
 
 function InitializeDataWrapper({ children }: { children?: React.ReactNode }) {
   const categoriesStatus = useAppSelector(selectCategoriesStatus);
@@ -76,6 +77,14 @@ function App() {
                         element={
                           <SessionAuth>
                             <Orders />
+                          </SessionAuth>
+                        }
+                      />
+                       <Route
+                        path="/orders/:id"
+                        element={
+                          <SessionAuth>
+                            <OrderPage />
                           </SessionAuth>
                         }
                       />

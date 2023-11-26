@@ -22,7 +22,17 @@ jest.mock('../../services/order-service', () => ({
 
 // Avoid loading store from the local storage
 jest.mock('../../app/persistance/local-storage');
-jest.mock('react-router-dom');
+
+const mockedNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+  useNavigate: jest.fn(() => mockedNavigate),
+}));
+
+jest.mock('../../config', () => ({
+  checkout: {
+    DelayAfterCompletion: 100,
+  },
+}));
 
 const assertTotal = async (containerElement: HTMLElement, itemsInCart: ShoppingCartItem[]) => {
   // eslint-disable-next-line testing-library/no-node-access
@@ -287,6 +297,8 @@ describe('Feature Checkout', () => {
       });
 
       it('if checkout successfully complete should show message', async () => {
+        const expectedOrderId = randomUUID();
+
         render(
           <Provider store={store}>
             <CheckOut />
@@ -298,15 +310,19 @@ describe('Feature Checkout', () => {
         await proceedToPayment();
         await fillInPayment();
         await proceedToReview();
-        (createOrdersAsync as jest.Mock).mockResolvedValue({ id: randomUUID() });
+        (createOrdersAsync as jest.Mock).mockResolvedValue({ id: expectedOrderId });
         const { stepElement } = await submit('review');
         await waitFor(() => expect(createOrdersAsync).toHaveBeenCalled());
         const successText = await within(stepElement).findByText(
-          'Order has been successfully placed and is being processed!', {
+          'Order has been successfully placed and is being processed!',
+          {
             exact: false,
-          }
+          },
         );
         expect(successText).toBeInTheDocument();
+        await waitFor(() => {
+          expect(mockedNavigate).toHaveBeenCalledWith(`/orders/${expectedOrderId}`);
+        });
       });
     });
   });
