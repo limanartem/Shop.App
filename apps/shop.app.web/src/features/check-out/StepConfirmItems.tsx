@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Box, Button, ButtonGroup, List, ListItem, Typography } from '@mui/material';
-import { useCallback } from 'react';
+import { FormEventHandler, useCallback } from 'react';
 import { confirmCheckoutItems } from '../../app/reducers/checkOutReducer';
 import { OrderedProductCard } from '../../components';
 
@@ -14,8 +14,13 @@ export function StepConfirmItems() {
       .toFixed(2);
   }, [items]);
 
+  const handleFormSubmit: FormEventHandler = (e) => {
+    e.preventDefault();
+    dispatch(confirmCheckoutItems());
+  };
+
   return (
-    <Box >
+    <Box>
       <List sx={{ width: '100%' }} data-testid="list-products">
         {items?.map((item) => (
           <ListItem
@@ -31,7 +36,7 @@ export function StepConfirmItems() {
         <strong>Total:</strong> {calculateTotal()} USD
       </Typography>
       <Box textAlign="right" padding={2}>
-        <form onSubmit={() => dispatch(confirmCheckoutItems())}>
+        <form onSubmit={handleFormSubmit}>
           <ButtonGroup size="large">
             <Button variant="contained" color="primary" style={{ minWidth: 80 }} type="submit">
               Continue

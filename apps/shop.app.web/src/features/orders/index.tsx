@@ -13,6 +13,7 @@ import {
   CardContent,
   Grid,
   CardHeader,
+  Stack,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { StatusIndicator } from '../shopping-cart/StatusIndicator';
@@ -73,7 +74,7 @@ export default function Orders() {
     title,
     fixedHight = true,
   }: {
-    children?: React.ReactNode;
+    children?: React.ReactElement<typeof SummaryItem> | React.ReactElement<typeof SummaryItem>[];
     title: string;
     fixedHight?: boolean;
   }) {
@@ -89,12 +90,24 @@ export default function Orders() {
     );
   }
 
-  function SummaryItem({ children, title }: { children: React.ReactNode; title?: string }) {
+  function SummaryItem({
+    children,
+    title,
+    wrapInContainer,
+  }: {
+    children: React.ReactNode;
+    title?: string;
+    wrapInContainer?: boolean;
+  }) {
+    console.log(children);
     return (
-      <Typography variant="body2">
-        {title != null && <strong>{title}: </strong>}
-        {children}
-      </Typography>
+      <Stack direction={{ xs: 'column', sm: 'row' }}  spacing={1}>
+        {title != null && (
+          <Typography variant="body2">{title != null && <strong>{title}: </strong>}</Typography>
+        )}
+        {wrapInContainer === true && <Box width="100%">{children}</Box>}
+        {!wrapInContainer && <Typography variant="body2">{children}</Typography>}
+      </Stack>
     );
   }
 
@@ -167,9 +180,9 @@ export default function Orders() {
                     </Grid>
                     <Grid item xs={12}>
                       <SummaryCard title="Items summary" fixedHight={false}>
-                        <SummaryItem>
+                        <SummaryItem wrapInContainer={true}>
                           <>
-                            <List>
+                            <List style={{ width: '100%'}}>
                               {order.items.map((item, index) => (
                                 <ListItem alignItems="flex-start" key={item.product?.id}>
                                   {item.product != null && (

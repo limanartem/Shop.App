@@ -14,5 +14,5 @@ const statusColor = (status?: string) => {
 };
 
 export function StatusIndicator({ status }: { status?: string }) {
-  return <Chip label={status} color={statusColor(status)} size="small" />;
+  return <Chip label={status} color={statusColor(status)} size="small" style={{ fontSize: '0.75rem'}} />;
 }

@@ -172,11 +172,7 @@ export function StepPaymentDetails() {
             <TextField
               label="Bank Name"
               fullWidth
-              required
-              name="bankName"
-              onChange={handleIbanChange}
-              error={errors.bankName}
-              helperText={errors.bankName && 'Please enter the bank name'}
+              helperText={'Please enter the bank name'}
             />
           </Grid>
         </Grid>

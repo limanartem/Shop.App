@@ -54,11 +54,11 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
           <Grid container direction="column" padding={1}>
             <Grid item justifyContent="flex-end" textAlign="right">
               <Typography>
-                <strong>Total:</strong>
+                <strong>Total:&nbsp;</strong>
                 {items
                   ?.reduce((acc, item) => acc + item.product.price * item.quantity, 0)
                   .toFixed(2)}
-                {items?.[0]?.product.currency}
+                &nbsp;{items?.[0]?.product.currency}
               </Typography>
             </Grid>
             <Grid item textAlign="right" marginTop={1}>
