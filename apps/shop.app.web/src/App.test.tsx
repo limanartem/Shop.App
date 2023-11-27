@@ -26,6 +26,7 @@ jest.mock('./services/catalog-service', () => ({
 
 jest.mock('./services/order-service', () => ({
   getOrdersAsync: jest.fn().mockResolvedValue({ orders: [] }),
+  getOrderAsync: jest.fn().mockResolvedValue({}),
   createOrdersAsync: jest.fn().mockResolvedValue(null),
 }));
 
@@ -47,7 +48,7 @@ describe('App', () => {
     await expect(await screen.findByTestId('feature-catalog')).toBeInTheDocument();
   });
 
-  describe('for unauthenticated user', () => {
+  describe('unauthenticated user', () => {
     beforeEach(() => {
       // Mock user is not authenticated
       (SessionAuth as jest.Mock).mockImplementation(
@@ -66,9 +67,15 @@ describe('App', () => {
       render(<App />);
       await expect(screen.findByTestId('feature-orders')).rejects.toThrow();
     });
+
+    it('should not navigate to order page feature if user is not authenticated', async () => {
+      window.history.pushState({}, '', '/orders/123445');
+      render(<App />);
+      await expect(screen.findByTestId('feature-orderPage')).rejects.toThrow();
+    });
   });
 
-  describe('for authenticated user', () => {
+  describe('authenticated user', () => {
     beforeEach(() => {
       // Mock user is authenticated
       (SessionAuth as jest.Mock).mockImplementation(
@@ -76,16 +83,22 @@ describe('App', () => {
       );
     });
 
-    it('should navigate to checkout feature', async () => {
+    it('able to navigate to checkout feature', async () => {
       window.history.pushState({}, '', '/checkout');
       render(<App />);
       await expect(await screen.findByTestId('feature-checkout')).toBeInTheDocument();
     });
 
-    it('should navigate to orders feature', async () => {
+    it('able to navigate to orders feature', async () => {
       window.history.pushState({}, '', '/orders');
       render(<App />);
       await expect(await screen.findByTestId('feature-orders')).toBeInTheDocument();
+    });
+
+    it('able to navigate to order page feature', async () => {
+      window.history.pushState({}, '', '/orders/1234');
+      render(<App />);
+      await expect(await screen.findByTestId('feature-orderPage')).toBeInTheDocument();
     });
   });
 

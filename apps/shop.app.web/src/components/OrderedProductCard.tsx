@@ -13,13 +13,12 @@ type Props = {
 };
 
 function ItemImage({ item, flow }: Props) {
-  const height = flow === 'shoppingCart' || flow === 'orderDetails' ? 56 : 100;
+  const width = flow === 'shoppingCart' || flow === 'orderDetails' ? 56 : 100;
 
   return (
     <CardMedia
       component="img"
-      height={height}
-      style={{ width: 'inherit' }}
+      style={{ width: width, minWidth: width }}
       image={getProductImage(item.product)}
       alt={item.product.title}
       onError={(e: any) => (e.target.src = ProductFallbackImage)}
@@ -41,7 +40,7 @@ function ItemAction({ item, flow }: Props) {
         <Tooltip title="Remove from Cart">
           <Button
             variant="outlined"
-            aria-label='remove'
+            aria-label="remove"
             style={
               flow === 'shoppingCart'
                 ? { height: '24px', minWidth: '24px', maxWidth: '24px' }
@@ -61,26 +60,20 @@ function ItemAction({ item, flow }: Props) {
 export function OrderedProductCard({ item, flow }: Props) {
   return (
     <Card style={{ display: 'flex', width: '100%' }}>
-      <Grid container direction="row" justifyContent="flex-end" alignItems="center">
-        <Grid item xs="auto">
-          <ItemImage item={item} flow={flow} />
-        </Grid>
-        <Grid item xs={8}>
-          <CardContent style={{ flex: 1, padding: '5px' }}>
-            <Typography variant="caption" component="div">
-              {item.product.title}
-            </Typography>
-            <Typography variant="body2">
-              {item.product.price.toFixed(2)} x {item.quantity} (
-              {(item.product.price * item.quantity).toFixed(2)})
-              <strong>&nbsp;{item.product.currency}</strong>
-            </Typography>
-          </CardContent>
-        </Grid>
-        <Grid item md textAlign="right" paddingRight={2}>
-          <ItemAction item={item} flow={flow} />
-        </Grid>
-      </Grid>
+      <ItemImage item={item} flow={flow} />
+      <CardContent style={{ flex: 1, padding: '5px' }}>
+        <Typography variant="caption" component="div">
+          {item.product.title}
+        </Typography>
+        <Typography variant="body2">
+          {item.product.price.toFixed(2)} x {item.quantity} (
+          {(item.product.price * item.quantity).toFixed(2)})
+          <strong>&nbsp;{item.product.currency}</strong>
+        </Typography>
+      </CardContent>
+      <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
+        <ItemAction item={item} flow={flow} />
+      </CardContent>
     </Card>
   );
 }

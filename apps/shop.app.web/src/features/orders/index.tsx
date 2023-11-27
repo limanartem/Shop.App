@@ -6,18 +6,21 @@ import {
   AccordionSummary,
   AccordionDetails,
   Typography,
-  List,
-  ListItem,
-  Box,
   Card,
   CardContent,
   Grid,
   CardHeader,
+  Backdrop,
+  CircularProgress,
+  Button,
+  Box,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { StatusIndicator } from '../shopping-cart/StatusIndicator';
-import { OrderProgressIndicator } from './OrderProgressIndicator';
-import { DateTime, MainContentContainer, OrderedProductCard } from '../../components';
+import { MainContentContainer } from '../../components';
+import { OrderDetails } from './OrderDetails';
+import { OrderSummary } from './OrderSummary';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { useNavigate } from 'react-router-dom';
 
 function sortOrdersDesc(o2: Order, o1: Order): number {
   const o1Date = new Date(o1.createdAt).getTime();
@@ -28,75 +31,24 @@ function sortOrdersDesc(o2: Order, o1: Order): number {
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [expandedOrderId, setExpandedOrderId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const toggleAccordion = (orderId: any) => {
     setExpandedOrderId(expandedOrderId === orderId ? '' : orderId);
   };
 
-  const calculateTotal = (order: Order) => {
-    return order.items
-      .reduce((total: number, item) => total + (item.product?.price || 0) * item.quantity, 0)
-      .toFixed(2);
-  };
-
-  const maskCreditCardNumber = (creditCardNumber: string) => {
-    if (creditCardNumber.length > 8) {
-      const maskedDigits = creditCardNumber.slice(0, -4).replace(/\d/g, '*');
-      const visibleDigits = creditCardNumber.slice(-4);
-
-      return maskedDigits + visibleDigits;
-    }
-    return creditCardNumber;
-  };
-
-  const maskIban = (iban: string) => {
-    if (iban.length > 4) {
-      const maskedCharacters = iban.slice(4, -4).replace(/[A-Z0-9]/g, '*');
-      const visibleCharacters = iban.slice(-4);
-
-      return iban.slice(0, 4) + maskedCharacters + visibleCharacters;
-    }
-    return iban;
-  };
-
   useEffect(() => {
+    setLoading(true);
+
     const getOrders = async () => {
       const result = await getOrdersAsync();
       setOrders(result.orders);
+      setLoading(false);
     };
 
     getOrders();
   }, []);
-
-  function SummaryCard({
-    children,
-    title,
-    fixedHight = true,
-  }: {
-    children?: React.ReactNode;
-    title: string;
-    fixedHight?: boolean;
-  }) {
-    return (
-      <Card style={{ height: fixedHight ? 120 : undefined }}>
-        <CardContent>
-          <Typography color="text.secondary" gutterBottom variant="subtitle2">
-            {title}
-          </Typography>
-          {children}
-        </CardContent>
-      </Card>
-    );
-  }
-
-  function SummaryItem({ children, title }: { children: React.ReactNode; title?: string }) {
-    return (
-      <Typography variant="body2">
-        {title != null && <strong>{title}: </strong>}
-        {children}
-      </Typography>
-    );
-  }
 
   return (
     <Grid container justifyContent="center" data-testid="feature-orders">
@@ -104,6 +56,12 @@ export default function Orders() {
         <Card style={{ width: '100%' }}>
           <CardHeader title="Orders Archive" subheader="Your previously placed orders" />
           <CardContent style={{ paddingTop: 0 }}>
+            <Backdrop
+              sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+              open={loading}
+            >
+              <CircularProgress color="inherit" />
+            </Backdrop>
             {orders.sort(sortOrdersDesc).map((order, index) => (
               <Accordion
                 key={order.id}
@@ -111,83 +69,31 @@ export default function Orders() {
                 onChange={() => toggleAccordion(order.id)}
               >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  {!(expandedOrderId === order.id) && (
-                    <>
-                      <Grid container justifyContent="flex-end">
-                        <Grid item xs={12} sm={10} textAlign="left">
-                          <Typography color="text.secondary" gutterBottom variant="body2">
-                            <StatusIndicator status={order.status} />
-                            &nbsp;Order placed on <DateTime date={order.createdAt} />
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={2} textAlign="right">
-                          <Typography color="text.secondary" variant="body2">
-                            <strong>Total:</strong> {calculateTotal(order)} USD
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                    </>
-                  )}
+                  {!(expandedOrderId === order.id) && <OrderSummary order={order} />}
                   {expandedOrderId === order.id && (
-                    <Typography variant="subtitle1">Order Details</Typography>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        width: '100%',
+                      }}
+                    >
+                      <Typography variant="subtitle1">Order Details</Typography>
+                      <Box  sx={{ flex: '1 0 auto', textAlign: 'right' }}>
+                        <Button
+                          variant="text"
+                          onClick={() => navigate(`/orders/${order.id}`)}
+                         
+                        >
+                          Open <KeyboardArrowRightIcon />
+                        </Button>
+                      </Box>
+                    </Box>
                   )}
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Grid container spacing={1}>
-                    <Grid item xs={12}>
-                      <OrderProgressIndicator orderStatus={order.status} />
-                    </Grid>
-                    <Grid item md={4} xs={12}>
-                      <SummaryCard title="Summary">
-                        <SummaryItem title="Placed">
-                          <DateTime date={order.createdAt} />
-                        </SummaryItem>
-                        <SummaryItem title="Status">
-                          <StatusIndicator status={order.status} />
-                        </SummaryItem>
-                      </SummaryCard>
-                    </Grid>
-                    <Grid item md={4} xs={12}>
-                      <SummaryCard title="Delivery Information">
-                        <SummaryItem title="Address">
-                          {order.shipping.address}, {order.shipping.city}, {order.shipping.zip},
-                          {order.shipping.country}
-                        </SummaryItem>
-                      </SummaryCard>
-                    </Grid>
-                    <Grid item md={4} xs={12}>
-                      <SummaryCard title="Payment Information">
-                        <SummaryItem title={order.payment.creditCard ? 'Credit card' : 'IBAN'}>
-                          {order.payment.creditCard != null && (
-                            <>{maskCreditCardNumber(order.payment.creditCard.number)}</>
-                          )}
-                          {order.payment.bank != null && <>{maskIban(order.payment.bank.iban)}</>}
-                        </SummaryItem>
-                      </SummaryCard>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <SummaryCard title="Items summary" fixedHight={false}>
-                        <SummaryItem>
-                          <>
-                            <List>
-                              {order.items.map((item, index) => (
-                                <ListItem alignItems="flex-start" key={item.product?.id}>
-                                  {item.product != null && (
-                                    <OrderedProductCard flow="orderDetails" item={item} />
-                                  )}
-                                </ListItem>
-                              ))}
-                            </List>
-                            <Box style={{ marginTop: 2 }}>
-                              <Typography color="text.secondary" variant="subtitle2">
-                                <strong>Total:</strong> {calculateTotal(order)} USD
-                              </Typography>
-                            </Box>
-                          </>
-                        </SummaryItem>
-                      </SummaryCard>
-                    </Grid>
-                  </Grid>
+                  <OrderDetails order={order} />
                 </AccordionDetails>
               </Accordion>
             ))}

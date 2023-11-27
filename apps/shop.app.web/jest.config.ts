@@ -1,4 +1,4 @@
-import { compilerOptions } from '../../tsconfig.json';
+import { compilerOptions } from './tsconfig.json';
 import type { Config } from '@jest/types';
 import { pathsToModuleNameMapper } from 'ts-jest';
 

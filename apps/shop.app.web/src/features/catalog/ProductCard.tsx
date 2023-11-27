@@ -11,6 +11,8 @@ import {
   ButtonGroup,
   Tooltip,
   Badge,
+  styled,
+  CardMediaProps,
 } from '@mui/material';
 import { ProductItem } from '../../model';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
@@ -29,7 +31,7 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
     dispatch(addToCart({ product, quantity }));
     console.log(`Added ${quantity} ${title} to the cart`);
   };
-  
+
   const handleRemoveFromCart = () => {
     dispatch(removeFromCart(product));
     console.log(`Removed ${title} from the cart`);
@@ -48,68 +50,75 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
     [items, product],
   );
 
+  const CardMediaExt = styled((props: CardMediaProps) =><CardMedia {...props} />)(({ theme }) => ({
+    width: 60,
+    hight: 60,
+    maxHeight: 60,
+    [theme.breakpoints.up('sm')]: {
+      width: 150,
+      minHeight: 160,
+    },
+  }));
+
   return (
     <Card style={{ display: 'flex', width: '100%' }}>
-      <Grid container>
-        <Grid item xs={12} md={2}>
-          <CardMedia
-            component="img"
-            height="160"
-            image={getProductImage(product)}
-            alt={title}
-            onError={(e: any) => (e.target.src = ProductFallbackImage)}
-          />
-        </Grid>
-        <Grid item xs={12} md={10}>
-          <CardContent style={{ flex: 1 }}>
-            <Typography variant="h6" component="div">
-              {title}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              dangerouslySetInnerHTML={{ __html: description }}
-            />
-            <Typography variant="h6">
-              {price} {currency}
-            </Typography>
-            <ButtonGroup size="small" sx={{ maxHeight: 35 }}>
-              <Select
-                value={quantity}
-                label="Quantity"
-                aria-label="quantity"
-                style={{ minWidth: '56px' }}
-                onChange={(e) => setQuantity(Number.parseInt(e.target.value as string))}
-                data-testid="quantity-select"
-                inputProps={{ 'data-testid': 'quantity-select-input' }} 
-              >
-                <MenuItem value={1}>1</MenuItem>
-                <MenuItem value={2}>2</MenuItem>
-                <MenuItem value={3}>3</MenuItem>
-              </Select>
-              <Tooltip title={`Add ${quantity} to Cart`}>
-                <Button variant="contained" style={{ width: '56px' }} onClick={handleAddToCart} aria-label="add">
-                  <AddShoppingCart fontSize="small" />
+      <CardMediaExt
+        component="img"
+        image={getProductImage(product)}
+        onError={(e: any) => (e.target.src = ProductFallbackImage)}
+      />
+      <CardContent style={{ flex: 1 }}>
+        <Typography variant="h6" component="div">
+          {title}
+        </Typography>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          dangerouslySetInnerHTML={{ __html: description }}
+        />
+        <Typography variant="h6">
+          {price} {currency}
+        </Typography>
+        <ButtonGroup size="small" sx={{ maxHeight: 35 }}>
+          <Select
+            value={quantity}
+            label="Quantity"
+            aria-label="quantity"
+            style={{ minWidth: '56px' }}
+            onChange={(e) => setQuantity(Number.parseInt(e.target.value as string))}
+            data-testid="quantity-select"
+            inputProps={{ 'data-testid': 'quantity-select-input' }}
+          >
+            <MenuItem value={1}>1</MenuItem>
+            <MenuItem value={2}>2</MenuItem>
+            <MenuItem value={3}>3</MenuItem>
+          </Select>
+          <Tooltip title={`Add ${quantity} to Cart`}>
+            <Button
+              variant="contained"
+              style={{ width: '56px' }}
+              onClick={handleAddToCart}
+              aria-label="add"
+            >
+              <AddShoppingCart fontSize="small" />
+            </Button>
+          </Tooltip>
+          {isProductInCart() && (
+            <Tooltip title="Remove from Cart">
+              <Badge badgeContent={itemsInCart()} color="success">
+                <Button
+                  variant="outlined"
+                  style={{ width: '56px' }}
+                  onClick={handleRemoveFromCart}
+                  aria-label="remove"
+                >
+                  <RemoveShoppingCartIcon fontSize="small" />
                 </Button>
-              </Tooltip>
-              {isProductInCart() && (
-                <Tooltip title="Remove from Cart">
-                  <Badge badgeContent={itemsInCart()} color="success">
-                    <Button
-                      variant="outlined"
-                      style={{ width: '56px' }}
-                      onClick={handleRemoveFromCart}
-                      aria-label="remove"
-                    >
-                      <RemoveShoppingCartIcon fontSize="small" />
-                    </Button>
-                  </Badge>
-                </Tooltip>
-              )}
-            </ButtonGroup>
-          </CardContent>
-        </Grid>
-      </Grid>
+              </Badge>
+            </Tooltip>
+          )}
+        </ButtonGroup>
+      </CardContent>
     </Card>
   );
 };

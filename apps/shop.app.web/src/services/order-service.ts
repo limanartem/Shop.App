@@ -1,4 +1,4 @@
-import { CreateOrder, OrdersResponse } from '../model';
+import { CreateOrder, Order, OrdersResponse } from '../model';
 import Session from 'supertokens-auth-react/recipe/session';
 import { env } from '../config/environment';
 
@@ -20,6 +20,11 @@ export const getOrdersAsync = async (): Promise<OrdersResponse> => {
   }
 
   return await response.json();
+};
+
+export const getOrderAsync = async (id: string): Promise<Order | undefined> => {
+  const orders = await getOrdersAsync(); //TODO: just dummy implementation for now
+  return orders.orders.find((order) => order.id === id);
 };
 
 export const createOrdersAsync = async (order: CreateOrder): Promise<{ id: string }> => {
