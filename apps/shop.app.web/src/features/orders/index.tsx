@@ -21,6 +21,7 @@ import { OrderDetails } from './OrderDetails';
 import { OrderSummary } from './OrderSummary';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { useNavigate } from 'react-router-dom';
+import { OrderProductPlaceholder } from './OrderProductPlaceholder';
 
 function sortOrdersDesc(o2: Order, o1: Order): number {
   const o1Date = new Date(o1.createdAt).getTime();
@@ -42,9 +43,12 @@ export default function Orders() {
     setLoading(true);
 
     const getOrders = async () => {
-      const result = await getOrdersAsync();
-      setOrders(result.orders);
-      setLoading(false);
+      try {
+        const result = await getOrdersAsync();
+        setOrders(result.orders);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getOrders();
@@ -57,37 +61,45 @@ export default function Orders() {
         <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
           <CircularProgress color="inherit" />
         </Backdrop>
-        {orders.sort(sortOrdersDesc).map((order, index) => (
-          <Accordion
-            key={order.id}
-            expanded={expandedOrderId === order.id}
-            onChange={() => toggleAccordion(order.id)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              {!(expandedOrderId === order.id) && <OrderSummary order={order} />}
-              {expandedOrderId === order.id && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    width: '100%',
-                  }}
-                >
-                  <Typography variant="subtitle1">Order Details</Typography>
-                  <Box sx={{ flex: '1 0 auto', textAlign: 'right' }}>
-                    <Button variant="text" onClick={() => navigate(`/orders/${order.id}`)}>
-                      Open <KeyboardArrowRightIcon />
-                    </Button>
-                  </Box>
-                </Box>
-              )}
-            </AccordionSummary>
-            <AccordionDetails>
-              <OrderDetails order={order} />
-            </AccordionDetails>
-          </Accordion>
-        ))}
+        {!loading
+          ? orders.sort(sortOrdersDesc).map((order, index) => (
+              <Accordion
+                key={order.id}
+                expanded={expandedOrderId === order.id}
+                onChange={() => toggleAccordion(order.id)}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  {!(expandedOrderId === order.id) && <OrderSummary order={order} />}
+                  {expandedOrderId === order.id && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        width: '100%',
+                      }}
+                    >
+                      <Typography variant="subtitle1">Order Details</Typography>
+                      <Box sx={{ flex: '1 0 auto', textAlign: 'right' }}>
+                        <Button variant="text" onClick={() => navigate(`/orders/${order.id}`)}>
+                          Open <KeyboardArrowRightIcon />
+                        </Button>
+                      </Box>
+                    </Box>
+                  )}
+                </AccordionSummary>
+                <AccordionDetails>
+                  <OrderDetails order={order} />
+                </AccordionDetails>
+              </Accordion>
+            ))
+          : [...Array(3).keys()].map(() => (
+              <Accordion disableGutters={true}>
+                <AccordionSummary>
+                  <OrderProductPlaceholder />
+                </AccordionSummary>
+              </Accordion>
+            ))}
       </CardContent>
     </Card>
   );

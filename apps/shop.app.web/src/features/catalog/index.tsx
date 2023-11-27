@@ -11,12 +11,15 @@ import {
   CircularProgress,
   List,
   ListItem,
+  Skeleton,
+  Stack,
 } from '@mui/material';
 import ProductCard from './ProductCard';
 import CategoryBreadcrumbs from './CategoryBreadcrumbs';
 import { useAppSelector } from '../../app/hooks';
 import { selectCategory } from '../../app/reducers/searchReducer';
 import { selectCategories } from '../../app/reducers/categoriesReducer';
+import { ProductPlaceholder } from './ProductPlaceholder';
 
 function Catalog() {
   const [productsLoading, setProductsLoading] = useState(false);
@@ -30,10 +33,13 @@ function Catalog() {
     setProductsLoading(true);
     getProductsAsync({
       category: globalSelectedCategory === '-1' ? null : globalSelectedCategory,
-    }).then((products) => {
-      setProducts(products);
-      setProductsLoading(false);
-    });
+    })
+      .then((products) => {
+        setProducts(products);
+      })
+      .finally(() => {
+        setProductsLoading(false);
+      });
   }, [globalSelectedCategory]);
 
   return (
@@ -49,11 +55,17 @@ function Catalog() {
             <CircularProgress color="inherit" />
           </Backdrop>
           <List data-testid="list-products">
-            {products.map((row) => (
-              <ListItem key={row.id} data-testid={`product-${row.id}`}>
-                <ProductCard product={row} />
-              </ListItem>
-            ))}
+            {productsLoading === false
+              ? products.map((row) => (
+                  <ListItem key={row.id} data-testid={`product-${row.id}`}>
+                    <ProductCard product={row} />
+                  </ListItem>
+                ))
+              : [...Array(3).keys()].map(() => (
+                  <ListItem>
+                    <ProductPlaceholder />
+                  </ListItem>
+                ))}
           </List>
         </Box>
       </CardContent>
