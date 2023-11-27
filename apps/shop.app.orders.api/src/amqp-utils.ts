@@ -29,7 +29,7 @@ export const sendMessage = async (
   console.log(`Connecting to ${MESSAGE_BROKER_URL} message broker..`);
   const connection = await amqp.connect(MESSAGE_BROKER_URL!);
   const channel = await connection.createChannel();
-  console.log(`Connected to message broker!`);
+  console.log('Connected to message broker!');
   await ensureQueueExchangeBinding(exchange, queue, routingKey, channel);
 
   console.log(`Publishing message to "${exchange}" exchange using "${routingKey}" routing key`);

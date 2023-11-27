@@ -1,4 +1,4 @@
-import { NextFunction, RequestHandler, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import supertokens from 'supertokens-node';
 import { SessionRequest } from 'supertokens-node/framework/express';

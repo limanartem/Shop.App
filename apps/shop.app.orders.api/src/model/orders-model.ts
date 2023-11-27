@@ -15,9 +15,6 @@ export type Status =
   | 'dispatched'
   | 'delivered';
 
-type UpdateStatusItem = {
-  status?: Status;
-};
 
 export const OrderStatuses: Status[] = [
   'pending',

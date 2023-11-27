@@ -3,6 +3,7 @@ import { Worker } from 'worker_threads';
 import path from 'path';
 import { WorkerResultPayload } from './model';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type OrderStatus =
   | 'pending'
   | 'inventory.confirmed'
@@ -12,6 +13,7 @@ type OrderStatus =
   | 'shipment.dispatched'
   | 'shipment.delivered';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type WorkerType = 'pending' | 'payment' | 'dispatch';
 const { MESSAGE_BROKER_URL, WORKER_TYPE } = process.env;
 
@@ -22,7 +24,7 @@ const workerFile = `order-worker-${WORKER_TYPE}.js`;
   console.log(`Connecting to ${MESSAGE_BROKER_URL} message broker..`);
   const connection = await amqp.connect(MESSAGE_BROKER_URL!);
   const channel = await connection.createChannel();
-  console.log(`Connected to message broker!`);
+  console.log('Connected to message broker!');
   channel.prefetch(10);
 
   process.once('SIGINT', async () => {

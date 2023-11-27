@@ -1,4 +1,3 @@
-/* eslint-disable testing-library/no-node-access */
 import '@testing-library/jest-dom';
 import { render, screen, cleanup, within, fireEvent, waitFor } from '@testing-library/react';
 import CheckOut from '.';
@@ -35,7 +34,6 @@ jest.mock('../../config', () => ({
 }));
 
 const assertTotal = async (containerElement: HTMLElement, itemsInCart: ShoppingCartItem[]) => {
-  // eslint-disable-next-line testing-library/no-node-access
   const totalElement = (await within(containerElement).findByText(/Total:/i)).closest('p')!;
   expect(totalElement).toBeInTheDocument();
   console.log(totalElement.textContent);

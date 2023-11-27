@@ -21,6 +21,8 @@ import {
   Card,
   ListItem,
   Button,
+  Grid,
+  Link,
 } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -35,7 +37,7 @@ import { useNavigate } from 'react-router-dom';
 import { selectCategories } from '../../app/reducers/categoriesReducer';
 import { selectUser, setUser } from '../../app/reducers/authReducer';
 import { resetCheckout } from '../../app/reducers/checkOutReducer';
-import { CategoriesTreeView } from '..';
+import { CategoriesTreeView, MainContentContainer } from '..';
 
 const drawerWidth: number = 240;
 
@@ -179,40 +181,48 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
             <MenuIcon />
           </IconButton>
           <Card sx={{ mr: 2 }}>
-            <CardMedia
-              component="img"
-              image="/shop-assets/logo/shop.app.logo.png"
-              style={{ width: '48px' }}
-            />
+            <Tooltip title="Go Home">
+              <Link href="/">
+                <CardMedia
+                  component="img"
+                  image="/shop-assets/logo/shop.app.logo.png"
+                  style={{ width: '48px' }}
+                />
+              </Link>
+            </Tooltip>
           </Card>
 
           <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
             AI-Powered eCommerce
           </Typography>
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <Tooltip title="Search catalog">
             <Search data-testid="appBar-search">
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
-              <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
+              <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} sx={{ height: '100%' }} />
             </Search>
-            <IconButton
-              size="large"
-              color="inherit"
-              onClick={(e) => {
-                //if (items.length) {
-                setAnchorElShoppingCart(e.currentTarget);
-                setShowCartPopup(true);
-                //}
-              }}
-            >
-              <Badge
-                badgeContent={items.reduce((count, item) => count + item.quantity, 0)}
-                color="success"
+            </Tooltip>
+            <Tooltip title="Open Shopping Cart">
+              <IconButton
+                size="large"
+                color="inherit"
+                onClick={(e) => {
+                  //if (items.length) {
+                  setAnchorElShoppingCart(e.currentTarget);
+                  setShowCartPopup(true);
+                  //}
+                }}
               >
-                <ShoppingCartIcon />
-              </Badge>
-            </IconButton>
+                <Badge
+                  badgeContent={items.reduce((count, item) => count + item.quantity, 0)}
+                  color="success"
+                >
+                  <ShoppingCartIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
             <ShoppingCartPopup
               open={showCartPopup}
               anchorEl={anchorElShoppingCart}
@@ -341,7 +351,9 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
         }}
       >
         <Toolbar />
-        {children}
+        <Grid container justifyContent="center">
+          <MainContentContainer>{children}</MainContentContainer>
+        </Grid>
       </Box>
     </Box>
   );

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import SuperTokens, { SuperTokensWrapper } from 'supertokens-auth-react';
 import ThirdPartyEmailPassword, {
   Google,

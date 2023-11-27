@@ -8,7 +8,6 @@ import {
   Typography,
   Card,
   CardContent,
-  Grid,
   CardHeader,
   Backdrop,
   CircularProgress,
@@ -16,11 +15,11 @@ import {
   Box,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { MainContentContainer } from '../../components';
 import { OrderDetails } from './OrderDetails';
 import { OrderSummary } from './OrderSummary';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { useNavigate } from 'react-router-dom';
+import { OrderProductPlaceholder } from './OrderProductPlaceholder';
 
 function sortOrdersDesc(o2: Order, o1: Order): number {
   const o1Date = new Date(o1.createdAt).getTime();
@@ -42,27 +41,26 @@ export default function Orders() {
     setLoading(true);
 
     const getOrders = async () => {
-      const result = await getOrdersAsync();
-      setOrders(result.orders);
-      setLoading(false);
+      try {
+        const result = await getOrdersAsync();
+        setOrders(result.orders);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getOrders();
   }, []);
 
   return (
-    <Grid container justifyContent="center" data-testid="feature-orders">
-      <MainContentContainer>
-        <Card style={{ width: '100%' }}>
-          <CardHeader title="Orders Archive" subheader="Your previously placed orders" />
-          <CardContent style={{ paddingTop: 0 }}>
-            <Backdrop
-              sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-              open={loading}
-            >
-              <CircularProgress color="inherit" />
-            </Backdrop>
-            {orders.sort(sortOrdersDesc).map((order, index) => (
+    <Card style={{ width: '100%' }} data-testid="feature-orders">
+      <CardHeader title="Orders Archive" subheader="Your previously placed orders" />
+      <CardContent style={{ paddingTop: 0 }}>
+        <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        {!loading
+          ? orders.sort(sortOrdersDesc).map((order) => (
               <Accordion
                 key={order.id}
                 expanded={expandedOrderId === order.id}
@@ -80,12 +78,8 @@ export default function Orders() {
                       }}
                     >
                       <Typography variant="subtitle1">Order Details</Typography>
-                      <Box  sx={{ flex: '1 0 auto', textAlign: 'right' }}>
-                        <Button
-                          variant="text"
-                          onClick={() => navigate(`/orders/${order.id}`)}
-                         
-                        >
+                      <Box sx={{ flex: '1 0 auto', textAlign: 'right' }}>
+                        <Button variant="text" onClick={() => navigate(`/orders/${order.id}`)}>
                           Open <KeyboardArrowRightIcon />
                         </Button>
                       </Box>
@@ -96,10 +90,15 @@ export default function Orders() {
                   <OrderDetails order={order} />
                 </AccordionDetails>
               </Accordion>
+            ))
+          : [...Array(3).keys()].map((i) => (
+              <Accordion disableGutters={true} key={i}>
+                <AccordionSummary>
+                  <OrderProductPlaceholder />
+                </AccordionSummary>
+              </Accordion>
             ))}
-          </CardContent>
-        </Card>
-      </MainContentContainer>
-    </Grid>
+      </CardContent>
+    </Card>
   );
 }

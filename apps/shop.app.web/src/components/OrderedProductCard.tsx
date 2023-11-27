@@ -1,5 +1,5 @@
 import { ShoppingCartItem } from '../model';
-import { Button, Card, CardContent, CardMedia, Grid, Tooltip, Typography } from '@mui/material';
+import { Button, Card, CardContent, CardMedia, Tooltip, Typography } from '@mui/material';
 import { useAppDispatch } from '../app/hooks';
 import { getProductImage, ProductFallbackImage } from '../utils/product-utils';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';

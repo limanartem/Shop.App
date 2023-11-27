@@ -1,6 +1,5 @@
-import Joi from 'joi';
 import { getOrders } from '../data-utils';
-import { fetchDocument, fetchDocuments, insertDocument, updateDocument } from '../mongodb-client';
+import { fetchDocuments } from '../mongodb-client';
 import { v4 as uuidv4 } from 'uuid';
 
 jest.mock('../mongodb-client', () => {
