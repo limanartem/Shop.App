@@ -41,7 +41,7 @@ export const categoriesSlice = createSlice({
         state.status = DataLoadingState.loaded;
         state.categories = action.payload;
       })
-      .addCase(fetchCategories.rejected, (state, action) => {
+      .addCase(fetchCategories.rejected, (state) => {
         state.status = DataLoadingState.failed;
       });
   },

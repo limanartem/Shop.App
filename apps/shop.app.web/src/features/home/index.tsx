@@ -8,7 +8,6 @@ import {
   ListItem,
   Link,
 } from '@mui/material';
-import React from 'react';
 
 function Home() {
   return (

@@ -69,6 +69,7 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
       <CarouselExt autoPlay={false} indicators={false}>
         {[0, 1, 2].map((i) => (
           <CardMedia
+            key={i}
             component="img"
             image={getProductImage(product, i)}
             onError={(e: any) => (e.target.src = ProductFallbackImage)}

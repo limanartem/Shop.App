@@ -10,7 +10,6 @@ jest.mock('supertokens-auth-react/recipe/session', () => ({
 jest.mock('./components/AuthWrapper', () => ({
   AuthWrapper: ({
     children,
-    onAuthInitialized,
   }: {
     children: React.ReactNode;
     onAuthInitialized: () => void;
@@ -52,7 +51,7 @@ describe('App', () => {
     beforeEach(() => {
       // Mock user is not authenticated
       (SessionAuth as jest.Mock).mockImplementation(
-        ({ children }: { children?: React.ReactNode }) => <></>,
+        () => <></>,
       );
     });
 

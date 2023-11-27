@@ -60,7 +60,7 @@ export default function Orders() {
           <CircularProgress color="inherit" />
         </Backdrop>
         {!loading
-          ? orders.sort(sortOrdersDesc).map((order, index) => (
+          ? orders.sort(sortOrdersDesc).map((order) => (
               <Accordion
                 key={order.id}
                 expanded={expandedOrderId === order.id}
@@ -91,8 +91,8 @@ export default function Orders() {
                 </AccordionDetails>
               </Accordion>
             ))
-          : [...Array(3).keys()].map(() => (
-              <Accordion disableGutters={true}>
+          : [...Array(3).keys()].map((i) => (
+              <Accordion disableGutters={true} key={i}>
                 <AccordionSummary>
                   <OrderProductPlaceholder />
                 </AccordionSummary>

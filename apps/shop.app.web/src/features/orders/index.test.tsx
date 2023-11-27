@@ -10,6 +10,7 @@ jest.mock('../../services/order-service', () => ({
 
 // Avoid loading store from the local storage
 jest.mock('../../app/persistance/local-storage');
+jest.mock('react-router-dom');
 
 describe('Feature Orders', () => {
   let store: ReturnType<typeof buildStore>;

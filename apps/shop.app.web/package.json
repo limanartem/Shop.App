@@ -27,9 +27,10 @@
   "scripts": {
     "dev": "chmod +x ./scripts/update-env.sh && ./scripts/update-env.sh && cp env-config.js ./public/ && react-scripts start",
     "start": "react-scripts start",
-    "build": "craco build",
+    "build": "npm run lint && craco build",
     "test": "jest",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint . --ext .js,.ts ./src --quiet"
   },
   "eslintConfig": {
     "extends": [
@@ -62,6 +63,10 @@
     "@types/luxon": "^3.3.5",
     "@types/react": "^18.2.37",
     "@types/react-redux": "^7.1.30",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "eslint": "^8.54.0",
+    "eslint-plugin-react": "^7.33.2",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.5.1",
     "jest-environment-jsdom": "^27.5.1",

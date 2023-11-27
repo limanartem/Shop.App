@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { getProductsAsync } from '../../services/catalog-service';
 import { ProductItem } from '../../model';
@@ -59,8 +58,8 @@ function Catalog() {
                     <ProductCard product={row} />
                   </ListItem>
                 ))
-              : [...Array(3).keys()].map(() => (
-                  <ListItem>
+              : [...Array(3).keys()].map((i) => (
+                  <ListItem key={i}>
                     <ProductPlaceholder />
                   </ListItem>
                 ))}

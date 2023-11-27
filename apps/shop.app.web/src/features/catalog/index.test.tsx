@@ -62,7 +62,7 @@ describe('Feature Catalog', () => {
       ]);
     });
 
-    async function ensureProductAddedToCart(expectedProductId: string, quantity: Number) {
+    async function ensureProductAddedToCart(expectedProductId: string, quantity: number) {
       const productsList = await screen.findByTestId('list-products');
       const productItem = await within(productsList).findByTestId(`product-${expectedProductId}`);
       const addToCartButton = await within(productItem).findByRole('button', { name: /add/i });
@@ -107,7 +107,7 @@ describe('Feature Catalog', () => {
       await expect(productItem).toBeInTheDocument();
     });
 
-    it.each([1, 2, 3])('adds %s item(s) to the cart', async (quantity: Number) => {
+    it.each([1, 2, 3])('adds %s item(s) to the cart', async (quantity: number) => {
       render(
         <Provider store={store}>
           <Catalog />
@@ -117,7 +117,7 @@ describe('Feature Catalog', () => {
       await ensureProductAddedToCart(expectedProductId, quantity);
     });
 
-    it.each([1, 2, 3])('removes %s items from the cart', async (quantity: Number) => {
+    it.each([1, 2, 3])('removes %s items from the cart', async (quantity: number) => {
       render(
         <Provider store={store}>
           <Catalog />

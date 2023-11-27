@@ -178,7 +178,7 @@ export function OrderDetails({ order }: { order: Order }) {
             {order.items?.length > 0 && (
               <>
                 <List style={{ width: '100%' }}>
-                  {order.items.map((item, index) => (
+                  {order.items.map((item) => (
                     <ListItem alignItems="flex-start" key={item.product?.id}>
                       {item.product != null && (
                         <OrderedProductCard flow="orderDetails" item={item} />
