@@ -23,6 +23,8 @@ import { addToCart, removeFromCart, selectItems } from '../../app/reducers/shopp
 import AddShoppingCart from '@mui/icons-material/AddShoppingCart';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import { ProductFallbackImage, getProductImage } from '../../utils/product-utils';
+import Carousel from 'react-material-ui-carousel';
+import { CarouselProps } from 'react-material-ui-carousel/dist/components/types';
 
 const ProductCard = ({ product }: { product: ProductItem }) => {
   const { id, title, description, price, currency } = product;
@@ -53,23 +55,29 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
     [items, product],
   );
 
-  const CardMediaExt = styled((props: CardMediaProps) => <CardMedia {...props} />)(({ theme }) => ({
+  const CarouselExt = styled((props: CarouselProps) => <Carousel {...props} />)(({ theme }) => ({
     width: 60,
     hight: 60,
     maxHeight: 60,
     [theme.breakpoints.up('sm')]: {
-      width: 150,
+      width: 160,
       minHeight: 160,
+      maxHeight: 160,
     },
   }));
 
   return (
     <Card style={{ display: 'flex', width: '100%' }}>
-      <CardMediaExt
-        component="img"
-        image={getProductImage(product)}
-        onError={(e: any) => (e.target.src = ProductFallbackImage)}
-      />
+      <CarouselExt autoPlay={false} indicators={false}>
+        {[0, 1, 2].map((i) => (
+          <CardMedia
+            component="img"
+            image={getProductImage(product, i)}
+            onError={(e: any) => (e.target.src = ProductFallbackImage)}
+          />
+        ))}
+      </CarouselExt>
+
       <CardContent style={{ flex: 1 }}>
         <Typography variant="h6" component="div">
           {title}
