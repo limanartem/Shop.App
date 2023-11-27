@@ -54,7 +54,7 @@ export function StepPaymentDetails() {
     let updatedErrors = { ...errors };
 
     if (paymentMethod === 'creditCard') {
-      const { number, cvc, expire } = creditCardDetails as CreditCardDetails;
+      const { number, cvc, expire } = creditCardDetails ?? {} as CreditCardDetails;
 
       // Credit card validation
       updatedErrors = {
@@ -65,8 +65,8 @@ export function StepPaymentDetails() {
         bankName: false,
         name: false,
       };
-    } else {
-      const { iban } = bankDetails as BankDetails;
+    } else  {
+      const { iban } = bankDetails ?? {} as BankDetails;
 
       // IBAN validation
       updatedErrors = {
@@ -111,7 +111,7 @@ export function StepPaymentDetails() {
               fullWidth
               required
               name="number"
-              value={creditCardDetails?.number}
+              value={creditCardDetails?.number || ''}
               onChange={handleCreditCardChange}
               error={errors.number}
               helperText={errors.number && 'Please enter a valid card number'}
@@ -123,7 +123,7 @@ export function StepPaymentDetails() {
               fullWidth
               required
               name="cvc"
-              value={creditCardDetails?.cvc}
+              value={creditCardDetails?.cvc || ''}
               onChange={handleCreditCardChange}
               error={errors.cvc}
               helperText={errors.cvc && 'Please enter a valid CVC (3 digits)'}
@@ -135,7 +135,7 @@ export function StepPaymentDetails() {
               fullWidth
               required
               name="expire"
-              value={creditCardDetails?.expire}
+              value={creditCardDetails?.expire || ''}
               onChange={handleCreditCardChange}
               error={errors.expire}
               helperText={errors.expire && 'Please enter a valid expiry date'}
@@ -147,7 +147,7 @@ export function StepPaymentDetails() {
               fullWidth
               required
               name="name"
-              value={creditCardDetails?.name}
+              value={creditCardDetails?.name || ''}
               onChange={handleCreditCardChange}
               error={errors.name}
               helperText={errors.name && 'Please enter a valid card holder'}
@@ -162,7 +162,7 @@ export function StepPaymentDetails() {
               fullWidth
               required
               name="iban"
-              value={bankDetails?.iban}
+              value={bankDetails?.iban || ''}
               onChange={handleIbanChange}
               error={errors.iban}
               helperText={errors.iban && 'Please enter a valid IBAN'}

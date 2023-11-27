@@ -58,7 +58,7 @@ export function StepShippingDetails() {
               fullWidth
               required
               name="name"
-              value={shipment.name}
+              value={shipment.name || ''}
               onChange={handleInputChange}
               error={errors.name}
               helperText={errors.name && 'Please enter a name'}
@@ -79,7 +79,7 @@ export function StepShippingDetails() {
               fullWidth
               required
               name="address"
-              value={shipment.address}
+              value={shipment.address || ''}
               onChange={handleInputChange}
               error={errors.address}
               helperText={errors.address && 'Please enter an address'}
@@ -91,7 +91,7 @@ export function StepShippingDetails() {
               fullWidth
               required
               name="zip"
-              value={shipment.zip}
+              value={shipment.zip || ''}
               onChange={handleInputChange}
               error={errors.zip}
               helperText={errors.zip && 'Please enter a valid Zip code (digits only)'}
@@ -103,7 +103,7 @@ export function StepShippingDetails() {
               fullWidth
               required
               name="city"
-              value={shipment.city}
+              value={shipment.city || ''}
               onChange={handleInputChange}
               error={errors.city}
               helperText={errors.city && 'Please enter a city'}
@@ -115,7 +115,7 @@ export function StepShippingDetails() {
               fullWidth
               required
               name="country"
-              value={shipment.country}
+              value={shipment.country || ''}
               onChange={handleInputChange}
               error={errors.country}
               helperText={errors.country && 'Please enter a country'}
@@ -127,7 +127,7 @@ export function StepShippingDetails() {
               fullWidth
               required
               name="state"
-              value={shipment.state}
+              value={shipment.state || ''}
               onChange={handleInputChange}
               error={errors.state}
               helperText={errors.state && 'Please enter a state'}

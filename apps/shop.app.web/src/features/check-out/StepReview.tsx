@@ -3,7 +3,7 @@ import { Alert, Box, Button, ButtonGroup, Grid } from '@mui/material';
 import { previousStep, placeOrder } from '../../app/reducers/checkOutReducer';
 import { createOrdersAsync } from '../../services/order-service';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useState } from 'react';
+import { FormEventHandler, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export function StepReview() {
@@ -19,7 +19,9 @@ export function StepReview() {
     dispatch(previousStep());
   };
 
-  const handleComplete = () => {
+  const handleComplete: FormEventHandler = (e) => {
+    e.preventDefault();
+
     setSuccess(false);
     setLoading(true);
     setError(null);
@@ -51,40 +53,45 @@ export function StepReview() {
         setLoading(false);
       }
     };
-    setTimeout(() => {
-      createOrder();
-    }, 5000);
+
+    createOrder();
   };
 
   return (
     <Box textAlign="right" padding={2}>
       {!success && (
-        <ButtonGroup size="large" sx={{ m: 1, position: 'relative' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={success ? undefined : () => handleComplete()}
-            style={{ minWidth: '120px' }}
-            disabled={loading}
-          >
-            Submit
-          </Button>
-          {loading && (
-            <CircularProgress
-              size={24}
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                marginTop: '-12px',
-                marginLeft: '-12px',
-              }}
-            />
-          )}
-          <Button disabled={loading || success} onClick={handleBack} style={{ minWidth: '120px' }}>
-            Back
-          </Button>
-        </ButtonGroup>
+        <form onSubmit={handleComplete}>
+          <ButtonGroup size="large" sx={{ m: 1, position: 'relative' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              type={success ? undefined : 'submit'}
+              style={{ minWidth: '120px' }}
+              disabled={loading}
+            >
+              Submit
+            </Button>
+            {loading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
+                }}
+              />
+            )}
+            <Button
+              disabled={loading || success}
+              onClick={handleBack}
+              style={{ minWidth: '120px' }}
+            >
+              Back
+            </Button>
+          </ButtonGroup>
+        </form>
       )}
       <Grid container spacing={2} alignContent="center" textAlign="center">
         <Grid item xs={12}>

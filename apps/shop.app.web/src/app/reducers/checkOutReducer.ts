@@ -3,7 +3,7 @@ import { RootState } from '../store';
 import { PersistentState } from '../persistance/local-storage';
 import { CheckoutPaymentInfo, CheckoutShippingInfo } from '../../model';
 
-type FlowStep = 'confirmItems' | 'shipping' | 'payment' | 'review';
+export type FlowStep = 'confirmItems' | 'shipping' | 'payment' | 'review';
 export const CHECKOUT_FLOW_STEPS: FlowStep[] = ['confirmItems', 'shipping', 'payment', 'review'];
 
 interface CheckOutState extends PersistentState {
