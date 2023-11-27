@@ -4,13 +4,13 @@ import { start } from '../express/server';
 import { StatusCodes } from 'http-status-codes';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { v4 as uuidv4 } from 'uuid';
-import { SessionRequest, middleware, errorHandler } from 'supertokens-node/framework/express';
+import { SessionRequest, middleware } from 'supertokens-node/framework/express';
 import { NextFunction } from 'express';
-import { CreateOrderRequest, Order, ProductItem } from '../model';
+import { CreateOrderRequest, ProductItem } from '../model';
 import { sendMessage } from '../amqp-utils';
 import { ObjectId } from 'mongodb';
 import { verifyUserRole } from '../auth';
-import { OrderFlow, OrderStatuses, Status } from '../model/orders-model';
+import { OrderStatuses } from '../model/orders-model';
 
 jest.mock('../data-utils', () => ({
   createOrder: jest.fn(),

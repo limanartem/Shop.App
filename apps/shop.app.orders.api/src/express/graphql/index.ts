@@ -1,7 +1,7 @@
 import { Express } from 'express';
 import { graphqlHTTP } from 'express-graphql';
 import { buildSchema } from 'graphql';
-import { getProductDetails, getOrdersExpanded } from '../../data-utils';
+import { getOrdersExpanded } from '../../data-utils';
 import { SessionRequest } from 'supertokens-node/framework/express';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 
