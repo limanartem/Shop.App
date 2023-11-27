@@ -6,13 +6,11 @@ import {
   Typography,
   Button,
   MenuItem,
-  Grid,
   Select,
   ButtonGroup,
   Tooltip,
   Badge,
   styled,
-  CardMediaProps,
   Stack,
   Rating,
   Box,
@@ -27,7 +25,7 @@ import Carousel from 'react-material-ui-carousel';
 import { CarouselProps } from 'react-material-ui-carousel/dist/components/types';
 
 const ProductCard = ({ product }: { product: ProductItem }) => {
-  const { id, title, description, price, currency } = product;
+  const { title, description, price, currency } = product;
   const [quantity, setQuantity] = useState(1);
   const items = useAppSelector(selectItems);
   const dispatch = useAppDispatch();

@@ -11,8 +11,6 @@ import {
   CircularProgress,
   List,
   ListItem,
-  Skeleton,
-  Stack,
 } from '@mui/material';
 import ProductCard from './ProductCard';
 import CategoryBreadcrumbs from './CategoryBreadcrumbs';

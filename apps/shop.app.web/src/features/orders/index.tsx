@@ -8,7 +8,6 @@ import {
   Typography,
   Card,
   CardContent,
-  Grid,
   CardHeader,
   Backdrop,
   CircularProgress,
@@ -16,7 +15,6 @@ import {
   Box,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { MainContentContainer } from '../../components';
 import { OrderDetails } from './OrderDetails';
 import { OrderSummary } from './OrderSummary';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
