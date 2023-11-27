@@ -13,6 +13,9 @@ import {
   Badge,
   styled,
   CardMediaProps,
+  Stack,
+  Rating,
+  Box,
 } from '@mui/material';
 import { ProductItem } from '../../model';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
@@ -50,7 +53,7 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
     [items, product],
   );
 
-  const CardMediaExt = styled((props: CardMediaProps) =><CardMedia {...props} />)(({ theme }) => ({
+  const CardMediaExt = styled((props: CardMediaProps) => <CardMedia {...props} />)(({ theme }) => ({
     width: 60,
     hight: 60,
     maxHeight: 60,
@@ -79,45 +82,61 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
         <Typography variant="h6">
           {price} {currency}
         </Typography>
-        <ButtonGroup size="small" sx={{ maxHeight: 35 }}>
-          <Select
-            value={quantity}
-            label="Quantity"
-            aria-label="quantity"
-            style={{ minWidth: '56px' }}
-            onChange={(e) => setQuantity(Number.parseInt(e.target.value as string))}
-            data-testid="quantity-select"
-            inputProps={{ 'data-testid': 'quantity-select-input' }}
-          >
-            <MenuItem value={1}>1</MenuItem>
-            <MenuItem value={2}>2</MenuItem>
-            <MenuItem value={3}>3</MenuItem>
-          </Select>
-          <Tooltip title={`Add ${quantity} to Cart`}>
-            <Button
-              variant="contained"
-              style={{ width: '56px' }}
-              onClick={handleAddToCart}
-              aria-label="add"
-            >
-              <AddShoppingCart fontSize="small" />
-            </Button>
-          </Tooltip>
-          {isProductInCart() && (
-            <Tooltip title="Remove from Cart">
-              <Badge badgeContent={itemsInCart()} color="success">
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1}
+          sx={{ width: '100%', display: 'flex' }}
+        >
+          <Rating
+            name="size-small"
+            defaultValue={2}
+            size="small"
+            readOnly={true}
+            value={Math.random() * 5 + 1}
+            precision={0.5}
+          />
+          <Box sx={{ maxHeight: 35, flex: '1 0 auto', textAlign: 'right' }}>
+            <ButtonGroup size="small" sx={{ maxHeight: 35 }}>
+              <Select
+                value={quantity}
+                label="Quantity"
+                aria-label="quantity"
+                style={{ minWidth: '56px' }}
+                onChange={(e) => setQuantity(Number.parseInt(e.target.value as string))}
+                data-testid="quantity-select"
+                inputProps={{ 'data-testid': 'quantity-select-input' }}
+              >
+                <MenuItem value={1}>1</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+                <MenuItem value={3}>3</MenuItem>
+              </Select>
+              <Tooltip title={`Add ${quantity} to Cart`}>
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   style={{ width: '56px' }}
-                  onClick={handleRemoveFromCart}
-                  aria-label="remove"
+                  onClick={handleAddToCart}
+                  aria-label="add"
                 >
-                  <RemoveShoppingCartIcon fontSize="small" />
+                  <AddShoppingCart fontSize="small" />
                 </Button>
-              </Badge>
-            </Tooltip>
-          )}
-        </ButtonGroup>
+              </Tooltip>
+              {isProductInCart() && (
+                <Tooltip title="Remove from Cart">
+                  <Badge badgeContent={itemsInCart()} color="success">
+                    <Button
+                      variant="outlined"
+                      style={{ width: '56px' }}
+                      onClick={handleRemoveFromCart}
+                      aria-label="remove"
+                    >
+                      <RemoveShoppingCartIcon fontSize="small" />
+                    </Button>
+                  </Badge>
+                </Tooltip>
+              )}
+            </ButtonGroup>
+          </Box>
+        </Stack>
       </CardContent>
     </Card>
   );

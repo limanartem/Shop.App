@@ -40,8 +40,6 @@ export default function CheckOut() {
         </Typography>
       )}
       {hasItems() && (
-        <Grid container justifyContent="center">
-          <MainContentContainer>
             <Card style={{ width: '100%' }}>
               <CardHeader title="Checkout" subheader="Complete all steps to place an order" />
               <CardContent style={{ paddingTop: 0 }}>
@@ -74,8 +72,6 @@ export default function CheckOut() {
                 </Stepper>
               </CardContent>
             </Card>
-          </MainContentContainer>
-        </Grid>
       )}
     </Box>
   );

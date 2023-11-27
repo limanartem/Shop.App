@@ -51,55 +51,44 @@ export default function Orders() {
   }, []);
 
   return (
-    <Grid container justifyContent="center" data-testid="feature-orders">
-      <MainContentContainer>
-        <Card style={{ width: '100%' }}>
-          <CardHeader title="Orders Archive" subheader="Your previously placed orders" />
-          <CardContent style={{ paddingTop: 0 }}>
-            <Backdrop
-              sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-              open={loading}
-            >
-              <CircularProgress color="inherit" />
-            </Backdrop>
-            {orders.sort(sortOrdersDesc).map((order, index) => (
-              <Accordion
-                key={order.id}
-                expanded={expandedOrderId === order.id}
-                onChange={() => toggleAccordion(order.id)}
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  {!(expandedOrderId === order.id) && <OrderSummary order={order} />}
-                  {expandedOrderId === order.id && (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        width: '100%',
-                      }}
-                    >
-                      <Typography variant="subtitle1">Order Details</Typography>
-                      <Box  sx={{ flex: '1 0 auto', textAlign: 'right' }}>
-                        <Button
-                          variant="text"
-                          onClick={() => navigate(`/orders/${order.id}`)}
-                         
-                        >
-                          Open <KeyboardArrowRightIcon />
-                        </Button>
-                      </Box>
-                    </Box>
-                  )}
-                </AccordionSummary>
-                <AccordionDetails>
-                  <OrderDetails order={order} />
-                </AccordionDetails>
-              </Accordion>
-            ))}
-          </CardContent>
-        </Card>
-      </MainContentContainer>
-    </Grid>
+    <Card style={{ width: '100%' }} data-testid="feature-orders">
+      <CardHeader title="Orders Archive" subheader="Your previously placed orders" />
+      <CardContent style={{ paddingTop: 0 }}>
+        <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        {orders.sort(sortOrdersDesc).map((order, index) => (
+          <Accordion
+            key={order.id}
+            expanded={expandedOrderId === order.id}
+            onChange={() => toggleAccordion(order.id)}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              {!(expandedOrderId === order.id) && <OrderSummary order={order} />}
+              {expandedOrderId === order.id && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    width: '100%',
+                  }}
+                >
+                  <Typography variant="subtitle1">Order Details</Typography>
+                  <Box sx={{ flex: '1 0 auto', textAlign: 'right' }}>
+                    <Button variant="text" onClick={() => navigate(`/orders/${order.id}`)}>
+                      Open <KeyboardArrowRightIcon />
+                    </Button>
+                  </Box>
+                </Box>
+              )}
+            </AccordionSummary>
+            <AccordionDetails>
+              <OrderDetails order={order} />
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </CardContent>
+    </Card>
   );
 }

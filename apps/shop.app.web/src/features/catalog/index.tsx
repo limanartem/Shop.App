@@ -2,7 +2,16 @@
 import { useEffect, useState } from 'react';
 import { getProductsAsync } from '../../services/catalog-service';
 import { ProductItem } from '../../model';
-import { Backdrop, Box, CircularProgress, List, ListItem } from '@mui/material';
+import {
+  Backdrop,
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  CircularProgress,
+  List,
+  ListItem,
+} from '@mui/material';
 import ProductCard from './ProductCard';
 import CategoryBreadcrumbs from './CategoryBreadcrumbs';
 import { useAppSelector } from '../../app/hooks';
@@ -28,24 +37,27 @@ function Catalog() {
   }, [globalSelectedCategory]);
 
   return (
-    <Box data-testid="feature-catalog">
-      <Box>
-        <CategoryBreadcrumbs categories={categories} currentTotal={products.length} />
-        <Backdrop
-          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={productsLoading}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
-        <List data-testid="list-products">
-          {products.map((row) => (
-            <ListItem key={row.id} data-testid={`product-${row.id}`}>
-              <ProductCard product={row} />
-            </ListItem>
-          ))}
-        </List>
-      </Box>
-    </Box>
+    <Card style={{ width: '100%' }} data-testid="feature-catalog">
+      <CardHeader title="Products Catalog" />
+      <CardContent style={{ paddingTop: 0 }}>
+        <Box>
+          <CategoryBreadcrumbs categories={categories} currentTotal={products.length} />
+          <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={productsLoading}
+          >
+            <CircularProgress color="inherit" />
+          </Backdrop>
+          <List data-testid="list-products">
+            {products.map((row) => (
+              <ListItem key={row.id} data-testid={`product-${row.id}`}>
+                <ProductCard product={row} />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </CardContent>
+    </Card>
   );
 }
 
