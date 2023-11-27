@@ -4,14 +4,18 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node ."
+    "build": "npm run lint && tsc",
+    "start": "node .",
+    "lint": "eslint . --ext .js,.ts ./src --quiet"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/amqplib": "^0.10.3",
     "@types/node": "^20.8.10",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "eslint": "^8.54.0",
     "typescript": "^5.2.2",
     "typescript-strict-plugin": "^2.2.1"
   },
