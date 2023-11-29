@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { get as getCache, update as updateCache } from './cache-utils';
+import { get as getCache, getObject, update as updateCache, updateObject } from './cache-utils';
 import { ProductItem, Order, OrderItemEnhanced, UpdateOrder, OrderItem } from './model';
 import {
   WithClearId,
@@ -39,7 +39,16 @@ export const createOrder = async (order: Order): Promise<ReturnType<typeof inser
 export const updateOrder = async (
   id: string,
   order: UpdateOrder,
-): Promise<ReturnType<typeof updateDocument>> => updateDocument(id, order);
+): Promise<ReturnType<typeof updateDocument>> => {
+  if (await updateDocument(id, order)) {
+    console.log(`Updated order id = ${id}, invalidating cache...`);
+    await updateObject(id, null, 'orders');
+    return true;
+  }
+  console.log(`No order with id = ${id} was updated.`);
+
+  return false;
+};
 //await updateCache(id, null);
 
 export const updateOrderItem = async (
@@ -65,11 +74,36 @@ export const getOrders = async (
   userId: string,
 ): ReturnType<typeof fetchDocuments<Order<OrderItemEnhanced>>> => fetchDocuments({ userId });
 
+const useCache = async <Type>(
+  cache: { group?: string; key: string },
+  fallback: () => Promise<Type | null>,
+): Promise<Type | null> => {
+  const { group, key } = cache;
+  const cachedValue = await getObject<Type>(key, group);
+  if (cachedValue != null) {
+    console.log(
+      `Found item with group= "${group}", key = "${key}" in the cache. Returning cached item`,
+    );
+    return cachedValue;
+  }
+
+  console.log(`Cache missed for group = "${group}", key = "${key}", fetching from db`);
+  const result = await fallback();
+  if (result != null) {
+    console.log('Found item in db. Updating cache...', group, key);
+    await updateObject(key, result, group);
+  }
+  return result;
+};
+
 export const getOrder = async (
   orderId: string,
   userId: string,
-): ReturnType<typeof fetchDocument<Order<OrderItemEnhanced>>> =>
-  fetchDocument({ _id: ObjectId.createFromHexString(orderId), userId });
+): ReturnType<typeof fetchDocument<Order<OrderItemEnhanced>>> => {
+  return await useCache({ group: 'orders', key: orderId }, () =>
+    fetchDocument({ _id: ObjectId.createFromHexString(orderId), userId }),
+  );
+};
 
 export const getOrdersExpanded = async (userId: string): ReturnType<typeof getOrders> => {
   const orders = await getOrders(userId);

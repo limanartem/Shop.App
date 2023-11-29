@@ -93,7 +93,7 @@ services:
     #  - '6379:6379'
     networks:
       - app-private-network
-    command: redis-server --save 20 1 --loglevel warning --requirepass qwerty123
+    command: redis-server --save 20 1 --loglevel warning --requirepass $REDIS_PASSWORD
     volumes: 
       - cache:/data
 
@@ -170,6 +170,9 @@ services:
       MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       AUTH_CORE_URL: $AUTH_CORE_URL
       CATALOG_API_URL: http://shop.app.catalog.api:$CATALOG_API_PORT
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
 
   # Shop products API
   shop.app.catalog.api:
@@ -184,16 +187,11 @@ services:
     depends_on:
       shop.app.catalog.db:
         condition: service_started
-      shop.app.cache:
-        condition: service_started
     environment:
       DB_HOST: $DB_HOST
       DB_USER: $DB_USER
       DB_PASSWORD: $DB_PASSWORD
       DB_DATABASE: $DB_DATABASE
-      REDIS_HOST: cache
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: qwerty123
 
   # Orders workflow processing workers
 
