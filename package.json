@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/limanartem/Shop.App#readme",
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "devDependencies": {
     "typescript": "^5.3.2"

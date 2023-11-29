@@ -12,6 +12,7 @@ dist
 obj
 bin
 publish 
+logs
 
 # dev
 /public/env-config.js

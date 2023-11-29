@@ -131,6 +131,14 @@ services:
       - mongodb-data7:/data/db
       - ./docker-support/shop.app.orders.db/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
+  # Shared packages
+  shop.app.packages:
+    image: shop.app.packages
+    build:
+      context: ./packages
+    deploy:
+      replicas: 0
+
   # Shop orders API
   shop.app.orders.api:
     build:
@@ -141,6 +149,8 @@ services:
     networks:
       - app-private-network
       - app-public-network
+    links:
+      - shop.app.packages
     depends_on:
       shop.app.catalog.db:
         condition: service_started
@@ -274,6 +284,12 @@ volumes:
     driver: local
  shop.app.auth.db_volume:
     driver: local
+ packages:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/Users/artem.liman/git_nlok/nodejs_server_app/packages'
 
 networks:
   app-private-network:
