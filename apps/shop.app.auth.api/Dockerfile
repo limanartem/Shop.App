@@ -1,6 +1,6 @@
 # Stage 1: Build the app
-FROM node:21.1.0-slim as builder
-WORKDIR /app
+FROM shop.app.packages as builder
+WORKDIR /app/apps/shop.app.auth.api
 COPY package*.json ./
 RUN npm install
 COPY . .
@@ -8,8 +8,11 @@ RUN npm run build
 
 # Stage 2: Build for prod env
 FROM node:21.1.0-slim 
-WORKDIR /app
-COPY --from=builder /app/dist /app/dist
+WORKDIR /app/apps/shop.app.auth.api
+COPY --from=builder /app/apps/shop.app.auth.api/dist /app/apps/shop.app.auth.api/dist
+# Adding shared packages
+COPY --from=builder /app/packages ../../packages
+
 ENV NODE_ENV=production
 
 COPY package*.json ./

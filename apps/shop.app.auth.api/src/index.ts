@@ -5,6 +5,7 @@ import { SessionRequest, middleware } from 'supertokens-node/framework/express';
 import { errorHandler } from 'supertokens-node/framework/express';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { initApiUser, initAuth } from './init-auth';
+import { useLogging, useTracing } from '@shop.app/lib.express';
 
 const { WEB_API_PORT = 3003, PUBLIC_WEB_UI_DOMAIN = 'localhost:3000' } = process.env;
 
@@ -20,6 +21,8 @@ app.use(
     credentials: true,
   }),
 );
+useLogging(app);
+useTracing(app);
 
 app.use(middleware());
 
