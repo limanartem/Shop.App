@@ -19,7 +19,7 @@ export const routerFactory = () => {
     .put('/order/:id', verifySession(), verifyUserRole('api'), putOrderHandler) //TODO: should be deprecated
     .put('/orders/:id', verifySession(), verifyUserRole('api'), putOrderHandler)
     .put(
-      '/order/:id/items/:productId',
+      '/orders/:id/items/:productId',
       verifySession(),
       verifyUserRole('api'),
       putOrderItemHandler,
