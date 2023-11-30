@@ -1,6 +1,8 @@
 # Build status
 
-![[build status](https://github.com/limanartem/Shop.App/actions/workflows/nodejs.yml/badge.svg)](https://github.com/limanartem/Shop.App/actions/workflows/nodejs.yml)
+<a href="https://github.com/limanartem/Shop.App/actions/workflows/nodejs.yml" target="_blank"><img src="https://github.com/limanartem/Shop.App/actions/workflows/nodejs.yml/badge.svg" /></a>
+
+
 
 # Shop.App
 Prototype of the shop app implementation as a playground for integration of different distributed components
