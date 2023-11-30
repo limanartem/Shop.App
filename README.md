@@ -55,3 +55,24 @@ Some endpoints are only available for backend-to-backend communucation, e.g. cha
 node.js based app that simulates order processing flow by updating its status after some time - new order processing, payment processing and dispatching. 
 
 At each step order is placed in message queue and picked by order processing instance. As a result order status is changed over time and can be refreshed on UI
+
+## Additional services (from docker-compose)
+### shop.app.catalog.db
+Database used by `shop.app.catalog.api` app, which stores all shop products. Uses latest version of [MySql](https://www.mysql.com) and has initiazation script that automatically populates catalog upon first container start up
+
+### shop.app.auth.db
+Database used by `shop.app.auth.core` app for storing user details and is based on latest image of [Postgres](https://www.postgresql.org)
+
+### shop.app.auth.core
+Authentication core based on supertokens image for Postgres 
+
+### shop.app.cache
+Key-Value caching service based on [Redis.io](https://redis.io)
+
+### shop.app.messagebroker
+Message broker service providing [AMQP](https://www.amqp.org) messaging protocol powered by [RebbitMQ](https://www.rabbitmq.com)
+
+Used to orchestrate order processing across different work loads
+
+### shop.app.orders.db
+NoSql database for managing orders placed by user from the front-end via `shop.app.orders.api` REST API. Backed by [MongoDB](https://www.mongodb.com)
