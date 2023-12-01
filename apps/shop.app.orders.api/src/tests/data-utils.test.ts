@@ -20,6 +20,7 @@ jest.mock('../cache-utils', () => ({
 }));
 
 const ORDERS_CACHE_GROUP = 'orders';
+
 describe('data-utils', () => {
   beforeEach(() => {
     jest.clearAllMocks();

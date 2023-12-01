@@ -9,6 +9,8 @@ import {
   updateDocument,
 } from './mongodb-client';
 const { CATALOG_API_URL } = process.env;
+const ORDERS_CACHE_GROUP = 'orders';
+
 
 export const fetchItem = async (id: string): Promise<any | null> => {
   const cachedValue = await getCache(id);
@@ -42,7 +44,7 @@ export const updateOrder = async (
 ): Promise<ReturnType<typeof updateDocument>> => {
   if (await updateDocument(id, order)) {
     console.log(`Updated order id = ${id}, invalidating cache...`);
-    await updateObject(id, null, 'orders');
+    await updateObject(id, null, ORDERS_CACHE_GROUP);
     return true;
   }
   console.log(`No order with id = ${id} was updated.`);
@@ -100,7 +102,7 @@ export const getOrder = async (
   orderId: string,
   userId: string,
 ): ReturnType<typeof fetchDocument<Order<OrderItemEnhanced>>> => {
-  return await useCache({ group: 'orders', key: orderId }, () =>
+  return await useCache({ group: ORDERS_CACHE_GROUP, key: orderId }, () =>
     fetchDocument({ _id: ObjectId.createFromHexString(orderId), userId }),
   );
 };

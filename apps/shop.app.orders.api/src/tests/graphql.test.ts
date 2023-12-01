@@ -1,4 +1,4 @@
-import { getOrdersExpanded, getProductDetails } from '../data-utils';
+import { getOrdersExpanded, getProductDetails, getOrders } from '../data-utils';
 import request from 'supertest';
 import { start } from '../express/server';
 import { StatusCodes } from 'http-status-codes';
@@ -13,6 +13,7 @@ jest.mock('../data-utils', () => ({
   createOrder: jest.fn(),
   getOrdersExpanded: jest.fn(),
   getProductDetails: jest.fn(),
+  getOrders: jest.fn(),
   updateOrder: jest.fn(() => Promise.resolve()),
 }));
 
@@ -20,16 +21,11 @@ jest.mock('../auth', () => ({
   verifyUserRole: jest.fn(() => () => {}),
   initAuth: jest.fn(() => () => {}),
 }));
-jest.mock('supertokens-node/framework/express', () => {
-  // const { errorHandler } = jest.requireActual('supertokens-node/framework/express');
-  return {
-    errorHandler: jest.fn(() => () => {}),
-    middleware: jest.fn(() => () => {}),
-  };
-});
+
 jest.mock('supertokens-node/recipe/session/framework/express', () => ({
   verifySession: jest.fn(() => () => {}),
 }));
+
 jest.mock('../amqp-utils');
 
 const mockSession = (expectedUserId: string) => {
@@ -45,7 +41,7 @@ const mockSession = (expectedUserId: string) => {
   });
 };
 
-xdescribe('orders graphql', () => {
+describe('orders graphql', () => {
   let verifySessionCalled = false;
   const expectedUserId = uuidv4();
 
@@ -74,7 +70,7 @@ xdescribe('orders graphql', () => {
       const expectedOrderId = ObjectId.createFromTime(Date.now());
 
       mockSession(expectedUserId);
-      (getOrdersExpanded as jest.Mock).mockImplementation(() => [
+      (getOrders as jest.Mock).mockImplementation(() => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -83,11 +79,14 @@ xdescribe('orders graphql', () => {
 
       await request(start())
         .post('/graphql')
-        .send({query: '{ orders: { id }}'})
+        .send({ query: '{ orders { id }}' })
         .expect(StatusCodes.OK)
-        ;
+        .then((res) => {
+          const { errors } = res.body;
+          expect(errors).toBeUndefined()
+        });
 
-      expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
+      expect(getOrders).toHaveBeenCalledWith(expectedUserId);
     });
 
     it('enriches ordered items with product details', async () => {

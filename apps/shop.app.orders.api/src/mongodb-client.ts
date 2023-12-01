@@ -9,7 +9,11 @@ import {
   Filter,
 } from 'mongodb';
 
-const { MONGODB_URL, MONGO_DB_USERNAME, MONGO_DB_PASSWORD } = process.env;
+const {
+  MONGODB_URL = 'mongodb://localhost:27017/shop-app-orders-db',
+  MONGO_DB_USERNAME = 'ordersWriteUser',
+  MONGO_DB_PASSWORD = 'qwerty123',
+} = process.env;
 
 export declare type WithClearId<TSchema> = WithId<TSchema> &
   EnhancedOmit<TSchema, '_id'> & {

@@ -24,16 +24,11 @@ jest.mock('../auth', () => ({
   verifyUserRole: jest.fn(() => () => {}),
   initAuth: jest.fn(() => () => {}),
 }));
-jest.mock('supertokens-node/framework/express', () => {
-  // const { errorHandler } = jest.requireActual('supertokens-node/framework/express');
-  return {
-    errorHandler: jest.fn(() => () => {}),
-    middleware: jest.fn(() => () => {}),
-  };
-});
+
 jest.mock('supertokens-node/recipe/session/framework/express', () => ({
   verifySession: jest.fn(() => () => {}),
 }));
+
 jest.mock('../amqp-utils');
 
 const mockSession = (expectedUserId: string) => {

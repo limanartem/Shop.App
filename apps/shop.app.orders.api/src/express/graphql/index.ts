@@ -1,81 +1,27 @@
 import { Express } from 'express';
-import { graphqlHTTP } from 'express-graphql';
-import { buildSchema } from 'graphql';
-import { getOrdersExpanded } from '../../data-utils';
+import { createHandler } from 'graphql-http/lib/use/express';
 import { SessionRequest } from 'supertokens-node/framework/express';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
-
-const schema = buildSchema(`
-  directive @inherits(type: String!) on OBJECT
-
-  type Order {
-    id: ID!
-    userId: ID!
-    createdAt: String!
-    updatedAt: String!
-    status: String!
-    items: [Item!]!
-    shipping: Shipping!
-    payment: Payment!
-  }
-
-  type Item {
-    status: String
-    productId: ID!
-    quantity: Int!
-    product: ProductItem
-  }
-
-  type ProductItem {
-    id: ID!
-    title: String
-    description: String
-    price: Int
-    currency: String
-    capacity: Int
-    category: String
-  }
-
-  type Shipping {
-    address: String!
-    country: String!
-    zip: String!
-    city: String!
-  }
-
-  type Bank {
-    iban: String!
-  }
-
-  type Payment {
-    bank: Bank!
-  }
-
-  type Query {
-    orders: [Order!]!
-  }
-`);
-
-const root = {
-  orders: async (_: any, req: SessionRequest) => {
-    if (req.session == null) {
-      throw new Error('No session found');
-    }
-    const userId = req.session.getUserId();
-
-    return await getOrdersExpanded(userId);
-  },
-};
+import expressPlayground from 'graphql-playground-middleware-express';
+import { graphqlSchema } from './schema';
+import resolvers from './resolvers';
 
 export const useGraphql = (app: Express) => {
   console.log('Configuring graphql..');
-  app.use('/graphql', verifySession());
   app.use(
     '/graphql',
-    graphqlHTTP(() => ({
-      schema: schema,
-      rootValue: root,
-      graphiql: true,
-    }) as any),
+    verifySession(),
+    createHandler({
+      schema: graphqlSchema(),
+      rootValue: resolvers,
+      context: (req) => {
+        console.log('context init');
+        return {
+          session: (req.raw as SessionRequest).session,
+        };
+      },
+    }),
   );
+
+  app.get('/playground', expressPlayground({ endpoint: '/graphql' }));
 };
