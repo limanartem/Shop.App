@@ -1,4 +1,5 @@
 import { expressMiddleware, id } from 'cls-rtracer';
+import { Request, Response } from "express";
 import { Express } from 'express';
 import morgan from 'morgan';
 import { createLogger, format, transports } from 'winston';
@@ -28,7 +29,9 @@ export const useLogging = (app: Express) => {
       new transports.File({ filename: './logs/combined.log' }),
     ],
   });
-  
+
+  morgan.token('body', (req: Request) => JSON.stringify(req.body));
+
   app.use(
     morgan(
       function (tokens: any, req, res) {
@@ -39,6 +42,7 @@ export const useLogging = (app: Express) => {
           status: Number.parseFloat(tokens.status(req, res)),
           content_length: tokens.res(req, res, 'content-length'),
           response_time: Number.parseFloat(tokens['response-time'](req, res)),
+          body: tokens.body(req, res),
         });
       },
       {
