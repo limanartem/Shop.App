@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: ['master']
 
+env:
+  NODE_ENV: development
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,6 +36,6 @@ jobs:
       - name: Shop.App.Orders.Api Tests
         working-directory: ./apps/shop.app.orders.api
         run: |
-          npm ci --legacy-peer-deps
+          npm install --legacy-peer-deps
           npm run lint
           npm run test
