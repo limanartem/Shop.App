@@ -196,7 +196,14 @@ describe('order routes', () => {
             },
           },
         } as any;
-        await request(start()).post('/orders').send(orderPayload).expect(StatusCodes.BAD_REQUEST);
+        await request(start())
+          .post('/orders')
+          .send(orderPayload)
+          .expect(StatusCodes.BAD_REQUEST)
+          .then((res) => {
+            const { errors } = res.body;
+            expect(errors).toBeUndefined();
+          });
       });
 
       it('fails when payment is missing', async () => {

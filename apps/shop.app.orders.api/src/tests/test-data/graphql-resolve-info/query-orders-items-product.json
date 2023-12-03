@@ -1,0 +1,249 @@
+{
+  "fieldName": "orders",
+  "fieldNodes": [
+    {
+      "kind": "Field",
+      "name": { "kind": "Name", "value": "orders", "loc": { "start": 2, "end": 8 } },
+      "arguments": [],
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "kind": "Field",
+            "name": { "kind": "Name", "value": "id", "loc": { "start": 11, "end": 13 } },
+            "arguments": [],
+            "directives": [],
+            "loc": { "start": 11, "end": 13 }
+          },
+          {
+            "kind": "Field",
+            "name": { "kind": "Name", "value": "items", "loc": { "start": 15, "end": 20 } },
+            "arguments": [],
+            "directives": [],
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "kind": "Field",
+                  "name": { "kind": "Name", "value": "product", "loc": { "start": 23, "end": 30 } },
+                  "arguments": [],
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "Field",
+                        "name": {
+                          "kind": "Name",
+                          "value": "title",
+                          "loc": { "start": 33, "end": 38 }
+                        },
+                        "arguments": [],
+                        "directives": [],
+                        "loc": { "start": 33, "end": 38 }
+                      }
+                    ],
+                    "loc": { "start": 31, "end": 40 }
+                  },
+                  "loc": { "start": 23, "end": 40 }
+                }
+              ],
+              "loc": { "start": 21, "end": 41 }
+            },
+            "loc": { "start": 15, "end": 41 }
+          }
+        ],
+        "loc": { "start": 9, "end": 43 }
+      },
+      "loc": { "start": 2, "end": 43 }
+    }
+  ],
+  "returnType": "[Order!]!",
+  "parentType": "Query",
+  "path": { "key": "orders", "typename": "Query" },
+  "schema": {
+    "__validationErrors": [],
+    "extensions": {},
+    "astNode": {
+      "kind": "SchemaDefinition",
+      "operationTypes": [
+        {
+          "kind": "OperationTypeDefinition",
+          "type": {
+            "kind": "NamedType",
+            "name": { "kind": "Name", "value": "Query", "loc": { "start": 611, "end": 616 } }
+          },
+          "operation": "query"
+        }
+      ]
+    },
+    "extensionASTNodes": [],
+    "_queryType": "Query",
+    "_directives": ["@inherits", "@include", "@skip", "@deprecated", "@specifiedBy"],
+    "_typeMap": {
+      "Date": "Date",
+      "Time": "Time",
+      "DateTime": "DateTime",
+      "DateTimeISO": "DateTimeISO",
+      "Timestamp": "Timestamp",
+      "TimeZone": "TimeZone",
+      "UtcOffset": "UtcOffset",
+      "Duration": "Duration",
+      "ISO8601Duration": "ISO8601Duration",
+      "LocalDate": "LocalDate",
+      "LocalTime": "LocalTime",
+      "LocalDateTime": "LocalDateTime",
+      "LocalEndTime": "LocalEndTime",
+      "EmailAddress": "EmailAddress",
+      "NegativeFloat": "NegativeFloat",
+      "NegativeInt": "NegativeInt",
+      "NonEmptyString": "NonEmptyString",
+      "NonNegativeFloat": "NonNegativeFloat",
+      "NonNegativeInt": "NonNegativeInt",
+      "NonPositiveFloat": "NonPositiveFloat",
+      "NonPositiveInt": "NonPositiveInt",
+      "PhoneNumber": "PhoneNumber",
+      "PositiveFloat": "PositiveFloat",
+      "PositiveInt": "PositiveInt",
+      "PostalCode": "PostalCode",
+      "UnsignedFloat": "UnsignedFloat",
+      "UnsignedInt": "UnsignedInt",
+      "URL": "URL",
+      "BigInt": "BigInt",
+      "Long": "Long",
+      "Byte": "Byte",
+      "UUID": "UUID",
+      "GUID": "GUID",
+      "Hexadecimal": "Hexadecimal",
+      "HexColorCode": "HexColorCode",
+      "HSL": "HSL",
+      "HSLA": "HSLA",
+      "IP": "IP",
+      "IPv4": "IPv4",
+      "IPv6": "IPv6",
+      "ISBN": "ISBN",
+      "JWT": "JWT",
+      "Latitude": "Latitude",
+      "Longitude": "Longitude",
+      "MAC": "MAC",
+      "Port": "Port",
+      "RGB": "RGB",
+      "RGBA": "RGBA",
+      "SafeInt": "SafeInt",
+      "USCurrency": "USCurrency",
+      "Currency": "Currency",
+      "JSON": "JSON",
+      "JSONObject": "JSONObject",
+      "IBAN": "IBAN",
+      "ObjectID": "ObjectID",
+      "Void": "Void",
+      "DID": "DID",
+      "CountryCode": "CountryCode",
+      "Locale": "Locale",
+      "RoutingNumber": "RoutingNumber",
+      "AccountNumber": "AccountNumber",
+      "Cuid": "Cuid",
+      "SemVer": "SemVer",
+      "DeweyDecimal": "DeweyDecimal",
+      "LCCSubclass": "LCCSubclass",
+      "IPCPatent": "IPCPatent",
+      "Order": "Order",
+      "String": "String",
+      "Item": "Item",
+      "Int": "Int",
+      "ProductItem": "ProductItem",
+      "Shipping": "Shipping",
+      "Bank": "Bank",
+      "Payment": "Payment",
+      "Query": "Query",
+      "Boolean": "Boolean",
+      "__Schema": "__Schema",
+      "__Type": "__Type",
+      "__TypeKind": "__TypeKind",
+      "__Field": "__Field",
+      "__InputValue": "__InputValue",
+      "__EnumValue": "__EnumValue",
+      "__Directive": "__Directive",
+      "__DirectiveLocation": "__DirectiveLocation"
+    },
+    "_subTypeMap": {},
+    "_implementationsMap": {}
+  },
+  "fragments": {},
+  "operation": {
+    "kind": "OperationDefinition",
+    "operation": "query",
+    "variableDefinitions": [],
+    "directives": [],
+    "selectionSet": {
+      "kind": "SelectionSet",
+      "selections": [
+        {
+          "kind": "Field",
+          "name": { "kind": "Name", "value": "orders", "loc": { "start": 2, "end": 8 } },
+          "arguments": [],
+          "directives": [],
+          "selectionSet": {
+            "kind": "SelectionSet",
+            "selections": [
+              {
+                "kind": "Field",
+                "name": { "kind": "Name", "value": "id", "loc": { "start": 11, "end": 13 } },
+                "arguments": [],
+                "directives": [],
+                "loc": { "start": 11, "end": 13 }
+              },
+              {
+                "kind": "Field",
+                "name": { "kind": "Name", "value": "items", "loc": { "start": 15, "end": 20 } },
+                "arguments": [],
+                "directives": [],
+                "selectionSet": {
+                  "kind": "SelectionSet",
+                  "selections": [
+                    {
+                      "kind": "Field",
+                      "name": {
+                        "kind": "Name",
+                        "value": "product",
+                        "loc": { "start": 23, "end": 30 }
+                      },
+                      "arguments": [],
+                      "directives": [],
+                      "selectionSet": {
+                        "kind": "SelectionSet",
+                        "selections": [
+                          {
+                            "kind": "Field",
+                            "name": {
+                              "kind": "Name",
+                              "value": "title",
+                              "loc": { "start": 33, "end": 38 }
+                            },
+                            "arguments": [],
+                            "directives": [],
+                            "loc": { "start": 33, "end": 38 }
+                          }
+                        ],
+                        "loc": { "start": 31, "end": 40 }
+                      },
+                      "loc": { "start": 23, "end": 40 }
+                    }
+                  ],
+                  "loc": { "start": 21, "end": 41 }
+                },
+                "loc": { "start": 15, "end": 41 }
+              }
+            ],
+            "loc": { "start": 9, "end": 43 }
+          },
+          "loc": { "start": 2, "end": 43 }
+        }
+      ],
+      "loc": { "start": 0, "end": 44 }
+    },
+    "loc": { "start": 0, "end": 44 }
+  },
+  "variableValues": {}
+}

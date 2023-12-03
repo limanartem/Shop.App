@@ -1,10 +1,10 @@
 directive @inherits(type: String!) on OBJECT
 
 type Order {
-  id: ID!
-  userId: ID!
-  createdAt: String!
-  updatedAt: String!
+  id: ObjectID!
+  userId: GUID!
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO!
   status: String!
   items: [Item!]!
   shipping: Shipping!
@@ -13,13 +13,13 @@ type Order {
 
 type Item {
   status: String
-  productId: ID!
+  productId: String!
   quantity: Int!
   product: ProductItem
 }
 
 type ProductItem {
-  id: ID!
+  id: GUID!
   title: String
   description: String
   price: Int
@@ -40,10 +40,10 @@ type Bank {
 }
 
 type Payment {
-  bank: Bank!
+  bank: Bank
 }
 
 type Query {
   orders: [Order!]!
-  order(id: ID!): Order
+  order(id: ObjectID!): Order
 }

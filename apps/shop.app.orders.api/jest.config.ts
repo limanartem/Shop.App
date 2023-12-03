@@ -15,6 +15,7 @@ const config: Config.InitialOptions = {
   verbose: true,
   passWithNoTests: true,
   roots: ['src/'],
+  forceExit: true,
   setupFiles: ['<rootDir>/src/.jest/globalSetup.ts'],
   // runner: 'groups',
 };
