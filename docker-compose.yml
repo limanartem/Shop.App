@@ -23,8 +23,8 @@ services:
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       POSTGRES_DB: $POSTGRES_DB
-    #ports:
-     #  - 5431:5432
+    ports:
+      - 5431:5432
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-U", "admin"]
@@ -43,8 +43,8 @@ services:
       shop.app.auth.db:
         condition: service_healthy
     # No need to expose ports
-    #ports:
-    #   - 3567:3567
+    ports:
+       - 3567:3567
     # Use init-env.sh to create a .env file with random postgres credentials
     # environment:
     #   POSTGRESQL_CONNECTION_URI: "postgresql://supertokens_user:password@supertoken_db:5432/supertokens_db"
@@ -123,8 +123,8 @@ services:
       MONGO_DB_USERNAME: $MONGO_DB_USERNAME
       MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
       MONGO_INITDB_DATABASE: $MONGO_INITDB_DATABASE
-    #ports:
-    #  - '27017:27017'
+    ports:
+      - '27017:27017'
     networks:
       - app-private-network
     volumes:
