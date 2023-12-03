@@ -8,6 +8,7 @@ import { SessionRequest, middleware } from 'supertokens-node/framework/express';
 import { NextFunction } from 'express';
 import { ProductItem } from '../model';
 import { ObjectId } from 'mongodb';
+import './utils';
 
 jest.mock('../data-utils', () => ({
   createOrder: jest.fn(),
@@ -38,7 +39,7 @@ jest.mock('supertokens-node/framework/express', () => ({
 jest.mock('../amqp-utils');
 
 const mockSession = (expectedUserId: string) => {
-  (middleware as jest.Mock).mockImplementation(() => {
+  middleware.mockImplementation(() => {
     return (req: SessionRequest, _: any, next: NextFunction) => {
       req.session = {
         getUserId: () => expectedUserId,
@@ -58,7 +59,7 @@ describe('orders graphql', () => {
     verifySessionCalled = false;
 
     jest.clearAllMocks();
-    (verifySession as jest.Mock).mockImplementation(() => {
+    verifySession.mockImplementation(() => {
       return (req: SessionRequest, _: any, next: NextFunction) => {
         verifySessionCalled = true;
 
@@ -70,22 +71,42 @@ describe('orders graphql', () => {
   });
 
   describe('query orders', () => {
-    afterEach(() => {
-      expect(verifySessionCalled).toBeTruthy();
-    });
+    const expectedOrderId = ObjectId.createFromTime(Date.now());
+    const expectedProducts: ProductItem[] = [uuidv4(), uuidv4()].map((id, index) => ({
+      id,
+      title: `Title ${index + 1}`,
+      description: `Description ${index + 1}`,
+      price: Math.random() * 1000,
+      currency: 'USD',
+      category: '1',
+    }));
 
-    it('returns orders for user', async () => {
-      const expectedUserId = uuidv4();
-      const expectedOrderId = ObjectId.createFromTime(Date.now());
-
-      mockSession(expectedUserId);
-      (getOrders as jest.Mock).mockImplementation(() => [
+    beforeEach(() => {
+      getOrders.mockImplementation(() => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
         },
       ]);
 
+      getOrdersExpanded.mockImplementation(() => [
+        {
+          _id: expectedOrderId.toHexString(),
+          id: expectedOrderId.toHexString(),
+          items: expectedProducts.map((p, index) => ({
+            product: p,
+            productId: p.id,
+            quantity: index + 1,
+          })),
+        },
+      ]);
+    });
+
+    afterEach(() => {
+      expect(verifySessionCalled).toBeTruthy();
+    });
+
+    it('returns orders for user', async () => {
       await request(start())
         .post('/graphql')
         .send({ query: '{ orders { id }}' })
@@ -100,30 +121,6 @@ describe('orders graphql', () => {
     });
 
     it('if item product info is requested then fetches expanded order', async () => {
-      const expectedUserId = uuidv4();
-      const expectedOrderId = ObjectId.createFromTime(Date.now());
-      const expectedProducts: ProductItem[] = [uuidv4(), uuidv4()].map((id, index) => ({
-        id,
-        title: `Title ${index + 1}`,
-        description: `Description ${index + 1}`,
-        price: Math.random() * 1000,
-        currency: 'USD',
-        category: '1',
-      }));
-
-      mockSession(expectedUserId);
-      (getOrdersExpanded as jest.Mock).mockImplementation(() => [
-        {
-          _id: expectedOrderId.toHexString(),
-          id: expectedOrderId.toHexString(),
-          items: expectedProducts.map((p, index) => ({
-            product: p,
-            productId: p.id,
-            quantity: index + 1,
-          })),
-        },
-      ]);
-
       await request(start())
         .post('/graphql')
         .send({ query: '{ orders { id, items { productId, quantity, product { title }} }}' })
@@ -151,70 +148,48 @@ describe('orders graphql', () => {
       expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
       expect(getOrders).not.toHaveBeenCalled();
     });
-  });
 
-  it('if item product info is requested in fragments then fetches expanded order', async () => {
-    const expectedUserId = uuidv4();
-    const expectedOrderId = ObjectId.createFromTime(Date.now());
-    const expectedProducts: ProductItem[] = [uuidv4(), uuidv4()].map((id, index) => ({
-      id,
-      title: `Title ${index + 1}`,
-      description: `Description ${index + 1}`,
-      price: Math.random() * 1000,
-      currency: 'USD',
-      category: '1',
-    }));
-
-    mockSession(expectedUserId);
-    (getOrdersExpanded as jest.Mock).mockImplementation(() => [
-      {
-        _id: expectedOrderId.toHexString(),
-        id: expectedOrderId.toHexString(),
-        items: expectedProducts.map((p, index) => ({
-          product: p,
-          productId: p.id,
-          quantity: index + 1,
-        })),
-      },
-    ]);
-
-    await request(start())
-      .post('/graphql')
-      .send({ query: `
-      query { orders { ...orderFields } },      
-      fragment orderFields on Order {
-        id
-        items {
-          productId
-          quantity
-          product {
-            title
+    it('if item product info is requested in fragments then fetches expanded order', async () => {
+      await request(start())
+        .post('/graphql')
+        .send({
+          query: `
+        query { orders { ...orderFields } },      
+        fragment orderFields on Order {
+          id
+          items {
+            productId
+            quantity
+            product {
+              title
+            }
           }
         }
-      }
-      `})
-      .expect(StatusCodes.OK)
-      .then((res) => {
-        const { errors } = res.body;
-        expect(errors).toBeUndefined();
+        `,
+        })
+        .expect(StatusCodes.OK)
+        .then((res) => {
+          const { errors } = res.body;
+          expect(errors).toBeUndefined();
 
-        expect(res.body).toMatchObject({
-          data: {
-            orders: [
-              {
-                id: expectedOrderId.toHexString(),
-                items: expectedProducts.map((p, index) => ({
-                  product: { title: p.title },
-                  productId: p.id,
-                  quantity: index + 1,
-                })),
-              },
-            ],
-          },
+          expect(res.body).toMatchObject({
+            data: {
+              orders: [
+                {
+                  id: expectedOrderId.toHexString(),
+                  items: expectedProducts.map((p, index) => ({
+                    product: { title: p.title },
+                    productId: p.id,
+                    quantity: index + 1,
+                  })),
+                },
+              ],
+            },
+          });
         });
-      });
 
-    expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
-    expect(getOrders).not.toHaveBeenCalled();
+      expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
+      expect(getOrders).not.toHaveBeenCalled();
+    });
   });
 });
