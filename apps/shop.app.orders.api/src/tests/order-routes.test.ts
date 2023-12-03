@@ -196,6 +196,7 @@ describe('order routes', () => {
             },
           },
         } as any;
+
         await request(start())
           .post('/orders')
           .send(orderPayload)
@@ -247,10 +248,8 @@ describe('order routes', () => {
     });
 
     it('returns orders for user', async () => {
-      const expectedUserId = uuidv4();
       const expectedOrderId = ObjectId.createFromTime(Date.now());
 
-      mockSession(expectedUserId);
       (getOrdersExpanded as jest.Mock).mockImplementation(() => [
         {
           _id: expectedOrderId.toHexString(),
@@ -275,7 +274,6 @@ describe('order routes', () => {
     });
 
     it('enriches ordered items with product details', async () => {
-      const expectedUserId = uuidv4();
       const expectedOrderId = ObjectId.createFromTime(Date.now());
       const expectedProducts: ProductItem[] = [uuidv4(), uuidv4()].map((id, index) => ({
         id,
@@ -286,7 +284,6 @@ describe('order routes', () => {
         category: '1',
       }));
 
-      mockSession(expectedUserId);
       (getOrdersExpanded as jest.Mock).mockImplementation(() => [
         {
           _id: expectedOrderId.toHexString(),
@@ -327,10 +324,8 @@ describe('order routes', () => {
     });
 
     it('returns order for given id for user', async () => {
-      const expectedUserId = uuidv4();
       const expectedOrderId = ObjectId.createFromTime(Date.now());
 
-      mockSession(expectedUserId);
       (getOrderExpanded as jest.Mock).mockResolvedValue({
         _id: expectedOrderId.toHexString(),
         id: expectedOrderId.toHexString(),
@@ -349,7 +344,6 @@ describe('order routes', () => {
     });
 
     it('enriches ordered items with product details', async () => {
-      const expectedUserId = uuidv4();
       const expectedOrderId = ObjectId.createFromTime(Date.now());
       const expectedProducts: ProductItem[] = [uuidv4(), uuidv4()].map((id, index) => ({
         id,
@@ -360,7 +354,6 @@ describe('order routes', () => {
         category: '1',
       }));
 
-      mockSession(expectedUserId);
       (getOrderExpanded as jest.Mock).mockResolvedValue({
         _id: expectedOrderId.toHexString(),
         id: expectedOrderId.toHexString(),
@@ -389,10 +382,8 @@ describe('order routes', () => {
     });
 
     it('returns 404 if order was not found', async () => {
-      const expectedUserId = uuidv4();
       const expectedOrderId = ObjectId.createFromTime(Date.now());
 
-      mockSession(expectedUserId);
       (getOrderExpanded as jest.Mock).mockResolvedValue(null);
 
       await request(start()).get(`/orders/${expectedOrderId}`).expect(StatusCodes.NOT_FOUND);
@@ -413,7 +404,6 @@ describe('order routes', () => {
         };
       });
 
-      mockSession(expectedUserId);
       (updateOrder as jest.Mock).mockResolvedValue(true);
     });
 
