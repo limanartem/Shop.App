@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: ['master']
 
-env:
-  NODE_ENV: development
-
 jobs:
   build:
     runs-on: ubuntu-latest
