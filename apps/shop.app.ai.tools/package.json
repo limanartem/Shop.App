@@ -5,7 +5,10 @@
   "description": "",
   "scripts": {
     "build": "tsc --build",
-    "generate": "tsc && node dist/generate-ai-product-images.js"
+    "generate": "tsc && node dist/generate-ai-product-images.js",
+    "pre-commit": "",
+    "pre-push": ""
+
   },
   "author": "",
   "license": "ISC",

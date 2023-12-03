@@ -32,7 +32,10 @@
     "build": "craco build",
     "test": "jest",
     "eject": "react-scripts eject",
-    "lint": "eslint . --ext .js,.ts ./src --quiet"
+    "lint": "eslint . --ext .js,.ts ./src --quiet",
+    "pre-commit": "npm run lint",
+    "pre-push": "npm run test"
+
   },
   "eslintConfig": {
     "extends": [

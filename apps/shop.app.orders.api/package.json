@@ -14,7 +14,9 @@
     "start-dev": "npm run build && node .",
     "test": "jest",
     "lint": "eslint . --ext .js,.ts ./src --quiet",
-    "codegen": "graphql-codegen --config graphql-codegen.config.ts"
+    "codegen": "graphql-codegen --config graphql-codegen.config.ts",
+    "pre-commit": "npm run lint",
+    "pre-push": "npm run test"
   },
   "author": "",
   "license": "ISC",

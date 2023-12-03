@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --build",
-    "start": "node ."
+    "start": "node .",
+    "pre-commit": "",
+    "pre-push": ""
   },
   "author": "",
   "license": "ISC",

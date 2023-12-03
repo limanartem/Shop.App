@@ -8,7 +8,9 @@
     "prebuild": "npm run clean",
     "build": "tsc",
     "start": "node .",
-    "lint": "eslint . --ext .js,.ts ./src --quiet"
+    "lint": "eslint . --ext .js,.ts ./src --quiet",
+    "pre-commit": "npm run lint",
+    "pre-push": ""
   },
   "author": "",
   "license": "ISC",
