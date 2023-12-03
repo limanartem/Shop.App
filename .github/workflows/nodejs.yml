@@ -22,16 +22,17 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Shop.App.Web Tests
-        working-directory: ./apps/shop.app.web
-        
+
+      - name: Shop.App.Orders.Api Tests
+        working-directory: ./apps/shop.app.orders.api
         run: |
           npm install
           npm run lint
           npm run test
 
-      - name: Shop.App.Orders.Api Tests
-        working-directory: ./apps/shop.app.orders.api
+      - name: Shop.App.Web Tests
+        working-directory: ./apps/shop.app.web
+        
         run: |
           npm install
           npm run lint
