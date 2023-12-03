@@ -36,6 +36,6 @@ jobs:
       - name: Shop.App.Orders.Api Tests
         working-directory: ./apps/shop.app.orders.api
         run: |
-          npm install --legacy-peer-deps
+          npm install
           npm run lint
           npm run test
