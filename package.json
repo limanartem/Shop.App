@@ -10,7 +10,7 @@
     "_pre-push": "npm run pre-push --ws",
     "pre-commit": "echo 'Nothing to run'",
     "pre-push": "echo 'Nothing to run'",
-    "prepare": "husky install"
+    "prepare": "node -e \"if (process.env.NODE_ENV !== 'production'){process.exit(1)} \" || husky install"
   },
   "repository": {
     "type": "git",
