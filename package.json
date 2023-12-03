@@ -7,6 +7,7 @@
     "start-web": "npm run start --workspace ./apps/shop.app.web",
     "test-web": "npm run test --workspace ./apps/shop.app.web",
     "_pre-commit": "npm run pre-commit --ws",
+    "_pre-push": "npm run pre-push --ws",
     "pre-commit": "echo 'Nothing to run'",
     "pre-push": "echo 'Nothing to run'",
     "prepare": "husky install"
