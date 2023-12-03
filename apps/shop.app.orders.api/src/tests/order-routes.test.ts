@@ -37,7 +37,7 @@ jest.mock('supertokens-node/framework/express', () => ({
 jest.mock('../amqp-utils');
 
 const mockSession = (expectedUserId: string) => {
-  (middleware as jest.Mock).mockImplementation(() => {
+  middleware.mockImpl(() => {
     return (req: SessionRequest, _: any, next: NextFunction) => {
       req.session = {
         getUserId: () => expectedUserId,
@@ -57,7 +57,7 @@ describe('order routes', () => {
     verifySessionCalled = false;
 
     jest.clearAllMocks();
-    (verifySession as jest.Mock).mockImplementation(() => {
+    verifySession.mockImpl(() => {
       return (req: SessionRequest, _: any, next: NextFunction) => {
         verifySessionCalled = true;
 
@@ -72,7 +72,7 @@ describe('order routes', () => {
     const expectedOrderId = uuidv4();
 
     beforeEach(() => {
-      (createOrder as jest.Mock).mockImplementation(() => ({
+      createOrder.mockImpl(() => ({
         id: expectedOrderId,
       }));
     });
@@ -255,7 +255,7 @@ describe('order routes', () => {
     it('returns orders for user', async () => {
       const expectedOrderId = ObjectId.createFromTime(Date.now());
 
-      (getOrdersExpanded as jest.Mock).mockImplementation(() => [
+      getOrdersExpanded.mockImpl(() => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -289,7 +289,7 @@ describe('order routes', () => {
         category: '1',
       }));
 
-      (getOrdersExpanded as jest.Mock).mockImplementation(() => [
+      getOrdersExpanded.mockImpl(() => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -402,7 +402,7 @@ describe('order routes', () => {
     const expectedOrderId = uuidv4();
 
     beforeEach(() => {
-      (verifyUserRole as jest.Mock).mockImplementation(() => {
+      verifyUserRole.mockImpl(() => {
         return (req: SessionRequest, _: any, next: NextFunction) => {
           verifyUserRoleCalled = true;
           return next();

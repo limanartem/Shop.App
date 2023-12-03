@@ -41,7 +41,7 @@ jest.mock('supertokens-node/framework/express', () => ({
 jest.mock('../amqp-utils');
 
 const mockSession = (expectedUserId: string) => {
-  middleware.mockImplementation(() => {
+  middleware.mockImpl(() => {
     return (req: SessionRequest, _: any, next: NextFunction) => {
       req.session = {
         getUserId: () => expectedUserId,
@@ -70,7 +70,7 @@ describe('orders graphql', () => {
     verifySessionCalled = false;
 
     jest.clearAllMocks();
-    verifySession.mockImplementation(() => {
+    verifySession.mockImpl(() => {
       return (req: SessionRequest, _: any, next: NextFunction) => {
         verifySessionCalled = true;
 
@@ -87,7 +87,7 @@ describe('orders graphql', () => {
 
   describe('query orders', () => {
     beforeEach(() => {
-      getOrders.mockImplementation(() => [
+      getOrders.mockImpl(() => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -95,7 +95,7 @@ describe('orders graphql', () => {
         },
       ]);
 
-      getOrdersExpanded.mockImplementation(() => [
+      getOrdersExpanded.mockImpl(() => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -198,13 +198,13 @@ describe('orders graphql', () => {
 
   describe('query order by id', () => {
     beforeEach(() => {
-      getOrder.mockImplementation(() => ({
+      getOrder.mockImpl(() => ({
         _id: expectedOrderId.toHexString(),
         id: expectedOrderId.toHexString(),
         status: 'new',
       }));
 
-      getOrderExpanded.mockImplementation(() => ({
+      getOrderExpanded.mockImpl(() => ({
         _id: expectedOrderId.toHexString(),
         id: expectedOrderId.toHexString(),
         status: 'new',

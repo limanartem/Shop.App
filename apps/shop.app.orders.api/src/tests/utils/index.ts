@@ -1,14 +1,14 @@
 const mockImplementation = (target: any, mock: (...args: any) => {}) => {
-  (target as jest.Mock).mockImplementation(mock);
+  (target as jest.Mock).mockImpl(mock);
 };
 
 declare global {
   interface Function {
-    mockImplementation(callback: (...args: any) => {}): void;
+    mockImpl(callback: (...args: any) => {}): void;
   }
 }
 
-Function.prototype.mockImplementation = (callback: (...args: any) => {}) => {
+Function.prototype.mockImpl = (callback: (...args: any) => {}) => {
   mockImplementation(this, callback);
 };
 

@@ -51,7 +51,7 @@ describe('data-utils', () => {
           },
         },
       };
-      (fetchDocuments as jest.Mock).mockImplementation(() => Promise.resolve([expectedOrder]));
+      fetchDocuments.mockImpl(() => Promise.resolve([expectedOrder]));
 
       const result = await getOrders(userId);
       expect(fetchDocuments).toHaveBeenCalledWith({ userId });
