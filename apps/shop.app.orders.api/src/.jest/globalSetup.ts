@@ -15,15 +15,4 @@ jest.mock('@shop.app/lib.express/dist', () => ({
 
 jest.mock('graphql-playground-middleware-express', () => () => () => {});
 
-jest.mock('supertokens-node/framework/express', () => {
-  return {
-    errorHandler: jest.fn(() => (err: any, __: any, ___: any, next: NextFunction) => {
-      console.error(err);
-
-      return next();
-    }),
-    middleware: jest.fn(() => () => {}),
-  };
-});
-
 export {};

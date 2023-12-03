@@ -26,6 +26,15 @@ jest.mock('supertokens-node/recipe/session/framework/express', () => ({
   verifySession: jest.fn(() => () => {}),
 }));
 
+jest.mock('supertokens-node/framework/express', () => ({
+  errorHandler: jest.fn(() => (err: any, __: any, ___: any, next: NextFunction) => {
+    console.error(err);
+
+    return next();
+  }),
+  middleware: jest.fn(() => () => {}),
+}));
+
 jest.mock('../amqp-utils');
 
 const mockSession = (expectedUserId: string) => {
