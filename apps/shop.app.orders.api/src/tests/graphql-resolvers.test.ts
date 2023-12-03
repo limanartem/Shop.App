@@ -99,7 +99,7 @@ describe('orders graphql', () => {
       expect(getOrdersExpanded).not.toHaveBeenCalled();
     });
 
-    it('if item product info is requested fetches expanded order', async () => {
+    it('if item product info is requested then fetches expanded order', async () => {
       const expectedUserId = uuidv4();
       const expectedOrderId = ObjectId.createFromTime(Date.now());
       const expectedProducts: ProductItem[] = [uuidv4(), uuidv4()].map((id, index) => ({
@@ -151,5 +151,70 @@ describe('orders graphql', () => {
       expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
       expect(getOrders).not.toHaveBeenCalled();
     });
+  });
+
+  it('if item product info is requested in fragments then fetches expanded order', async () => {
+    const expectedUserId = uuidv4();
+    const expectedOrderId = ObjectId.createFromTime(Date.now());
+    const expectedProducts: ProductItem[] = [uuidv4(), uuidv4()].map((id, index) => ({
+      id,
+      title: `Title ${index + 1}`,
+      description: `Description ${index + 1}`,
+      price: Math.random() * 1000,
+      currency: 'USD',
+      category: '1',
+    }));
+
+    mockSession(expectedUserId);
+    (getOrdersExpanded as jest.Mock).mockImplementation(() => [
+      {
+        _id: expectedOrderId.toHexString(),
+        id: expectedOrderId.toHexString(),
+        items: expectedProducts.map((p, index) => ({
+          product: p,
+          productId: p.id,
+          quantity: index + 1,
+        })),
+      },
+    ]);
+
+    await request(start())
+      .post('/graphql')
+      .send({ query: `
+      query { orders { ...orderFields } },      
+      fragment orderFields on Order {
+        id
+        items {
+          productId
+          quantity
+          product {
+            title
+          }
+        }
+      }
+      `})
+      .expect(StatusCodes.OK)
+      .then((res) => {
+        const { errors } = res.body;
+        expect(errors).toBeUndefined();
+
+        expect(res.body).toMatchObject({
+          data: {
+            orders: [
+              {
+                id: expectedOrderId.toHexString(),
+                items: expectedProducts.map((p, index) => ({
+                  product: { title: p.title },
+                  productId: p.id,
+                  quantity: index + 1,
+                })),
+              },
+            ],
+          },
+        });
+      });
+
+    expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
+    expect(getOrders).not.toHaveBeenCalled();
   });
 });
