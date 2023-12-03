@@ -4,6 +4,7 @@ import { fetchDocuments, fetchDocument, updateDocument } from '../mongodb-client
 import { v4 as uuidv4 } from 'uuid';
 import { getObject, updateObject } from '../cache-utils';
 import { Status } from '../model/orders-model';
+import { mockImpl } from './utils';
 
 jest.mock('../mongodb-client', () => {
   return {
@@ -51,7 +52,7 @@ describe('data-utils', () => {
           },
         },
       };
-      fetchDocuments.mockImpl(() => Promise.resolve([expectedOrder]));
+      mockImpl(fetchDocuments, () => Promise.resolve([expectedOrder]));
 
       const result = await getOrders(userId);
       expect(fetchDocuments).toHaveBeenCalledWith({ userId });

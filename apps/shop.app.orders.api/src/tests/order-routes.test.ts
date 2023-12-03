@@ -11,6 +11,7 @@ import { sendMessage } from '../amqp-utils';
 import { ObjectId } from 'mongodb';
 import { verifyUserRole } from '../auth';
 import { OrderStatuses } from '../model/orders-model';
+import { mockImpl } from './utils';
 
 jest.mock('../data-utils', () => ({
   createOrder: jest.fn(),
@@ -37,7 +38,7 @@ jest.mock('supertokens-node/framework/express', () => ({
 jest.mock('../amqp-utils');
 
 const mockSession = (expectedUserId: string) => {
-  middleware.mockImpl(() => {
+  mockImpl(middleware, () => {
     return (req: SessionRequest, _: any, next: NextFunction) => {
       req.session = {
         getUserId: () => expectedUserId,
@@ -57,7 +58,7 @@ describe('order routes', () => {
     verifySessionCalled = false;
 
     jest.clearAllMocks();
-    verifySession.mockImpl(() => {
+    mockImpl(verifySession, () => {
       return (req: SessionRequest, _: any, next: NextFunction) => {
         verifySessionCalled = true;
 
@@ -72,7 +73,7 @@ describe('order routes', () => {
     const expectedOrderId = uuidv4();
 
     beforeEach(() => {
-      createOrder.mockImpl(() => ({
+      mockImpl(createOrder, () => ({
         id: expectedOrderId,
       }));
     });
@@ -255,7 +256,7 @@ describe('order routes', () => {
     it('returns orders for user', async () => {
       const expectedOrderId = ObjectId.createFromTime(Date.now());
 
-      getOrdersExpanded.mockImpl(() => [
+      mockImpl(getOrdersExpanded, () => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -289,7 +290,7 @@ describe('order routes', () => {
         category: '1',
       }));
 
-      getOrdersExpanded.mockImpl(() => [
+      mockImpl(getOrdersExpanded, () => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -402,7 +403,7 @@ describe('order routes', () => {
     const expectedOrderId = uuidv4();
 
     beforeEach(() => {
-      verifyUserRole.mockImpl(() => {
+      mockImpl(verifyUserRole, () => {
         return (req: SessionRequest, _: any, next: NextFunction) => {
           verifyUserRoleCalled = true;
           return next();

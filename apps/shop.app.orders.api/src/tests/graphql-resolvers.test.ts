@@ -8,7 +8,7 @@ import { SessionRequest, middleware } from 'supertokens-node/framework/express';
 import { NextFunction } from 'express';
 import { ProductItem } from '../model';
 import { ObjectId } from 'mongodb';
-import './utils';
+import { mockImpl } from './utils';
 
 jest.mock('../data-utils', () => ({
   createOrder: jest.fn(),
@@ -41,7 +41,7 @@ jest.mock('supertokens-node/framework/express', () => ({
 jest.mock('../amqp-utils');
 
 const mockSession = (expectedUserId: string) => {
-  middleware.mockImpl(() => {
+  mockImpl(middleware, () => {
     return (req: SessionRequest, _: any, next: NextFunction) => {
       req.session = {
         getUserId: () => expectedUserId,
@@ -70,7 +70,7 @@ describe('orders graphql', () => {
     verifySessionCalled = false;
 
     jest.clearAllMocks();
-    verifySession.mockImpl(() => {
+    mockImpl(verifySession, () => {
       return (req: SessionRequest, _: any, next: NextFunction) => {
         verifySessionCalled = true;
 
@@ -87,7 +87,7 @@ describe('orders graphql', () => {
 
   describe('query orders', () => {
     beforeEach(() => {
-      getOrders.mockImpl(() => [
+      mockImpl(getOrders, () => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -95,7 +95,7 @@ describe('orders graphql', () => {
         },
       ]);
 
-      getOrdersExpanded.mockImpl(() => [
+      mockImpl(getOrdersExpanded, () => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -198,13 +198,13 @@ describe('orders graphql', () => {
 
   describe('query order by id', () => {
     beforeEach(() => {
-      getOrder.mockImpl(() => ({
+      mockImpl(getOrder, () => ({
         _id: expectedOrderId.toHexString(),
         id: expectedOrderId.toHexString(),
         status: 'new',
       }));
 
-      getOrderExpanded.mockImpl(() => ({
+      mockImpl(getOrderExpanded, () => ({
         _id: expectedOrderId.toHexString(),
         id: expectedOrderId.toHexString(),
         status: 'new',
