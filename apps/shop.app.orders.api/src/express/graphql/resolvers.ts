@@ -1,4 +1,4 @@
-import { getOrder, getOrders, getOrdersExpanded } from '../../data-utils';
+import { getOrder, getOrderExpanded, getOrders, getOrdersExpanded } from '../../data-utils';
 import { Resolvers } from './__generated__/resolver-types';
 import { SessionContext } from '.';
 import { GraphQLResolveInfo } from 'graphql';
@@ -11,13 +11,22 @@ const root: Resolvers = {
       if (session == null) {
         throw new Error('No session found');
       }
+
       const userId = session.getUserId();
+      if (userId == null) {
+        throw new Error('No user id found');
+      }
 
       const requestedProductField = isFieldRequested('items.product', info);
 
       return await (requestedProductField ? getOrdersExpanded(userId) : getOrders(userId));
     },
-    order: async (_, { id }: { id?: string }, { session }: SessionContext) => {
+    order: async (
+      _,
+      { id }: { id?: string },
+      { session }: SessionContext,
+      info: GraphQLResolveInfo,
+    ) => {
       if (session == null) {
         throw new Error('No session found');
       }
@@ -25,9 +34,15 @@ const root: Resolvers = {
       if (id == null) {
         throw new Error('No id found');
       }
-      const userId = session.getUserId();
 
-      return await getOrder(id, userId);
+      const userId = session.getUserId();
+      if (userId == null) {
+        throw new Error('No user id found');
+      }
+
+      const requestedProductField = isFieldRequested('items.product', info);
+
+      return await (requestedProductField ? getOrderExpanded(id, userId) : getOrder(id, userId));
     },
   },
 };

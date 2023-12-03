@@ -1,4 +1,4 @@
-import { getOrdersExpanded, getOrders } from '../data-utils';
+import { getOrdersExpanded, getOrders, getOrder, getOrderExpanded } from '../data-utils';
 import request from 'supertest';
 import { start } from '../express/server';
 import { StatusCodes } from 'http-status-codes';
@@ -13,8 +13,10 @@ import './utils';
 jest.mock('../data-utils', () => ({
   createOrder: jest.fn(),
   getOrdersExpanded: jest.fn(),
+  getOrderExpanded: jest.fn(),
   getProductDetails: jest.fn(),
   getOrders: jest.fn(),
+  getOrder: jest.fn(),
   updateOrder: jest.fn(() => Promise.resolve()),
 }));
 
@@ -54,6 +56,15 @@ const mockSession = (expectedUserId: string) => {
 describe('orders graphql', () => {
   let verifySessionCalled = false;
   const expectedUserId = uuidv4();
+  const expectedOrderId = ObjectId.createFromTime(Date.now());
+  const expectedProducts: ProductItem[] = [uuidv4(), uuidv4()].map((id, index) => ({
+    id,
+    title: `Title ${index + 1}`,
+    description: `Description ${index + 1}`,
+    price: Math.random() * 1000,
+    currency: 'USD',
+    category: '1',
+  }));
 
   beforeEach(() => {
     verifySessionCalled = false;
@@ -70,22 +81,17 @@ describe('orders graphql', () => {
     mockSession(expectedUserId);
   });
 
-  describe('query orders', () => {
-    const expectedOrderId = ObjectId.createFromTime(Date.now());
-    const expectedProducts: ProductItem[] = [uuidv4(), uuidv4()].map((id, index) => ({
-      id,
-      title: `Title ${index + 1}`,
-      description: `Description ${index + 1}`,
-      price: Math.random() * 1000,
-      currency: 'USD',
-      category: '1',
-    }));
+  afterEach(() => {
+    expect(verifySessionCalled).toBeTruthy();
+  });
 
+  describe('query orders', () => {
     beforeEach(() => {
       getOrders.mockImplementation(() => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
+          status: 'new',
         },
       ]);
 
@@ -93,6 +99,7 @@ describe('orders graphql', () => {
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
+          status: 'new',
           items: expectedProducts.map((p, index) => ({
             product: p,
             productId: p.id,
@@ -100,10 +107,6 @@ describe('orders graphql', () => {
           })),
         },
       ]);
-    });
-
-    afterEach(() => {
-      expect(verifySessionCalled).toBeTruthy();
     });
 
     it('returns orders for user', async () => {
@@ -190,6 +193,99 @@ describe('orders graphql', () => {
 
       expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
       expect(getOrders).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('query order by id', () => {
+    beforeEach(() => {
+      getOrder.mockImplementation(() => ({
+        _id: expectedOrderId.toHexString(),
+        id: expectedOrderId.toHexString(),
+        status: 'new',
+      }));
+
+      getOrderExpanded.mockImplementation(() => ({
+        _id: expectedOrderId.toHexString(),
+        id: expectedOrderId.toHexString(),
+        status: 'new',
+        items: expectedProducts.map((p, index) => ({
+          product: p,
+          productId: p.id,
+          quantity: index + 1,
+        })),
+      }));
+    });
+
+    it('fetches order details', async () => {
+      await request(start())
+        .post('/graphql')
+        .send({
+          query: `
+            query getOrder($id: ObjectID!) {
+               order(id: $id) {
+                 id, status
+               }
+            }`,
+          variables: { id: expectedOrderId },
+        })
+        .expect(StatusCodes.OK)
+        .then((res) => {
+          const { errors } = res.body;
+          expect(errors).toBeUndefined();
+          expect(res.body).toMatchObject({
+            data: {
+              order: {
+                id: expectedOrderId.toHexString(),
+                status: 'new',
+              },
+            },
+          });
+        });
+
+      expect(getOrder).toHaveBeenCalledWith(expectedOrderId.toHexString(), expectedUserId);
+      expect(getOrderExpanded).not.toHaveBeenCalled();
+    });
+
+    it('fetches extended order details', async () => {
+      await request(start())
+        .post('/graphql')
+        .send({
+          query: `
+            query getOrder($id: ObjectID!) {
+               order(id: $id) {
+                 id, status,
+                 items {
+                  productId
+                  quantity
+                  product {
+                    title
+                  }
+                }
+               }
+            }`,
+          variables: { id: expectedOrderId },
+        })
+        .expect(StatusCodes.OK)
+        .then((res) => {
+          const { errors } = res.body;
+          expect(errors).toBeUndefined();
+          expect(res.body).toMatchObject({
+            data: {
+              order: {
+                id: expectedOrderId.toHexString(),
+                status: 'new',
+                items: expectedProducts.map((p, index) => ({
+                  product: { title: p.title },
+                  productId: p.id,
+                  quantity: index + 1,
+                })),
+              },
+            },
+          });
+        });
+
+      expect(getOrderExpanded).toHaveBeenCalledWith(expectedOrderId.toHexString(), expectedUserId);
+      expect(getOrder).not.toHaveBeenCalled();
     });
   });
 });

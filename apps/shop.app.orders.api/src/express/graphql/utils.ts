@@ -7,7 +7,7 @@ import {
 } from 'graphql';
 
 /**
- * Check if a field is requested in the GraphQLResolveInfo.
+ * Check if a field is requested in the GraphQLResolveInfo. Supports query fragments.
  *
  * @param {string} fieldPath dot separated path to field to check
  * @param {GraphQLResolveInfo} info
