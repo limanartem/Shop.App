@@ -1,5 +1,10 @@
 import { ObjectId } from 'mongodb';
-import { get as getCache, getObject, update as updateCache, updateObject } from './cache-utils';
+import {
+  get as getCache,
+  getObject as getCachedObject,
+  update as updateCache,
+  updateObject as updateCacheObject,
+} from './cache-utils';
 import { ProductItem, Order, OrderItemEnhanced, UpdateOrder, OrderItem } from './model';
 import {
   WithClearId,
@@ -10,7 +15,6 @@ import {
 } from './mongodb-client';
 const { CATALOG_API_URL } = process.env;
 const ORDERS_CACHE_GROUP = 'orders';
-
 
 export const fetchItem = async (id: string): Promise<any | null> => {
   const cachedValue = await getCache(id);
@@ -44,14 +48,16 @@ export const updateOrder = async (
 ): Promise<ReturnType<typeof updateDocument>> => {
   if (await updateDocument(id, order)) {
     console.log(`Updated order id = ${id}, invalidating cache...`);
-    await updateObject(id, null, ORDERS_CACHE_GROUP);
+    // TODO: if cache service is unavailable we could potentially leave stale value in cache
+    //  which would be used next time service is up again. To mitigate this we are setting
+    //  shorter TTL for cache keys
+    await updateCacheObject(id, null, ORDERS_CACHE_GROUP);
     return true;
   }
   console.log(`No order with id = ${id} was updated.`);
 
   return false;
 };
-//await updateCache(id, null);
 
 export const updateOrderItem = async (
   id: string,
@@ -81,7 +87,7 @@ const useCache = async <Type>(
   fallback: () => Promise<Type | null>,
 ): Promise<Type | null> => {
   const { group, key } = cache;
-  const cachedValue = await getObject<Type>(key, group);
+  const cachedValue = await getCachedObject<Type>(key, group);
   if (cachedValue != null) {
     console.log(
       `Found item with group= "${group}", key = "${key}" in the cache. Returning cached item`,
@@ -93,7 +99,7 @@ const useCache = async <Type>(
   const result = await fallback();
   if (result != null) {
     console.log('Found item in db. Updating cache...', group, key);
-    await updateObject(key, result, group);
+    await updateCacheObject(key, result, group);
   }
   return result;
 };
@@ -152,9 +158,11 @@ const expandOrder = async (order: WithClearId<Order<OrderItemEnhanced>>) => {
   const productIds = order.items?.map((i) => i.productId);
   try {
     const products = await getProductDetails(productIds);
-    order.items?.forEach((item) => {
-      item.product = products.find((p) => p.id === item.productId);
-    });
+    if (products?.length > 0) {
+      order.items?.forEach((item) => {
+        item.product = products.find((p) => p.id === item.productId);
+      });
+    }
   } catch (error) {
     console.error('Error fetching product details', error, productIds);
   }

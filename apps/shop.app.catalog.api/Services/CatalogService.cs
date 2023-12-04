@@ -31,7 +31,7 @@ namespace Shop.App.Catalog.Api.Services
       return context.Products.Where(p => categories.Contains(p.CategoryId));
     }
 
-    public IQueryable<Product> Products(Guid[] ids)
+    public IQueryable<Product> Products(Guid[] ids) 
     {
       return context.Products.Where(p => ids.Contains(p.Id));
     }
