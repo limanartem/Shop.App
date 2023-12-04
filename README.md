@@ -29,6 +29,7 @@ The project is structured as a monorepo using npm workspaces. This structure pri
 - `docker-compose build --no-cache`: Rebuilds all containers without using cache.
   - Add `--progress plain` to view more command outputs.
 - `docker-compose up --build`: Starts and rebuilds all containers.
+  - Add `--remove-orphans` to remove orphan containers 
 
 ## Architecture Overview
 ![Architecture Overview](media/Shop.App.Architecture_1.png)

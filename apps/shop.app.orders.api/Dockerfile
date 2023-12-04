@@ -3,7 +3,7 @@ FROM shop.app.packages as builder
 
 WORKDIR /app/apps/shop.app.orders.api
 COPY package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY . .
 RUN npm run build
 
@@ -17,7 +17,7 @@ COPY --from=builder /app/packages ../../packages
 ENV NODE_ENV=production
 
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm install --omit=dev --legacy-peer-deps
 #COPY . .
 
 EXPOSE 3001

@@ -1,9 +1,14 @@
 # shop.app.orders.api
 Provides REST and GraphQL APIs for handling orders - submitting new orders, getting all users order, updating order status by other backend systems
 
-## requirements
+## Requirements
 * node >= 21
-  
+
+## Setup
+* Ensure that packages from `./packages/*` are built
+* `npm i `  to install dependencies
+* `npm run start-dev` to build and run app locally
+
 
 ## npm tasks
 * `npm run start-dev` - builds and starts local node.js express server
