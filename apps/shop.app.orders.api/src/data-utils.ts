@@ -13,7 +13,6 @@ import {
   insertDocument,
   updateDocument,
 } from './mongodb-client';
-import { stringify } from 'querystring';
 const { CATALOG_API_URL } = process.env;
 const ORDERS_CACHE_GROUP = 'orders';
 
