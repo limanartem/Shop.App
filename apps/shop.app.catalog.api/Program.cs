@@ -88,7 +88,7 @@ app.MapPost("/products/search", async (HttpContext context, Guid[] ids) =>
   catch (Exception ex)
   {
     Console.WriteLine(ex.Message);
-    await context.Response.WriteAsJsonAsync(ex.Message);
+    throw new Exception("Could not retrieve catalog");
   }
 });
 
