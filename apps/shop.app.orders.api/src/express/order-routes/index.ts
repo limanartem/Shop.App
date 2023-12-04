@@ -6,6 +6,7 @@ import {
   getOrdersHandler,
   putOrderHandler,
   putOrderItemHandler,
+  getOrderHandler,
 } from './handlers';
 
 export const routerFactory = () => {
@@ -14,9 +15,11 @@ export const routerFactory = () => {
   router
     .post('/orders', verifySession(), postOrdersHandler)
     .get('/orders', verifySession(), getOrdersHandler)
-    .put('/order/:id', verifySession(), verifyUserRole('api'), putOrderHandler)
+    .get('/orders/:id', verifySession(), getOrderHandler)
+    .put('/order/:id', verifySession(), verifyUserRole('api'), putOrderHandler) //TODO: should be deprecated
+    .put('/orders/:id', verifySession(), verifyUserRole('api'), putOrderHandler)
     .put(
-      '/order/:id/items/:productId',
+      '/orders/:id/items/:productId',
       verifySession(),
       verifyUserRole('api'),
       putOrderItemHandler,

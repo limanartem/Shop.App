@@ -6,9 +6,14 @@ import {
   ObjectId,
   EnhancedOmit,
   InferIdType,
+  Filter,
 } from 'mongodb';
 
-const { MONGODB_URL, MONGO_DB_USERNAME, MONGO_DB_PASSWORD } = process.env;
+const {
+  MONGODB_URL = 'mongodb://localhost:27017/shop-app-orders-db',
+  MONGO_DB_USERNAME = 'ordersWriteUser',
+  MONGO_DB_PASSWORD = 'qwerty123',
+} = process.env;
 
 export declare type WithClearId<TSchema> = WithId<TSchema> &
   EnhancedOmit<TSchema, '_id'> & {
@@ -53,7 +58,7 @@ const mapToClearIdDocument = <DocumentType extends Document = Document>(
 });
 
 export const fetchDocuments = async <DocumentType extends Document = Document>(
-  criteria: any,
+  criteria: Filter<WithId<Document>>,
   collection: DB_COLLECTION = DB_COLLECTION.ORDERS,
 ): Promise<WithClearId<DocumentType>[]> =>
   usingClient(async (client) => {
@@ -63,17 +68,17 @@ export const fetchDocuments = async <DocumentType extends Document = Document>(
     ).map(mapToClearIdDocument);
   });
 
-export const fetchDocument = async (
-  id: string,
+export const fetchDocument = async <DocumentType extends Document = Document>(
+  criteria: Filter<WithId<Document>>,
   collection: DB_COLLECTION = DB_COLLECTION.ORDERS,
-): Promise<WithClearId<Document> | null> =>
+): Promise<WithClearId<DocumentType> | null> =>
   usingClient(async (client) => {
-    const _id = ObjectId.createFromHexString(id);
+    // const _id = ObjectId.createFromHexString(id);
     console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
-    console.log('Fetching item from db...', id, collection);
-    const order = await client.db().collection(collection).findOne({ _id });
+    console.log('Fetching item from db...', criteria, collection);
+    const order = await client.db().collection(collection).findOne<WithId<DocumentType>>(criteria);
     if (order != null) {
-      return mapToClearIdDocument(order);
+      return mapToClearIdDocument<DocumentType>(order);
     }
     return null;
   });
@@ -82,12 +87,16 @@ export const updateDocument = async <T extends object>(
   id: string,
   data: T,
   collection: DB_COLLECTION = DB_COLLECTION.ORDERS,
-): Promise<void> =>
+): Promise<boolean> =>
   usingClient(async (client) => {
     const _id = ObjectId.createFromHexString(id);
     console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
     console.log('Updating item in db...', id, data, collection);
-    await client.db().collection(collection).updateOne({ _id }, { $set: data });
+    const updateResult = await client
+      .db()
+      .collection(collection)
+      .updateOne({ _id }, { $set: data });
+    return updateResult.modifiedCount === 1;
   });
 
 export const insertDocument = async <T extends object>(

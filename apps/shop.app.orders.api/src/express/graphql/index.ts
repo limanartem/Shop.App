@@ -1,81 +1,62 @@
 import { Express } from 'express';
-import { graphqlHTTP } from 'express-graphql';
-import { buildSchema } from 'graphql';
-import { getOrdersExpanded } from '../../data-utils';
+import { createHandler } from 'graphql-http/lib/use/express';
 import { SessionRequest } from 'supertokens-node/framework/express';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
+import expressPlayground from 'graphql-playground-middleware-express';
+import { graphqlSchema } from './schema';
+import { SessionContainerInterface } from 'supertokens-node/lib/build/recipe/session/types';
+import { OperationContext } from 'graphql-http';
 
-const schema = buildSchema(`
-  directive @inherits(type: String!) on OBJECT
+export type SessionContext = {
+  session?: SessionContainerInterface;
+} & OperationContext;
 
-  type Order {
-    id: ID!
-    userId: ID!
-    createdAt: String!
-    updatedAt: String!
-    status: String!
-    items: [Item!]!
-    shipping: Shipping!
-    payment: Payment!
-  }
+export const useGraphql = async (app: Express) => {
+  console.log('Configuring graphql with Express..');
+  
+  /* 
+    
+  // TODO: alternative we can configure Apollo server as below
+  console.log('Configuring graphql with Apollo server for Express..');
 
-  type Item {
-    status: String
-    productId: ID!
-    quantity: Int!
-    product: ProductItem
-  }
+  const schema = fs.readFileSync(path.join(__dirname, 'schema.graphql')).toString();
 
-  type ProductItem {
-    id: ID!
-    title: String
-    description: String
-    price: Int
-    currency: String
-    capacity: Int
-    category: String
-  }
+  const server = new ApolloServer<SessionContext>({
+    //schema: graphqlSchema(),
 
-  type Shipping {
-    address: String!
-    country: String!
-    zip: String!
-    city: String!
-  }
+    resolvers,
+    typeDefs: [...scalarTypeDefs, schema],
+  });
 
-  type Bank {
-    iban: String!
-  }
+  await server.start();
 
-  type Payment {
-    bank: Bank!
-  }
-
-  type Query {
-    orders: [Order!]!
-  }
-`);
-
-const root = {
-  orders: async (_: any, req: SessionRequest) => {
-    if (req.session == null) {
-      throw new Error('No session found');
-    }
-    const userId = req.session.getUserId();
-
-    return await getOrdersExpanded(userId);
-  },
-};
-
-export const useGraphql = (app: Express) => {
-  console.log('Configuring graphql..');
-  app.use('/graphql', verifySession());
   app.use(
     '/graphql',
-    graphqlHTTP(() => ({
-      schema: schema,
-      rootValue: root,
-      graphiql: true,
-    }) as any),
+    cors<cors.CorsRequest>(),
+    express.json(),
+    verifySession(),
+    expressMiddleware(server, {
+      context: async (req) => {
+        console.log((req.req as SessionRequest).session);
+        return {
+          session: (req.req as SessionRequest).session,
+        };
+      },
+    }),
+  ); */
+
+  app.use(
+    '/graphql',
+    verifySession(),
+    createHandler<SessionContext>({
+      schema: graphqlSchema(),
+      context: (req) => {
+        return {
+          session: (req.raw as SessionRequest).session,
+        };
+      },
+    }),
   );
+
+  app.get('/playground', expressPlayground({ endpoint: '/graphql' }));
 };

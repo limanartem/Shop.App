@@ -1,4 +1,3 @@
-import Joi from 'joi';
 import { CreateOrderRequestPayloadSchema, UpdateOrderStatusRequestPayloadSchema } from '../model';
 import {
   OrderStatuses,
@@ -85,7 +84,6 @@ describe('CreateOrderRequestPayloadSchema Validation', () => {
     };
 
     const validationResult = CreateOrderRequestPayloadSchema.validate(validPayload);
-    console.log(Joi.attempt(validPayload, CreateOrderRequestPayloadSchema, { stripUnknown: true }));
     expect(validationResult.error).toBeUndefined();
   });
 

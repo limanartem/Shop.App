@@ -1,0 +1,49 @@
+directive @inherits(type: String!) on OBJECT
+
+type Order {
+  id: ObjectID!
+  userId: GUID!
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO!
+  status: String!
+  items: [Item!]!
+  shipping: Shipping!
+  payment: Payment!
+}
+
+type Item {
+  status: String
+  productId: String!
+  quantity: Int!
+  product: ProductItem
+}
+
+type ProductItem {
+  id: GUID!
+  title: String
+  description: String
+  price: Int
+  currency: String
+  capacity: Int
+  category: String
+}
+
+type Shipping {
+  address: String!
+  country: String!
+  zip: String!
+  city: String!
+}
+
+type Bank {
+  iban: String!
+}
+
+type Payment {
+  bank: Bank
+}
+
+type Query {
+  orders: [Order!]!
+  order(id: ObjectID!): Order
+}

@@ -1,5 +1,5 @@
 import type { Response } from 'express';
-import { createOrder, getOrdersExpanded, getProductDetails, updateOrder } from '../../data-utils';
+import { createOrder, getOrderExpanded, getOrdersExpanded, updateOrder } from '../../data-utils';
 import { SessionRequest } from 'supertokens-node/framework/express';
 import { CreateOrderRequest, Order, CreateOrderRequestPayloadSchema } from '../../model';
 import { StatusCodes } from 'http-status-codes';
@@ -80,11 +80,16 @@ export async function putOrderHandler(req: SessionRequest, res: Response) {
     stripUnknown: true,
   }) as UpdateOrderStatusRequest;
 
-  await updateOrder(orderId, {
+  const result = await updateOrder(orderId, {
     ...payload,
     updatedAt: new Date(),
     updatedBy: req.session?.getUserId()!,
   });
+
+  if (!result) {
+    res.status(StatusCodes.NOT_FOUND).send(`Order with "${orderId}" was not found`);
+    return;
+  }
 
   const orderFlow = getOrderFlow(payload.status);
 
@@ -110,21 +115,28 @@ export async function getOrdersHandler(req: SessionRequest, res: Response) {
 
   const orders = await getOrdersExpanded(userId);
 
-  await Promise.all(
-    orders.map(async (order) => {
-      const productIds = order.items?.map((i) => i.productId);
-      try {
-        const products = await getProductDetails(productIds);
-        order.items?.forEach((item) => {
-          item.product = products.find((p) => p.id === item.productId);
-        });
-      } catch (error) {
-        console.error('Error fetching product details', error, productIds);
-      }
-    }),
-  );
-
   res.json({ orders });
+}
+
+export async function getOrderHandler(req: SessionRequest, res: Response) {
+  if (req.session == null) {
+    throw new Error('Undefined session');
+  }
+
+  const userId = req.session.getUserId();
+  const orderId = req.params.id;
+
+  if (!orderId) {
+    throw new Error('Invalid order id');
+  }
+
+  const order = await getOrderExpanded(orderId, userId);
+
+  if (order != null) {
+    res.json(order);
+  } else {
+    res.status(StatusCodes.NOT_FOUND).send();
+  }
 }
 
 export async function postOrdersHandler(req: SessionRequest, res: Response) {

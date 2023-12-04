@@ -4,9 +4,13 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "npm run lint && tsc",
+    "clean": "npx rimraf dist",
+    "prebuild": "npm run clean",
+    "build": "tsc",
     "start": "node .",
-    "lint": "eslint . --ext .js,.ts ./src --quiet"
+    "lint": "eslint . --ext .js,.ts ./src --quiet",
+    "pre-commit": "npm run lint",
+    "pre-push": ""
   },
   "author": "",
   "license": "ISC",

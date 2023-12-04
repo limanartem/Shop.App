@@ -10,8 +10,10 @@
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": ".",
-    "noEmit": false, 
+    "declaration": true,
+    "noEmit": false,
     "strict": true,
+
     "plugins": [
       {
         "name": "typescript-strict-plugin"

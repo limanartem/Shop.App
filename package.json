@@ -5,7 +5,12 @@
   "scripts": {
     "build": "tsc --build --verbose",
     "start-web": "npm run start --workspace ./apps/shop.app.web",
-    "test-web": "npm run test --workspace ./apps/shop.app.web"
+    "test-web": "npm run test --workspace ./apps/shop.app.web",
+    "_pre-commit": "npm run pre-commit --ws",
+    "_pre-push": "npm run pre-push --ws",
+    "pre-commit": "echo 'Nothing to run'",
+    "pre-push": "echo 'Nothing to run'",
+    "_prepare": "node -e \"if (process.env.NODE_ENV !== 'production'){process.exit(1)} \" || husky install"
   },
   "repository": {
     "type": "git",
@@ -19,9 +24,11 @@
   },
   "homepage": "https://github.com/limanartem/Shop.App#readme",
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "devDependencies": {
+    "husky": "^8.0.3",
     "typescript": "^5.3.2"
   }
 }

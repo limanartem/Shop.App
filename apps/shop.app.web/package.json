@@ -25,12 +25,17 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "clean": "npx rimraf dist",
+    "prebuild": "npm run clean",
     "dev": "chmod +x ./scripts/update-env.sh && ./scripts/update-env.sh && cp env-config.js ./public/ && react-scripts start",
     "start": "react-scripts start",
-    "build": "npm run lint && craco build",
+    "build": "craco build",
     "test": "jest",
     "eject": "react-scripts eject",
-    "lint": "eslint . --ext .js,.ts ./src --quiet"
+    "lint": "eslint . --ext .js,.ts ./src --quiet",
+    "pre-commit": "npm run lint",
+    "pre-push": "npm run test"
+
   },
   "eslintConfig": {
     "extends": [

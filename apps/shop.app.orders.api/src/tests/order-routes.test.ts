@@ -1,4 +1,4 @@
-import { createOrder, getOrdersExpanded, getProductDetails, updateOrder } from '../data-utils';
+import { createOrder, getOrdersExpanded, updateOrder, getOrderExpanded } from '../data-utils';
 import request from 'supertest';
 import { start } from '../express/server';
 import { StatusCodes } from 'http-status-codes';
@@ -11,32 +11,34 @@ import { sendMessage } from '../amqp-utils';
 import { ObjectId } from 'mongodb';
 import { verifyUserRole } from '../auth';
 import { OrderStatuses } from '../model/orders-model';
+import { mockImpl } from './utils';
 
 jest.mock('../data-utils', () => ({
   createOrder: jest.fn(),
   getOrdersExpanded: jest.fn(),
+  getOrderExpanded: jest.fn(),
   getProductDetails: jest.fn(),
-  updateOrder: jest.fn(() => Promise.resolve()),
+  updateOrder: jest.fn(() => Promise.resolve(true)),
 }));
 
 jest.mock('../auth', () => ({
   verifyUserRole: jest.fn(() => () => {}),
   initAuth: jest.fn(() => () => {}),
 }));
-jest.mock('supertokens-node/framework/express', () => {
-  // const { errorHandler } = jest.requireActual('supertokens-node/framework/express');
-  return {
-    errorHandler: jest.fn(() => () => {}),
-    middleware: jest.fn(() => () => {}),
-  };
-});
+
 jest.mock('supertokens-node/recipe/session/framework/express', () => ({
   verifySession: jest.fn(() => () => {}),
 }));
+
+jest.mock('supertokens-node/framework/express', () => ({
+  errorHandler: jest.fn(() => () => {}),
+  middleware: jest.fn(() => () => {}),
+}));
+
 jest.mock('../amqp-utils');
 
 const mockSession = (expectedUserId: string) => {
-  (middleware as jest.Mock).mockImplementation(() => {
+  mockImpl(middleware, () => {
     return (req: SessionRequest, _: any, next: NextFunction) => {
       req.session = {
         getUserId: () => expectedUserId,
@@ -56,7 +58,7 @@ describe('order routes', () => {
     verifySessionCalled = false;
 
     jest.clearAllMocks();
-    (verifySession as jest.Mock).mockImplementation(() => {
+    mockImpl(verifySession, () => {
       return (req: SessionRequest, _: any, next: NextFunction) => {
         verifySessionCalled = true;
 
@@ -71,7 +73,7 @@ describe('order routes', () => {
     const expectedOrderId = uuidv4();
 
     beforeEach(() => {
-      (createOrder as jest.Mock).mockImplementation(() => ({
+      mockImpl(createOrder, () => ({
         id: expectedOrderId,
       }));
     });
@@ -200,7 +202,15 @@ describe('order routes', () => {
             },
           },
         } as any;
-        await request(start()).post('/orders').send(orderPayload).expect(StatusCodes.BAD_REQUEST);
+
+        await request(start())
+          .post('/orders')
+          .send(orderPayload)
+          .expect(StatusCodes.BAD_REQUEST)
+          .then((res) => {
+            const { errors } = res.body;
+            expect(errors).toBeUndefined();
+          });
       });
 
       it('fails when payment is missing', async () => {
@@ -244,11 +254,9 @@ describe('order routes', () => {
     });
 
     it('returns orders for user', async () => {
-      const expectedUserId = uuidv4();
       const expectedOrderId = ObjectId.createFromTime(Date.now());
 
-      mockSession(expectedUserId);
-      (getOrdersExpanded as jest.Mock).mockImplementation(() => [
+      mockImpl(getOrdersExpanded, () => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
@@ -272,7 +280,6 @@ describe('order routes', () => {
     });
 
     it('enriches ordered items with product details', async () => {
-      const expectedUserId = uuidv4();
       const expectedOrderId = ObjectId.createFromTime(Date.now());
       const expectedProducts: ProductItem[] = [uuidv4(), uuidv4()].map((id, index) => ({
         id,
@@ -283,15 +290,14 @@ describe('order routes', () => {
         category: '1',
       }));
 
-      (getProductDetails as jest.Mock).mockImplementation(() => Promise.resolve(expectedProducts));
-      mockSession(expectedUserId);
-      (getOrdersExpanded as jest.Mock).mockImplementation(() => [
+      mockImpl(getOrdersExpanded, () => [
         {
           _id: expectedOrderId.toHexString(),
           id: expectedOrderId.toHexString(),
           items: expectedProducts.map((p, index) => ({
             productId: p.id,
             quantity: index + 1,
+            product: p,
           })),
         },
       ]);
@@ -315,64 +321,96 @@ describe('order routes', () => {
         });
 
       expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
-      expect(getProductDetails).toHaveBeenCalledWith(expectedProducts.map((p) => p.id));
-    });
-
-    it('skip products details if fetching product details fails', async () => {
-      const expectedUserId = uuidv4();
-      const expectedOrderId = ObjectId.createFromTime(Date.now());
-      const expectedProducts: string[] = [uuidv4(), uuidv4()];
-
-      (getProductDetails as jest.Mock).mockImplementation(() =>
-        Promise.reject('Error fetching products'),
-      );
-      mockSession(expectedUserId);
-      (getOrdersExpanded as jest.Mock).mockImplementation(() => [
-        {
-          _id: expectedOrderId.toHexString(),
-          id: expectedOrderId.toHexString(),
-          items: expectedProducts.map((id, index) => ({
-            productId: id,
-            quantity: index + 1,
-          })),
-        },
-      ]);
-
-      await request(start())
-        .get('/orders')
-        .expect(StatusCodes.OK)
-        .then((response) => {
-          expect(response.body).toMatchObject({
-            orders: [
-              {
-                id: expectedOrderId.toHexString(),
-                items: expectedProducts.map((id, index) => ({
-                  productId: id,
-                  quantity: index + 1,
-                })),
-              },
-            ],
-          });
-        });
-
-      expect(getOrdersExpanded).toHaveBeenCalledWith(expectedUserId);
-      expect(getProductDetails).toHaveBeenCalledWith(expectedProducts.map((id) => id));
     });
   });
 
-  describe('put /order/:id', () => {
+  describe('get /orders/:id', () => {
+    afterEach(() => {
+      expect(verifySessionCalled).toBeTruthy();
+    });
+
+    it('returns order for given id for user', async () => {
+      const expectedOrderId = ObjectId.createFromTime(Date.now());
+
+      (getOrderExpanded as jest.Mock).mockResolvedValue({
+        _id: expectedOrderId.toHexString(),
+        id: expectedOrderId.toHexString(),
+      });
+
+      await request(start())
+        .get(`/orders/${expectedOrderId}`)
+        .expect(StatusCodes.OK)
+        .then((response) => {
+          expect(response.body).toMatchObject({
+            id: expectedOrderId.toHexString(),
+          });
+        });
+
+      expect(getOrderExpanded).toHaveBeenCalledWith(expectedOrderId.toHexString(), expectedUserId);
+    });
+
+    it('enriches ordered items with product details', async () => {
+      const expectedOrderId = ObjectId.createFromTime(Date.now());
+      const expectedProducts: ProductItem[] = [uuidv4(), uuidv4()].map((id, index) => ({
+        id,
+        title: `Title ${index + 1}`,
+        description: `Description ${index + 1}`,
+        price: Math.random() * 1000,
+        currency: 'USD',
+        category: '1',
+      }));
+
+      (getOrderExpanded as jest.Mock).mockResolvedValue({
+        _id: expectedOrderId.toHexString(),
+        id: expectedOrderId.toHexString(),
+        items: expectedProducts.map((p, index) => ({
+          productId: p.id,
+          quantity: index + 1,
+          product: p,
+        })),
+      });
+
+      await request(start())
+        .get(`/orders/${expectedOrderId}`)
+        .expect(StatusCodes.OK)
+        .then((response) => {
+          expect(response.body).toMatchObject({
+            id: expectedOrderId.toHexString(),
+            items: expectedProducts.map((p, index) => ({
+              product: p,
+              productId: p.id,
+              quantity: index + 1,
+            })),
+          });
+        });
+
+      expect(getOrderExpanded).toHaveBeenCalledWith(expectedOrderId.toHexString(), expectedUserId);
+    });
+
+    it('returns 404 if order was not found', async () => {
+      const expectedOrderId = ObjectId.createFromTime(Date.now());
+
+      (getOrderExpanded as jest.Mock).mockResolvedValue(null);
+
+      await request(start()).get(`/orders/${expectedOrderId}`).expect(StatusCodes.NOT_FOUND);
+
+      expect(getOrderExpanded).toHaveBeenCalledWith(expectedOrderId.toHexString(), expectedUserId);
+    });
+  });
+
+  describe('put /orders/:id', () => {
     let verifyUserRoleCalled = false;
     const expectedOrderId = uuidv4();
 
     beforeEach(() => {
-      (verifyUserRole as jest.Mock).mockImplementation(() => {
+      mockImpl(verifyUserRole, () => {
         return (req: SessionRequest, _: any, next: NextFunction) => {
           verifyUserRoleCalled = true;
           return next();
         };
       });
 
-      mockSession(expectedUserId);
+      (updateOrder as jest.Mock).mockResolvedValue(true);
     });
 
     afterEach(() => {
@@ -382,12 +420,12 @@ describe('order routes', () => {
 
     describe('validates payload', () => {
       it('missing body', async () => {
-        await request(start()).put(`/order/${expectedOrderId}`).expect(StatusCodes.BAD_REQUEST);
+        await request(start()).put(`/orders/${expectedOrderId}`).expect(StatusCodes.BAD_REQUEST);
       });
 
       it('missing order data to update', async () => {
         await request(start())
-          .put(`/order/${expectedOrderId}`)
+          .put(`/orders/${expectedOrderId}`)
           .send({})
           .expect(StatusCodes.BAD_REQUEST);
       });
@@ -399,9 +437,27 @@ describe('order routes', () => {
         const expectedStatus = OrderStatuses[1];
 
         await request(start())
-          .put(`/order/${expectedOrderId}`)
+          .put(`/orders/${expectedOrderId}`)
           .send({ status: expectedStatus })
           .expect(StatusCodes.OK);
+
+        expect(updateOrder).toHaveBeenCalledWith(expectedOrderId, {
+          status: expectedStatus,
+          updatedAt: expect.any(Date),
+          updatedBy: expect.any(String),
+        });
+      });
+
+      it('if order was not found returns 404', async () => {
+        const expectedOrderId = uuidv4();
+        const expectedStatus = OrderStatuses[1];
+
+        (updateOrder as jest.Mock).mockResolvedValue(false);
+
+        await request(start())
+          .put(`/orders/${expectedOrderId}`)
+          .send({ status: expectedStatus })
+          .expect(StatusCodes.NOT_FOUND);
 
         expect(updateOrder).toHaveBeenCalledWith(expectedOrderId, {
           status: expectedStatus,
@@ -419,7 +475,7 @@ describe('order routes', () => {
           const expectedOrderId = uuidv4();
 
           await request(start())
-            .put(`/order/${expectedOrderId}`)
+            .put(`/orders/${expectedOrderId}`)
             .send({ status })
             .expect(StatusCodes.OK);
 
