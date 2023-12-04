@@ -22,7 +22,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-
+      - name: Shop.App.Packages lib.express
+        working-directory: ./packages/shop.app.lib.express
+        run: |
+          npm install
+          npm run build
+  
       - name: Shop.App.Orders.Api Tests
         working-directory: ./apps/shop.app.orders.api
         run: |
