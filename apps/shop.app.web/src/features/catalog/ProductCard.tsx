@@ -62,10 +62,16 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
       minHeight: 160,
       maxHeight: 160,
     },
+    [theme.breakpoints.only('xs')]: {
+      width: '100%',
+      minHeight: 160,
+      maxHeight: 160,
+    },
+
   }));
 
   return (
-    <Card style={{ display: 'flex', width: '100%' }}>
+    <Card sx={{ display: { sm: 'flex' }, width: '100%' }}>
       <CarouselExt autoPlay={false} indicators={false}>
         {[0, 1, 2].map((i) => (
           <CardMedia
