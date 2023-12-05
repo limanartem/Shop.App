@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import { MainContentContainer } from '..';
 import { ShopAppBar } from './ShopAppBar';
-import { ShopDrawer, drawerWidth } from './ShopDrawer';
+import { ShopDrawer } from './ShopDrawer';
 
 const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
   const [open, setOpen] = React.useState(true);
@@ -17,7 +17,7 @@ const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <ShopAppBar open={open} toggleDrawer={toggleDrawer} drawerWidth={drawerWidth} />
+      <ShopAppBar open={open} toggleDrawer={toggleDrawer} />
       <ShopDrawer open={open} toggleDrawer={toggleDrawer} />
       <Box
         component="main"

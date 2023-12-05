@@ -26,6 +26,7 @@ import { ShoppingCartPopup } from '../../features/shopping-cart/ShoppingCartPopu
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { drawerWidth } from './ShopDrawer';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -76,18 +77,34 @@ interface AppBarProps extends MuiAppBarProps {
 type ShopBarPropsType = {
   open: boolean;
   toggleDrawer: () => void;
-  drawerWidth: number;
 };
 
-export function ShopAppBar({ open, toggleDrawer, drawerWidth }: ShopBarPropsType) {
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})<AppBarProps>(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(['width', 'margin'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+export function ShopAppBar({ open, toggleDrawer }: ShopBarPropsType) {
   const user = useAppSelector(selectUser);
+  const [anchorElShoppingCart, setAnchorElShoppingCart] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [showCartPopup, setShowCartPopup] = React.useState(false);
-  const [anchorElShoppingCart, setAnchorElShoppingCart] = React.useState<null | HTMLElement>(null);
-  const dispatch = useAppDispatch();
-
   const items = useAppSelector((state) => state.shoppingCart.items);
+
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -102,26 +119,10 @@ export function ShopAppBar({ open, toggleDrawer, drawerWidth }: ShopBarPropsType
     setIsLoggedIn(user != null);
   }, [user]);
 
-  const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== 'open',
-  })<AppBarProps>(({ theme, open }) => ({
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-      marginLeft: drawerWidth,
-      width: `calc(100% - ${drawerWidth}px)`,
-      transition: theme.transitions.create(['width', 'margin'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-    }),
-  }));
+ 
 
   return (
-    <AppBar position="absolute" open={open} data-testid="appBar">
+    <AppBar open={open} data-testid="appBar">
       <Toolbar
         sx={{
           pr: '24px', // keep right padding when drawer closed
@@ -172,10 +173,7 @@ export function ShopAppBar({ open, toggleDrawer, drawerWidth }: ShopBarPropsType
               size="large"
               color="inherit"
               onClick={(e) => {
-                //if (items.length) {
                 setAnchorElShoppingCart(e.currentTarget);
-                setShowCartPopup(true);
-                //}
               }}
             >
               <Badge
@@ -187,18 +185,16 @@ export function ShopAppBar({ open, toggleDrawer, drawerWidth }: ShopBarPropsType
             </IconButton>
           </Tooltip>
           <ShoppingCartPopup
-            open={showCartPopup}
+            open={Boolean(anchorElShoppingCart)}
             anchorEl={anchorElShoppingCart}
-            onClose={() => setShowCartPopup(false)}
+            onClose={() => setAnchorElShoppingCart(null)}
           />
           <Box sx={{ flexGrow: 0, pl: 1 }}>
             {isLoggedIn && (
               <>
-                <Tooltip title="Open settings">
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt="Max Muster" sx={{ bgcolor: 'primary.light' }} />
-                  </IconButton>
-                </Tooltip>
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar sx={{ bgcolor: 'primary.light' }} />
+                </IconButton>
                 <Menu
                   sx={{ mt: '45px' }}
                   id="menu-appbar"
