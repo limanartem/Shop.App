@@ -14,7 +14,7 @@ type Order {
 type Item {
   status: String
   productId: String!
-  quantity: Int!
+  quantity: Int
   product: ProductItem
 }
 
@@ -22,7 +22,7 @@ type ProductItem {
   id: GUID!
   title: String
   description: String
-  price: Int
+  price: Float
   currency: String
   capacity: Int
   category: String

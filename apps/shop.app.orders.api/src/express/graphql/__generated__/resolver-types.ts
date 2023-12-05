@@ -92,7 +92,7 @@ export type Item = {
   __typename?: 'Item';
   product?: Maybe<ProductItem>;
   productId: Scalars['String']['output'];
-  quantity: Scalars['Int']['output'];
+  quantity?: Maybe<Scalars['Int']['output']>;
   status?: Maybe<Scalars['String']['output']>;
 };
 
@@ -104,7 +104,7 @@ export type Order = {
   payment: Payment;
   shipping: Shipping;
   status: Scalars['String']['output'];
-  updatedAt: Scalars['Timestamp']['output'];
+  updatedAt: Scalars['DateTimeISO']['output'];
   userId: Scalars['GUID']['output'];
 };
 
@@ -120,7 +120,7 @@ export type ProductItem = {
   currency?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['GUID']['output'];
-  price?: Maybe<Scalars['Int']['output']>;
+  price?: Maybe<Scalars['Float']['output']>;
   title?: Maybe<Scalars['String']['output']>;
 };
 
@@ -229,6 +229,7 @@ export type ResolversTypes = {
   DeweyDecimal: ResolverTypeWrapper<Scalars['DeweyDecimal']['output']>;
   Duration: ResolverTypeWrapper<Scalars['Duration']['output']>;
   EmailAddress: ResolverTypeWrapper<Scalars['EmailAddress']['output']>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GUID: ResolverTypeWrapper<Scalars['GUID']['output']>;
   HSL: ResolverTypeWrapper<Scalars['HSL']['output']>;
   HSLA: ResolverTypeWrapper<Scalars['HSLA']['output']>;
@@ -309,6 +310,7 @@ export type ResolversParentTypes = {
   DeweyDecimal: Scalars['DeweyDecimal']['output'];
   Duration: Scalars['Duration']['output'];
   EmailAddress: Scalars['EmailAddress']['output'];
+  Float: Scalars['Float']['output'];
   GUID: Scalars['GUID']['output'];
   HSL: Scalars['HSL']['output'];
   HSLA: Scalars['HSLA']['output'];
@@ -486,7 +488,7 @@ export interface Iso8601DurationScalarConfig extends GraphQLScalarTypeConfig<Res
 export type ItemResolvers<ContextType = SessionContext, ParentType extends ResolversParentTypes['Item'] = ResolversParentTypes['Item']> = {
   product?: Resolver<Maybe<ResolversTypes['ProductItem']>, ParentType, ContextType>;
   productId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  quantity?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -582,7 +584,7 @@ export type OrderResolvers<ContextType = SessionContext, ParentType extends Reso
   payment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType>;
   shipping?: Resolver<ResolversTypes['Shipping'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  updatedAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTimeISO'], ParentType, ContextType>;
   userId?: Resolver<ResolversTypes['GUID'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -618,7 +620,7 @@ export type ProductItemResolvers<ContextType = SessionContext, ParentType extend
   currency?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['GUID'], ParentType, ContextType>;
-  price?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
