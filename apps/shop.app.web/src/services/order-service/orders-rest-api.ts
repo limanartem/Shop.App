@@ -1,6 +1,6 @@
-import { CreateOrder, Order, OrdersResponse } from '../model';
+import { CreateOrder, Order, OrdersResponse } from '../../model';
 import Session from 'supertokens-auth-react/recipe/session';
-import { env } from '../config/environment';
+import { env } from '../../config/environment';
 
 const { REACT_APP_ORDERS_API_URL } = env;
 
@@ -23,8 +23,21 @@ export const getOrdersAsync = async (): Promise<OrdersResponse> => {
 };
 
 export const getOrderAsync = async (id: string): Promise<Order | undefined> => {
-  const orders = await getOrdersAsync(); //TODO: just dummy implementation for now
-  return orders.orders.find((order) => order.id === id);
+  console.log(`Fetching order from ${REACT_APP_ORDERS_API_URL}/orders/${id}`);
+
+  const response = await fetch(`${REACT_APP_ORDERS_API_URL}/orders/${id}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${await Session.getAccessToken()}`,
+    },
+  });
+
+  if (!response.ok) {
+    console.error({ status: response.status, statusText: response.statusText });
+    throw new Error('Unable to get order!');
+  }
+
+  return await response.json();
 };
 
 export const createOrdersAsync = async (order: CreateOrder): Promise<{ id: string }> => {
