@@ -58,7 +58,6 @@ const PermanentDrawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !=
   ({ theme, open }) => ({
     width: drawerWidth,
     flexShrink: 0,
-    whiteSpace: 'nowrap',
     boxSizing: 'border-box',
     ...(open && {
       ...openedMixin(theme),
@@ -81,47 +80,48 @@ export function ShopDrawer({ open, toggleDrawer }: DrawerPropsType) {
     setLoading(categoriesStatus === DataLoadingState.loading);
   }, [categoriesStatus]);
 
-  const DrawerContent = (open: boolean) => loading ? (
-    <TreeViewPlaceholder />
-  ) : (
-    <List component="nav">
-      <ListItemButton
-        alignItems="flex-start"
-        onClick={() => {
-          if (!open) {
-            toggleDrawer();
-            setCategoryExpanded(true);
-          } else {
-            setCategoryExpanded(!categoryExpanded);
-          }
-        }}
-        sx={{
-          pb: open ? 0 : 2.5,
-          '&:hover, &:focus': { '& svg': { opacity: open ? 1 : 0 } },
-        }}
-      >
-        <ListItemIcon>
-          <ShoppingCartIcon />
-        </ListItemIcon>
-        <ListItemText primary="Products" />
-        <KeyboardArrowDown
-          sx={{
-            mr: -1,
-            opacity: 0,
-            transform: categoryExpanded ? 'rotate(-180deg)' : 'rotate(0)',
-            transition: '0.2s',
+  const DrawerContent = (open: boolean, onSelectedChanged?: () => void) =>
+    loading ? (
+      <TreeViewPlaceholder />
+    ) : (
+      <List component="nav">
+        <ListItemButton
+          alignItems="flex-start"
+          onClick={() => {
+            if (!open) {
+              toggleDrawer();
+              setCategoryExpanded(true);
+            } else {
+              setCategoryExpanded(!categoryExpanded);
+            }
           }}
-        />
-      </ListItemButton>
-      {open && categoryExpanded && (
-        <ListItem>
-          <CategoriesTreeView categories={categories} />
-        </ListItem>
-      )}
+          sx={{
+            pb: open ? 0 : 2.5,
+            '&:hover, &:focus': { '& svg': { opacity: open ? 1 : 0 } },
+          }}
+        >
+          <ListItemIcon>
+            <ShoppingCartIcon />
+          </ListItemIcon>
+          <ListItemText primary="Products" />
+          <KeyboardArrowDown
+            sx={{
+              mr: -1,
+              opacity: 0,
+              transform: categoryExpanded ? 'rotate(-180deg)' : 'rotate(0)',
+              transition: '0.2s',
+            }}
+          />
+        </ListItemButton>
+        {open && categoryExpanded && (
+          <ListItem>
+            <CategoriesTreeView categories={categories} onSelectedChanged={onSelectedChanged} />
+          </ListItem>
+        )}
 
-      <Divider sx={{ my: 1 }} />
-    </List>
-  );
+        <Divider sx={{ my: 1 }} />
+      </List>
+    );
 
   return (
     <Box sx={{ flexShrink: { sm: 0 } }} aria-label="categories">
@@ -160,7 +160,7 @@ export function ShopDrawer({ open, toggleDrawer }: DrawerPropsType) {
           '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
         }}
       >
-        {DrawerContent(open.temporary || false)}
+        {DrawerContent(open.temporary || false, () => toggleDrawer())}
       </Drawer>
     </Box>
   );
