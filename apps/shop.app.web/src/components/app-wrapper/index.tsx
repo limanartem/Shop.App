@@ -1,18 +1,42 @@
-import React from 'react';
-import {
-  Box,
-  Toolbar,
-  Grid,
-} from '@mui/material';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useEffect } from 'react';
+import { Box, Toolbar, Grid, useMediaQuery, useTheme } from '@mui/material';
 import { MainContentContainer } from '..';
 import { ShopAppBar } from './ShopAppBar';
 import { ShopDrawer } from './ShopDrawer';
 
+export type DrawerOpenState = {
+  permanent: boolean | null;
+  temporary: boolean | null;
+};
+
 const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
-  const [open, setOpen] = React.useState(true);
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.only('xs'));
+  const [open, setOpen] = React.useState<DrawerOpenState>({
+    permanent: isSmallScreen ? null : true,
+    temporary: !isSmallScreen ? null : false,
+  });
+
+  useEffect(() => {
+    setOpen({
+      permanent: isSmallScreen ? null : open.permanent,
+      temporary: !isSmallScreen ? null : open.temporary,
+    });
+  }, [isSmallScreen]);
 
   const toggleDrawer = () => {
-    setOpen(!open);
+    if (isSmallScreen === true) {
+      setOpen({
+        ...open,
+        temporary: !open.temporary,
+      });
+    } else {
+      setOpen({
+        ...open,
+        permanent: !open.permanent,
+      });
+    }
   };
 
   return (

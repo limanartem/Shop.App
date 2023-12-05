@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { drawerWidth } from './ShopDrawer';
+import { DrawerOpenState } from '.';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -75,21 +76,25 @@ interface AppBarProps extends MuiAppBarProps {
 }
 
 type ShopBarPropsType = {
-  open: boolean;
+  open: DrawerOpenState;
   toggleDrawer: () => void;
 };
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })<AppBarProps>(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
+  [theme.breakpoints.up('sm')]: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
   transition: theme.transitions.create(['width', 'margin'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: { drawerWidth },
+      width: `calc(100% - ${drawerWidth}px)`,
+    },
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -119,10 +124,10 @@ export function ShopAppBar({ open, toggleDrawer }: ShopBarPropsType) {
     setIsLoggedIn(user != null);
   }, [user]);
 
- 
+  // const isOpen = useCallback(() => open.permanent || open.temporary || false, [open]);
 
   return (
-    <AppBar open={open} data-testid="appBar">
+    <AppBar open={open.permanent || false} data-testid="appBar" position="absolute">
       <Toolbar
         sx={{
           pr: '24px', // keep right padding when drawer closed
@@ -134,8 +139,8 @@ export function ShopAppBar({ open, toggleDrawer }: ShopBarPropsType) {
           aria-label="open drawer"
           onClick={toggleDrawer}
           sx={{
-            marginRight: '36px',
-            ...(open && { display: 'none' }),
+            marginRight: { sm: '36px' },
+            ...(open.permanent && { display: 'none' }),
           }}
         >
           <MenuIcon />
@@ -152,10 +157,13 @@ export function ShopAppBar({ open, toggleDrawer }: ShopBarPropsType) {
           </Tooltip>
         </Card>
 
-        <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-          AI-Powered eCommerce
-        </Typography>
-        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Typography component="h1" variant="h6" color="inherit" noWrap>
+            AI-Powered eCommerce
+          </Typography>
+        </Box>
+        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}></Box>
+        <Box sx={{ flexGrow: 0, display: 'flex' }}>
           <Tooltip title="Search catalog">
             <Search data-testid="appBar-search">
               <SearchIconWrapper>
