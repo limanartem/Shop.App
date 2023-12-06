@@ -47,7 +47,13 @@ const getCategoryPath = (categories: ProductCategory[], categoryId: number) => {
   return path;
 };
 
-export default function CategoriesTreeView({ categories }: { categories: ProductCategory[] }) {
+export default function CategoriesTreeView({
+  categories,
+  onSelectedChanged,
+}: {
+  categories: ProductCategory[];
+  onSelectedChanged?: () => void;
+}) {
   const globalSelectedCategory = useAppSelector(selectCategory);
   const dispatch = useAppDispatch();
 
@@ -67,16 +73,16 @@ export default function CategoriesTreeView({ categories }: { categories: Product
 
   const renderTree = (nodes?: RenderTree[]) => {
     return nodes?.map((node) => (
-      <TreeItem key={node.id} nodeId={node.id.toString()} label={node.name} >
+      <TreeItem key={node.id} nodeId={node.id.toString()} label={node.name}>
         {Array.isArray(node.children) ? renderTree(node.children) : null}
       </TreeItem>
     ));
   };
 
   return (
-    <Box sx={{  flexGrow: 1, maxWidth: 300 }}>
+    <Box sx={{ flexGrow: 1, maxWidth: 300 }}>
       <TreeView
-        data-testid='categoriesTree'
+        data-testid="categoriesTree"
         aria-expanded={true}
         expanded={expanded}
         selected={selected}
@@ -86,6 +92,7 @@ export default function CategoriesTreeView({ categories }: { categories: Product
         onNodeSelect={(_, nodeIds) => {
           setSelected(nodeIds);
           dispatch(setCategory(nodeIds));
+          onSelectedChanged?.();
         }}
       >
         {renderTree([data(categories)])}

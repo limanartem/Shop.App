@@ -1,4 +1,4 @@
-import React, {  } from 'react';
+import React, { useEffect } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import {
@@ -14,13 +14,20 @@ import {
   InputBase,
   CardMedia,
   Card,
+  Button,
+  Link,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import MailIcon from '@mui/icons-material/Mail';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import SearchIcon from '@mui/icons-material/Search';
-
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+import { signOut } from 'supertokens-auth-react/recipe/thirdpartyemailpassword';
+import { selectUser, setUser } from '../../app/reducers/authReducer';
+import { resetCheckout } from '../../app/reducers/checkOutReducer';
+import { ShoppingCartPopup } from '../../features/shopping-cart/ShoppingCartPopup';
+import { useNavigate } from 'react-router-dom';
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { drawerWidth } from './ShopDrawer';
+import { DrawerOpenState } from '.';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -69,31 +76,41 @@ interface AppBarProps extends MuiAppBarProps {
 }
 
 type ShopBarPropsType = {
-  open: boolean;
+  open: DrawerOpenState;
   toggleDrawer: () => void;
-  drawerWidth: number;
 };
 
-export function ShopAppBar({ open, toggleDrawer, drawerWidth }: ShopBarPropsType) {
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-
-  const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== 'open',
-  })<AppBarProps>(({ theme, open }) => ({
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})<AppBarProps>(({ theme, open }) => ({
+  [theme.breakpoints.up('sm')]: {
     zIndex: theme.zIndex.drawer + 1,
+  },
+  transition: theme.transitions.create(['width', 'margin'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: { drawerWidth },
+      width: `calc(100% - ${drawerWidth}px)`,
+    },
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
+      duration: theme.transitions.duration.enteringScreen,
     }),
-    ...(open && {
-      marginLeft: drawerWidth,
-      width: `calc(100% - ${drawerWidth}px)`,
-      transition: theme.transitions.create(['width', 'margin'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-    }),
-  }));
+  }),
+}));
+
+export function ShopAppBar({ open, toggleDrawer }: ShopBarPropsType) {
+  const user = useAppSelector(selectUser);
+  const [anchorElShoppingCart, setAnchorElShoppingCart] = React.useState<null | HTMLElement>(null);
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const items = useAppSelector((state) => state.shoppingCart.items);
+
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -103,8 +120,14 @@ export function ShopAppBar({ open, toggleDrawer, drawerWidth }: ShopBarPropsType
     setAnchorElUser(null);
   };
 
+  useEffect(() => {
+    setIsLoggedIn(user != null);
+  }, [user]);
+
+  // const isOpen = useCallback(() => open.permanent || open.temporary || false, [open]);
+
   return (
-    <AppBar position="absolute" open={open} data-testid="appBar">
+    <AppBar open={open.permanent || false} data-testid="appBar" position="absolute">
       <Toolbar
         sx={{
           pr: '24px', // keep right padding when drawer closed
@@ -116,68 +139,118 @@ export function ShopAppBar({ open, toggleDrawer, drawerWidth }: ShopBarPropsType
           aria-label="open drawer"
           onClick={toggleDrawer}
           sx={{
-            marginRight: '36px',
-            ...(open && { display: 'none' }),
+            marginRight: { sm: '36px' },
+            ...(open.permanent && { display: 'none' }),
           }}
         >
           <MenuIcon />
         </IconButton>
         <Card sx={{ mr: 2 }}>
-          <CardMedia
-            component="img"
-            image="/shop-assets/logo/shop.app.logo.png"
-            style={{ width: '48px' }}
-          />
+          <Tooltip title="Go Home">
+            <Link href="/">
+              <CardMedia
+                component="img"
+                image="/shop-assets/logo/shop.app.logo.png"
+                style={{ width: '48px' }}
+              />
+            </Link>
+          </Tooltip>
         </Card>
 
-        <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-          AI-Powered eCommerce
-        </Typography>
-        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-          <Search data-testid="appBar-search">
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
-          </Search>
-          <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-            <Badge badgeContent={4} color="error">
-              <MailIcon />
-            </Badge>
-          </IconButton>
-          <IconButton color="inherit" sx={{ mr: 2 }}>
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Max Muster" sx={{ bgcolor: 'primary.light' }} />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
+        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Typography component="h1" variant="h6" color="inherit" noWrap>
+            AI-Powered eCommerce
+          </Typography>
+        </Box>
+        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}></Box>
+        <Box sx={{ flexGrow: 0, display: 'flex' }}>
+          <Tooltip title="Search catalog">
+            <Search data-testid="appBar-search">
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ 'aria-label': 'search' }}
+                sx={{ height: '100%' }}
+              />
+            </Search>
+          </Tooltip>
+          <Tooltip title="Open Shopping Cart">
+            <IconButton
+              size="large"
+              color="inherit"
+              onClick={(e) => {
+                setAnchorElShoppingCart(e.currentTarget);
               }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
+              <Badge
+                badgeContent={items.reduce((count, item) => count + item.quantity, 0)}
+                color="success"
+              >
+                <ShoppingCartIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
+          <ShoppingCartPopup
+            open={Boolean(anchorElShoppingCart)}
+            anchorEl={anchorElShoppingCart}
+            onClose={() => setAnchorElShoppingCart(null)}
+          />
+          <Box sx={{ flexGrow: 0, pl: 1 }}>
+            {isLoggedIn && (
+              <>
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar sx={{ bgcolor: 'primary.light' }} />
+                </IconButton>
+                <Menu
+                  sx={{ mt: '45px' }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
+                >
+                  <MenuItem
+                    onClick={async () => {
+                      // TODO: handle in a better place
+                      await signOut();
+                      dispatch(setUser(null));
+                      dispatch(resetCheckout());
+                      document.location.reload();
+                    }}
+                  >
+                    <Typography textAlign="center">Sign Out</Typography>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      navigate('/orders');
+                      handleCloseUserMenu();
+                    }}
+                  >
+                    <Typography textAlign="center">Orders</Typography>
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+            {!isLoggedIn && (
+              <Button
+                variant="text"
+                color="inherit"
+                onClick={() => navigate('auth')}
+                sx={{ mt: 0.5 }}
+              >
+                Log In
+              </Button>
+            )}
           </Box>
         </Box>
       </Toolbar>
