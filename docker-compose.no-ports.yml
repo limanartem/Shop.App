@@ -1,0 +1,29 @@
+  version: '2.23'
+
+  services:
+    shop.app.catalog.db:
+      ports: !reset []
+
+    shop.app.auth.db:
+      ports: !reset []
+
+    shop.app.auth.core:
+      ports: !reset []
+
+    shop.app.cache:
+      ports: !reset []
+
+    shop.app.messagebroker:
+      ports: !reset []
+
+    shop.app.orders.db:
+      ports: !reset []
+
+    shop.app.orders.pending.processing:
+      ports: !reset []
+
+    shop.app.orders.payment.processing:
+      ports: !reset []
+
+    shop.app.orders.dispatch.processing:
+      ports: !reset []

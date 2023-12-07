@@ -18,6 +18,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getOrderAsync } from '../../services/order-service';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { selectChangedOrderIds } from '../../app/reducers/notificationsReducer';
+import { useAppSelector } from '../../app/hooks';
 
 const calculateTotal = (order: Order) => {
   return (
@@ -93,8 +95,9 @@ export function OrderPage() {
   const { id } = useParams();
   const [order, setOrder] = useState<Order | undefined | null>(null);
   const navigate = useNavigate();
+  const changedOrderIds = useAppSelector(selectChangedOrderIds);
 
-  useEffect(() => {
+  function fetchOrder() {
     const getOrder = async () => {
       if (id != null) {
         const result = await getOrderAsync(id);
@@ -103,7 +106,18 @@ export function OrderPage() {
     };
 
     getOrder();
+  }
+
+  useEffect(() => {
+    fetchOrder();
   }, [id]);
+
+  useEffect(() => {
+    if (id != null && changedOrderIds?.includes(id)) {
+      console.log('Order changed, fetching new order...');
+      fetchOrder();
+    }
+  }, [changedOrderIds]);
 
   return (
     <>

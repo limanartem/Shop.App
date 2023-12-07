@@ -1,3 +1,10 @@
+/**
+ * Utility functions for working with cache in a Node.js application.
+ * This module provides functions for connecting to a Redis cache server,
+ * reading and updating cache values, and working with cache objects.
+ *
+ * @module cache-utils
+ */
 import { RedisClientType, createClient } from 'redis';
 
 const { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } = process.env;
@@ -97,6 +104,11 @@ function ensureClientConnected() {
   return redisClient;
 }
 
+/**
+ * Retrieves the value associated with the specified key from the cache.
+ * @param key - The key to retrieve the value for.
+ * @returns A Promise that resolves to the value associated with the key, or null if the key is not found in the cache.
+ */
 export const get = async (key: string): Promise<string | null | undefined> => {
   try {
     const client = ensureClientConnected();
@@ -108,6 +120,13 @@ export const get = async (key: string): Promise<string | null | undefined> => {
   }
 };
 
+/**
+ * Updates the cache with the provided key and data.
+ * If the data is null, the key will be removed from the cache.
+ * @param key - The key to update in the cache.
+ * @param data - The data to be stored in the cache.
+ * @returns A promise that resolves when the cache is updated.
+ */
 export const update = async (key: string, data: string | null): Promise<void> => {
   try {
     const client = ensureClientConnected();
@@ -124,6 +143,12 @@ export const update = async (key: string, data: string | null): Promise<void> =>
   }
 };
 
+/**
+ * Retrieves an object from the cache based on the specified key and group.
+ * @param key - The key used to identify the object in the cache.
+ * @param group - The optional group used to categorize objects in the cache.
+ * @returns A Promise that resolves to the retrieved object, or null if the object is not found in the cache.
+ */
 export const getObject = async <Type>(
   key: string,
   group?: string,
@@ -135,6 +160,13 @@ export const getObject = async <Type>(
   return null;
 };
 
+/**
+ * Updates an object in the cache.
+ * @param key - The key of the object in the cache.
+ * @param data - The data to be stored in the cache. Can be null.
+ * @param group - Optional. The group of the object in the cache.
+ * @returns A Promise that resolves when the object is updated in the cache.
+ */
 export const updateObject = async (
   key: string,
   data: object | null,

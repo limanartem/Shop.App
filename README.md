@@ -22,6 +22,7 @@ The project is structured as a monorepo using npm workspaces. This structure pri
   - Apps may require specific environment variables for external dependencies. If running them in a container, ensure they expose ports, as some services reside in a private network and don't expose ports to the host.
 - Additionally, apps can be started from the root folder (e.g., `npm run start-web` starts `shop.app.web`).
   - When running an app from the CLI, ensure to stop the corresponding container to avoid port conflicts.
+- To test with ports not exposed for apps from app-private-network network run: `docker-compose -f docker-compose.yml -f docker-compose.no-ports.yml up --build -d`
 
 ## Docker Compose Commands Quick Reference
 - `docker-compose down -v {service name}`: Takes down service volume, useful for re-running init scripts for the database.
@@ -55,3 +56,6 @@ The project is structured as a monorepo using npm workspaces. This structure pri
 - `shop.app.cache`: Key-Value caching service based on [Redis.io](https://redis.io).
 - `shop.app.messagebroker`: Message broker service providing [AMQP](https://www.amqp.org) messaging protocol powered by [RabbitMQ](https://www.rabbitmq.com), orchestrating order processing across different workloads.
 - `shop.app.orders.db`: NoSQL database managing orders placed by users via the `shop.app.orders.api` REST API. Utilizes [MongoDB](https://www.mongodb.com).
+
+## Troubleshooting
+* When running docker compose build on Windows machine some .sh file may fail to execute due to different line end feeding characters on Linux and Windows based systems. To quickly fix issue, in VS Code switch to CRLF EOL sequence see  https://essenceofcode.com/2019/11/20/linux-style-line-feeds-in-docker-desktop-on-windows/ for some additional information

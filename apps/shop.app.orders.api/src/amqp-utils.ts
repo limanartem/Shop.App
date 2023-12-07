@@ -18,6 +18,13 @@ const ensureQueueExchangeBinding = async (
   await channel.bindQueue(queue, exchange, routingKey);
 };
 
+/**
+ * Sends a message to the specified exchange using the provided flow, message, and optional exchange.
+ * @param flow The order flow.
+ * @param message The message to be sent.
+ * @param exchange The exchange to send the message to. Default value is 'orders.events'.
+ * @returns A promise that resolves when the message is sent successfully.
+ */
 export const sendMessage = async (
   flow: OrderFlow,
   message: any,

@@ -3,3 +3,6 @@ dist
 distTS
 coverage
 build
+
+/public/env-config.js
+env-config.js

@@ -47,3 +47,12 @@ type Query {
   orders: [Order!]!
   order(id: ObjectID!): Order
 }
+
+type Subscription {
+  orderChanged: OrderChanged
+}
+
+type OrderChanged {
+  id: ObjectID!
+  timestamp: DateTimeISO!
+}

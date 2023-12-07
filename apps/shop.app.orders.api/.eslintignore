@@ -3,3 +3,4 @@ dist
 distTS
 coverage
 build
+__generated__

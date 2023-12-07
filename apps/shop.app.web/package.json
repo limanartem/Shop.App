@@ -14,6 +14,7 @@
     "@types/node": "^16.18.53",
     "@types/react-dom": "^18.2.7",
     "card-validator": "^9.0.0",
+    "graphql-ws": "^5.14.2",
     "ibantools": "^4.3.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -27,7 +28,7 @@
   "scripts": {
     "clean": "npx rimraf dist",
     "prebuild": "npm run clean",
-    "dev": "chmod +x ./scripts/update-env.sh && ./scripts/update-env.sh && cp env-config.js ./public/ && react-scripts start",
+    "dev": "chmod +x ./scripts/update-env.sh && ./scripts/update-env.sh && cp env-config.js ./public/ && npm start",
     "start": "react-scripts start",
     "build": "craco build",
     "test": "jest",
@@ -35,7 +36,6 @@
     "lint": "eslint . --ext .js,.ts ./src --quiet",
     "pre-commit": "npm run lint",
     "pre-push": "npm run test"
-
   },
   "eslintConfig": {
     "extends": [

@@ -124,8 +124,6 @@ export function ShopAppBar({ open, toggleDrawer }: ShopBarPropsType) {
     setIsLoggedIn(user != null);
   }, [user]);
 
-  // const isOpen = useCallback(() => open.permanent || open.temporary || false, [open]);
-
   return (
     <AppBar open={open.permanent || false} data-testid="appBar" position="absolute">
       <Toolbar
@@ -151,7 +149,7 @@ export function ShopAppBar({ open, toggleDrawer }: ShopBarPropsType) {
               <CardMedia
                 component="img"
                 image="/shop-assets/logo/shop.app.logo.png"
-                style={{ width: '48px' }}
+                sx={{ width: { md: '48px', xs: '32px' } }}
               />
             </Link>
           </Tooltip>

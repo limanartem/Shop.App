@@ -19,7 +19,8 @@
     ],
     "paths": {
       "*": ["node_modules/*"]
-    }
+    },
+    "lib": ["ESNext.AsyncIterable"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

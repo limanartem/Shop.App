@@ -1,7 +1,7 @@
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function OrderProgressIndicator({ orderStatus }: { orderStatus: string }) {
   const mapStatusToStep = () => {
@@ -22,7 +22,11 @@ export function OrderProgressIndicator({ orderStatus }: { orderStatus: string })
   
   }
 
-  const [ activeStep ] = useState(mapStatusToStep());
+  const [ activeStep, setActiveStep ] = useState(mapStatusToStep());
+
+  useEffect(() => {
+    setActiveStep(mapStatusToStep());
+  }, [orderStatus]);
 
   return (
     <Stepper activeStep={activeStep}>
@@ -39,7 +43,7 @@ export function OrderProgressIndicator({ orderStatus }: { orderStatus: string })
         <StepLabel>Out for delivery</StepLabel>
       </Step>
       <Step>
-        <StepLabel>Delivered</StepLabel>
+        <StepLabel color="success">Delivered</StepLabel>
       </Step>
     </Stepper>
   );

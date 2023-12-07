@@ -1,5 +1,5 @@
 import { expressMiddleware, id } from 'cls-rtracer';
-import { Request, Response } from "express";
+import { Request } from 'express';
 import { Express } from 'express';
 import morgan from 'morgan';
 import { createLogger, format, transports } from 'winston';

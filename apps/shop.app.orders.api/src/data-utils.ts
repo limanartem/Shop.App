@@ -1,10 +1,10 @@
+/**
+ * This file contains utility functions for working with data in the application.
+ * It includes functions for fetching, updating, and creating orders, as well as
+ * functions for caching and retrieving data from the database.
+ */
 import { ObjectId } from 'mongodb';
-import {
-  get as getCache,
-  getObject as getCachedObject,
-  update as updateCache,
-  updateObject as updateCacheObject,
-} from './cache-utils';
+import { getObject as getCachedObject, updateObject as updateCacheObject } from './cache-utils';
 import { ProductItem, Order, OrderItemEnhanced, UpdateOrder, OrderItem } from './model';
 import {
   WithClearId,
@@ -16,49 +16,48 @@ import {
 const { CATALOG_API_URL } = process.env;
 const ORDERS_CACHE_GROUP = 'orders';
 
-export const fetchItem = async (id: string): Promise<any | null> => {
-  const cachedValue = await getCache(id);
-  if (cachedValue) {
-    console.log(`Found item with id = "${id}" in cache. Returning cached item`);
-    return JSON.parse(cachedValue);
-  }
-  console.log('Cache missed. Fetching from db...');
-
-  const value = await fetchDocument({ id });
-  if (value) {
-    console.log('Found item in db. Updating cache...');
-    updateCache(id, JSON.stringify(value));
-  }
-  return value;
-};
-
-export const updateItem = async (id: string, data: any): Promise<void> => {
-  console.log('Updating item in db...');
-  await updateDocument(id, data);
-  console.log('Invalidating cache..');
-  await updateCache(id, null);
-};
-
+/**
+ * Creates an order.
+ * @param order - The order to be created.
+ * @returns A promise that resolves to the result of inserting the order document.
+ */
 export const createOrder = async (order: Order): Promise<ReturnType<typeof insertDocument>> =>
   insertDocument(order);
 
+/**
+ * Updates an order with the specified ID.
+ * If the order is successfully updated, the cache for the order is invalidated.
+ * If the cache service is unavailable, a stale value may remain in the cache until the service is up again.
+ * To mitigate this, a shorter TTL (Time To Live) is set for cache keys.
+ * @param id - The ID of the order to update.
+ * @param order - The updated order data.
+ * @returns A promise that resolves to the updated order if it exists, or null if no order with the specified ID was found.
+ */
 export const updateOrder = async (
   id: string,
   order: UpdateOrder,
 ): Promise<ReturnType<typeof updateDocument>> => {
-  if (await updateDocument(id, order)) {
+  const updatedOrder = await updateDocument(id, order);
+  if (updatedOrder != null) {
     console.log(`Updated order id = ${id}, invalidating cache...`);
     // TODO: if cache service is unavailable we could potentially leave stale value in cache
     //  which would be used next time service is up again. To mitigate this we are setting
     //  shorter TTL for cache keys
     await updateCacheObject(id, null, ORDERS_CACHE_GROUP);
-    return true;
+    return updatedOrder;
   }
   console.log(`No order with id = ${id} was updated.`);
 
-  return false;
+  return null;
 };
 
+/**
+ * Updates an order item with the specified ID and product ID.
+ * @param id - The ID of the order.
+ * @param productId - The ID of the product.
+ * @param order - The updated order information.
+ * @returns A promise that resolves to the updated order item, or null if the order item does not exist.
+ */
 export const updateOrderItem = async (
   id: string,
   productId: string,
@@ -72,12 +71,17 @@ export const updateOrderItem = async (
       }
       return item;
     });
-    await updateDocument(id, { items });
+    return await updateDocument(id, { items });
     //await updateCache(id, null);
   }
-  return false;
+  return null;
 };
 
+/**
+ * Retrieves orders for a given user.
+ * @param userId - The ID of the user.
+ * @returns A promise that resolves to the fetched orders.
+ */
 export const getOrders = async (
   userId: string,
 ): ReturnType<typeof fetchDocuments<Order<OrderItemEnhanced>>> => fetchDocuments({ userId });
@@ -104,6 +108,12 @@ const useCache = async <Type>(
   return result;
 };
 
+/**
+ * Retrieves an order from the database.
+ * @param orderId - The ID of the order.
+ * @param userId - The ID of the user.
+ * @returns A promise that resolves to the fetched order.
+ */
 export const getOrder = async (
   orderId: string,
   userId: string,
@@ -113,12 +123,23 @@ export const getOrder = async (
   );
 };
 
+/**
+ * Retrieves the expanded orders for a given user.
+ * @param userId The ID of the user.
+ * @returns A promise that resolves to the expanded orders.
+ */
 export const getOrdersExpanded = async (userId: string): ReturnType<typeof getOrders> => {
   const orders = await getOrders(userId);
   await Promise.all(orders.map(expandOrder));
   return orders;
 };
 
+/**
+ * Retrieves an expanded order by its ID and user ID.
+ * @param orderId - The ID of the order.
+ * @param userId - The ID of the user.
+ * @returns A promise that resolves to the expanded order.
+ */
 export const getOrderExpanded = async (
   orderId: string,
   userId: string,
@@ -130,6 +151,12 @@ export const getOrderExpanded = async (
   return order;
 };
 
+/**
+ * Fetches product details for the given product IDs from the catalog API.
+ * @param productIds - An array of product IDs.
+ * @returns A promise that resolves to an array of ProductItem objects representing the product details.
+ * @throws An error if the request to the catalog API fails.
+ */
 export const getProductDetails = async (productIds: string[]): Promise<ProductItem[]> => {
   console.log(
     `Fetching product details from "${CATALOG_API_URL}/products/search" for productIds`,
@@ -151,7 +178,7 @@ export const getProductDetails = async (productIds: string[]): Promise<ProductIt
     );
   }
 
-  return await response.json();
+  return (await response.json()) as ProductItem[];
 };
 
 const expandOrder = async (order: WithClearId<Order<OrderItemEnhanced>>) => {
