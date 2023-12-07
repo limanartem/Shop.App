@@ -22,6 +22,7 @@ The project is structured as a monorepo using npm workspaces. This structure pri
   - Apps may require specific environment variables for external dependencies. If running them in a container, ensure they expose ports, as some services reside in a private network and don't expose ports to the host.
 - Additionally, apps can be started from the root folder (e.g., `npm run start-web` starts `shop.app.web`).
   - When running an app from the CLI, ensure to stop the corresponding container to avoid port conflicts.
+- To test with ports not exposed for apps from app-private-network network run: `docker-compose -f docker-compose.yml -f docker-compose.no-ports.yml up --build -d`
 
 ## Docker Compose Commands Quick Reference
 - `docker-compose down -v {service name}`: Takes down service volume, useful for re-running init scripts for the database.
