@@ -29,7 +29,7 @@ const getOrderFlow = (status: Status): OrderFlow | null => {
 
 /**
  * Handles the PUT request for updating an order item.
- * 
+ *
  * @param req - The request object.
  * @param res - The response object.
  * @returns A Promise that resolves to the updated order item payload.
@@ -77,7 +77,7 @@ export async function putOrderItemHandler(req: SessionRequest, res: Response) {
 
 /**
  * Handles the PUT request for updating an order.
- * 
+ *
  * @param req - The request object.
  * @param res - The response object.
  * @returns A JSON response with the updated order payload.
@@ -115,7 +115,9 @@ export async function putOrderHandler(req: SessionRequest, res: Response) {
     return;
   }
 
-  pubsub.publish(ORDER_CHANGED, { orderChanged: { id: orderId, userId: result.userId } });
+  pubsub.publish(ORDER_CHANGED, {
+    orderChanged: { id: orderId, userId: result.userId, timestamp: new Date() },
+  });
 
   const orderFlow = getOrderFlow(payload.status);
 
@@ -152,7 +154,7 @@ export async function getOrdersHandler(req: SessionRequest, res: Response) {
 
 /**
  * Retrieves the order details for a given order ID.
- * 
+ *
  * @param req - The request object containing the session information.
  * @param res - The response object used to send the order details.
  * @throws Error if the session is undefined or the order ID is invalid.
@@ -180,7 +182,7 @@ export async function getOrderHandler(req: SessionRequest, res: Response) {
 
 /**
  * Handles the POST request for creating orders.
- * 
+ *
  * @param req - The request object.
  * @param res - The response object.
  * @returns A Promise that resolves to the created order.

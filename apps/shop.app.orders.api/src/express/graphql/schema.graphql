@@ -54,4 +54,5 @@ type Subscription {
 
 type OrderChanged {
   id: ObjectID!
+  timestamp: DateTimeISO!
 }

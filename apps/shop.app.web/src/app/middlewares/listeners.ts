@@ -46,9 +46,9 @@ const authMiddleware = () => {
     actionCreator: setUser,
     effect: async (action, listenerApi) => {
       if (action.payload == null) {
-        stopListening();
+        await stopListening();
       } else {
-        startListening(listenerApi.dispatch);
+        await startListening(listenerApi.dispatch);
       }
     },
   });

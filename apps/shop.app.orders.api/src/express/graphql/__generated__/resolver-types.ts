@@ -111,6 +111,7 @@ export type Order = {
 export type OrderChanged = {
   __typename?: 'OrderChanged';
   id: Scalars['ObjectID']['output'];
+  timestamp: Scalars['DateTimeISO']['output'];
 };
 
 export type Payment = {
@@ -605,6 +606,7 @@ export type OrderResolvers<ContextType = SessionContext, ParentType extends Reso
 
 export type OrderChangedResolvers<ContextType = SessionContext, ParentType extends ResolversParentTypes['OrderChanged'] = ResolversParentTypes['OrderChanged']> = {
   id?: Resolver<ResolversTypes['ObjectID'], ParentType, ContextType>;
+  timestamp?: Resolver<ResolversTypes['DateTimeISO'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

@@ -47,7 +47,7 @@ const queries = {
 export const subscriptions = {
   SUBSCRIPTION_ORDER_CHANGED: `
   subscription {
-    orderChanged { id }
+    orderChanged { id, timestamp }
   }`,
 };
 

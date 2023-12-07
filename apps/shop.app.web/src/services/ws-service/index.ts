@@ -21,7 +21,7 @@ let client: Client;
  * @returns A promise that resolves when the connection is established.
  */
 export async function startListening(dispatch: ReturnType<typeof useAppDispatch>) {
-  stopListening();
+  await stopListening();
 
   console.log(
     `Connecting to WS socket on "${graphQlSubscriptionsUrl}" and starting listening for events`,
@@ -36,6 +36,7 @@ export async function startListening(dispatch: ReturnType<typeof useAppDispatch>
 
   client.on('error', (err) => {
     // TODO: can add retry after timeout
+    console.error('WS socket error');
     console.error(err);
   });
 
@@ -75,9 +76,10 @@ function iterateMessages<T>(onMessage: (message: T) => void, query: string) {
 /**
  * Stops listening for events and disconnects from the GraphQL WebSocket socket.
  */
-export function stopListening() {
+export async function stopListening() {
   if (client) {
+    console.log('Stopping listening for events and disconnected from WS socket');
     client.terminate();
-    console.log('Stopped listening for events and disconnected from WS socket');
+    await client.dispose();
   }
 }
