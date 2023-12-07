@@ -11,6 +11,8 @@ import {
   UpdateOrderStatusRequest,
   UpdateOrderStatusRequestPayloadSchema,
 } from '../../model/orders-model';
+import { ORDER_CHANGED, pubsub } from '../graphql/resolvers';
+import { WithId } from 'mongodb';
 
 const getOrderFlow = (status: Status): OrderFlow | null => {
   switch (status) {
@@ -76,20 +78,28 @@ export async function putOrderHandler(req: SessionRequest, res: Response) {
     throw new Error('Invalid order id');
   }
 
+  const userId = req.session?.getUserId();
+
+  if (userId == null) {
+    throw new Error('Invalid user id');
+  }
+
   const payload = Joi.attempt(req.body, UpdateOrderStatusRequestPayloadSchema, {
     stripUnknown: true,
   }) as UpdateOrderStatusRequest;
 
-  const result = await updateOrder(orderId, {
+  const result = (await updateOrder(orderId, {
     ...payload,
     updatedAt: new Date(),
-    updatedBy: req.session?.getUserId()!,
-  });
+    updatedBy: userId,
+  })) as WithId<Order>;
 
-  if (!result) {
+  if (result == null) {
     res.status(StatusCodes.NOT_FOUND).send(`Order with "${orderId}" was not found`);
     return;
   }
+
+  pubsub.publish(ORDER_CHANGED, { orderChanged: { id: orderId, userId: result.userId } });
 
   const orderFlow = getOrderFlow(payload.status);
 

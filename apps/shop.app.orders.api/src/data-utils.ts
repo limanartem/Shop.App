@@ -46,17 +46,18 @@ export const updateOrder = async (
   id: string,
   order: UpdateOrder,
 ): Promise<ReturnType<typeof updateDocument>> => {
-  if (await updateDocument(id, order)) {
+  const updatedOrder = await updateDocument(id, order);
+  if (updatedOrder != null) {
     console.log(`Updated order id = ${id}, invalidating cache...`);
     // TODO: if cache service is unavailable we could potentially leave stale value in cache
     //  which would be used next time service is up again. To mitigate this we are setting
     //  shorter TTL for cache keys
     await updateCacheObject(id, null, ORDERS_CACHE_GROUP);
-    return true;
+    return updatedOrder;
   }
   console.log(`No order with id = ${id} was updated.`);
 
-  return false;
+  return null;
 };
 
 export const updateOrderItem = async (
@@ -72,10 +73,10 @@ export const updateOrderItem = async (
       }
       return item;
     });
-    await updateDocument(id, { items });
+    return await updateDocument(id, { items });
     //await updateCache(id, null);
   }
-  return false;
+  return null;
 };
 
 export const getOrders = async (
@@ -151,7 +152,7 @@ export const getProductDetails = async (productIds: string[]): Promise<ProductIt
     );
   }
 
-  return await response.json();
+  return (await response.json()) as ProductItem[];
 };
 
 const expandOrder = async (order: WithClearId<Order<OrderItemEnhanced>>) => {

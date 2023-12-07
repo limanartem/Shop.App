@@ -108,6 +108,11 @@ export type Order = {
   userId: Scalars['GUID']['output'];
 };
 
+export type OrderChanged = {
+  __typename?: 'OrderChanged';
+  id: Scalars['ObjectID']['output'];
+};
+
 export type Payment = {
   __typename?: 'Payment';
   bank?: Maybe<Bank>;
@@ -141,6 +146,11 @@ export type Shipping = {
   city: Scalars['String']['output'];
   country: Scalars['String']['output'];
   zip: Scalars['String']['output'];
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  orderChanged?: Maybe<OrderChanged>;
 };
 
 
@@ -266,6 +276,7 @@ export type ResolversTypes = {
   NonPositiveInt: ResolverTypeWrapper<Scalars['NonPositiveInt']['output']>;
   ObjectID: ResolverTypeWrapper<Scalars['ObjectID']['output']>;
   Order: ResolverTypeWrapper<Order>;
+  OrderChanged: ResolverTypeWrapper<OrderChanged>;
   Payment: ResolverTypeWrapper<Payment>;
   PhoneNumber: ResolverTypeWrapper<Scalars['PhoneNumber']['output']>;
   Port: ResolverTypeWrapper<Scalars['Port']['output']>;
@@ -281,6 +292,7 @@ export type ResolversTypes = {
   SemVer: ResolverTypeWrapper<Scalars['SemVer']['output']>;
   Shipping: ResolverTypeWrapper<Shipping>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  Subscription: ResolverTypeWrapper<{}>;
   Time: ResolverTypeWrapper<Scalars['Time']['output']>;
   TimeZone: ResolverTypeWrapper<Scalars['TimeZone']['output']>;
   Timestamp: ResolverTypeWrapper<Scalars['Timestamp']['output']>;
@@ -347,6 +359,7 @@ export type ResolversParentTypes = {
   NonPositiveInt: Scalars['NonPositiveInt']['output'];
   ObjectID: Scalars['ObjectID']['output'];
   Order: Order;
+  OrderChanged: OrderChanged;
   Payment: Payment;
   PhoneNumber: Scalars['PhoneNumber']['output'];
   Port: Scalars['Port']['output'];
@@ -362,6 +375,7 @@ export type ResolversParentTypes = {
   SemVer: Scalars['SemVer']['output'];
   Shipping: Shipping;
   String: Scalars['String']['output'];
+  Subscription: {};
   Time: Scalars['Time']['output'];
   TimeZone: Scalars['TimeZone']['output'];
   Timestamp: Scalars['Timestamp']['output'];
@@ -589,6 +603,11 @@ export type OrderResolvers<ContextType = SessionContext, ParentType extends Reso
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type OrderChangedResolvers<ContextType = SessionContext, ParentType extends ResolversParentTypes['OrderChanged'] = ResolversParentTypes['OrderChanged']> = {
+  id?: Resolver<ResolversTypes['ObjectID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type PaymentResolvers<ContextType = SessionContext, ParentType extends ResolversParentTypes['Payment'] = ResolversParentTypes['Payment']> = {
   bank?: Resolver<Maybe<ResolversTypes['Bank']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -656,6 +675,10 @@ export type ShippingResolvers<ContextType = SessionContext, ParentType extends R
   country?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   zip?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SubscriptionResolvers<ContextType = SessionContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
+  orderChanged?: SubscriptionResolver<Maybe<ResolversTypes['OrderChanged']>, "orderChanged", ParentType, ContextType>;
 };
 
 export interface TimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Time'], any> {
@@ -748,6 +771,7 @@ export type Resolvers<ContextType = SessionContext> = {
   NonPositiveInt?: GraphQLScalarType;
   ObjectID?: GraphQLScalarType;
   Order?: OrderResolvers<ContextType>;
+  OrderChanged?: OrderChangedResolvers<ContextType>;
   Payment?: PaymentResolvers<ContextType>;
   PhoneNumber?: GraphQLScalarType;
   Port?: GraphQLScalarType;
@@ -762,6 +786,7 @@ export type Resolvers<ContextType = SessionContext> = {
   SafeInt?: GraphQLScalarType;
   SemVer?: GraphQLScalarType;
   Shipping?: ShippingResolvers<ContextType>;
+  Subscription?: SubscriptionResolvers<ContextType>;
   Time?: GraphQLScalarType;
   TimeZone?: GraphQLScalarType;
   Timestamp?: GraphQLScalarType;

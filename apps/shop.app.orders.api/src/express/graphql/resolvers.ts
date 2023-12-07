@@ -1,8 +1,12 @@
 import { getOrder, getOrderExpanded, getOrders, getOrdersExpanded } from '../../data-utils';
-import { Resolvers } from './__generated__/resolver-types';
+import { ResolverFn, Resolvers } from './__generated__/resolver-types';
 import { SessionContext } from '.';
 import { GraphQLResolveInfo } from 'graphql';
 import { isFieldRequested } from './utils';
+import { PubSub, withFilter } from 'graphql-subscriptions';
+
+export const pubsub = new PubSub();
+export const ORDER_CHANGED = 'ORDER_CHANGED';
 
 const root: Resolvers = {
   Query: {
@@ -43,6 +47,16 @@ const root: Resolvers = {
       const requestedProductField = isFieldRequested('items.product', info);
 
       return await (requestedProductField ? getOrderExpanded(id, userId) : getOrder(id, userId));
+    },
+  },
+  Subscription: {
+    orderChanged: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(ORDER_CHANGED) as AsyncIterator<any, any, undefined>,
+        (payload, _, ctx) => {
+          return payload.orderChanged.userId === ctx.userId;
+        },
+      ) as ResolverFn<any, {}, SessionContext, {}>,
     },
   },
 };

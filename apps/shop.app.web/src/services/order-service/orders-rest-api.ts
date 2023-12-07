@@ -4,11 +4,12 @@ import { env } from '../../config/environment';
 import { OrderService } from '.';
 
 const { REACT_APP_ORDERS_API_URL } = env;
+const apiUrl = `http://${REACT_APP_ORDERS_API_URL}`;
 
 const getOrdersAsync = async (): Promise<OrdersResponse> => {
-  console.log(`Fetching orders from ${REACT_APP_ORDERS_API_URL}/orders`);
+  console.log(`Fetching orders from ${apiUrl}/orders`);
 
-  const response = await fetch(`${REACT_APP_ORDERS_API_URL}/orders`, {
+  const response = await fetch(`${apiUrl}/orders`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${await Session.getAccessToken()}`,
@@ -24,9 +25,9 @@ const getOrdersAsync = async (): Promise<OrdersResponse> => {
 };
 
 const getOrderAsync = async (id: string): Promise<Order | undefined> => {
-  console.log(`Fetching order from ${REACT_APP_ORDERS_API_URL}/orders/${id}`);
+  console.log(`Fetching order from ${apiUrl}/orders/${id}`);
 
-  const response = await fetch(`${REACT_APP_ORDERS_API_URL}/orders/${id}`, {
+  const response = await fetch(`${apiUrl}/orders/${id}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${await Session.getAccessToken()}`,
@@ -42,9 +43,9 @@ const getOrderAsync = async (id: string): Promise<Order | undefined> => {
 };
 
 const createOrdersAsync = async (order: CreateOrder): Promise<{ id: string }> => {
-  console.log(`Creation new orders using POST ${REACT_APP_ORDERS_API_URL}/orders`);
+  console.log(`Creation new orders using POST ${apiUrl}/orders`);
 
-  const response = await fetch(`${REACT_APP_ORDERS_API_URL}/orders`, {
+  const response = await fetch(`${apiUrl}/orders`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${await Session.getAccessToken()}`,

@@ -79,11 +79,11 @@ export const fetchDocument = async <DocumentType extends Document = Document>(
     return null;
   });
 
-export const updateDocument = async <T extends object>(
+export const updateDocument = async (
   id: string,
-  data: T,
+  data: any,
   collection: DB_COLLECTION = DB_COLLECTION.ORDERS,
-): Promise<boolean> =>
+): Promise<WithId<Document> | null> =>
   usingClient(async (client) => {
     const _id = ObjectId.createFromHexString(id);
     console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
@@ -91,8 +91,8 @@ export const updateDocument = async <T extends object>(
     const updateResult = await client
       .db()
       .collection(collection)
-      .updateOne({ _id }, { $set: data });
-    return updateResult.modifiedCount === 1;
+      .findOneAndUpdate({ _id }, { $set: data }, {});
+    return updateResult;
   });
 
 export const insertDocument = async <T extends object>(

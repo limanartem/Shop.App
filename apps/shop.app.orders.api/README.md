@@ -50,3 +50,4 @@ curl --location 'http://localhost:3003/auth/signin' \
 * `MONGODB_URL`
 * `MONGO_DB_USERNAME`
 * `MONGO_DB_PASSWORD`
+* `AUTH_CORE_URL`
