@@ -452,7 +452,7 @@ describe('order routes', () => {
         const expectedOrderId = uuidv4();
         const expectedStatus = OrderStatuses[1];
 
-        (updateOrder as jest.Mock).mockResolvedValue(false);
+        (updateOrder as jest.Mock).mockResolvedValue(null);
 
         await request(start())
           .put(`/orders/${expectedOrderId}`)
