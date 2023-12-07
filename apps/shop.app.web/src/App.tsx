@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import Orders from './features/orders';
 import { AuthWrapper, CategoryContextProvider, AuthRoutes } from './components';
 import { OrderPage } from './features/orders/OrderDetails';
+import { WsWrapper } from './components/WsWrapper';
 
 function InitializeDataWrapper({ children }: { children?: React.ReactNode }) {
   const categoriesStatus = useAppSelector(selectCategoriesStatus);
@@ -54,46 +55,48 @@ function App() {
             setAuthInitialized(true);
           }}
         >
-          <ThemeProvider theme={defaultTheme}>
-            <CssBaseline />
-            <BrowserRouter>
-              <CategoryContextProvider>
-                <AppWrapper>
-                  <Box padding={1}>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/catalog" element={<Catalog />} />
-                      <Route
-                        path="/checkout"
-                        element={
-                          <SessionAuth>
-                            <CheckOut />
-                          </SessionAuth>
-                        }
-                      />
-                      <Route
-                        path="/orders"
-                        element={
-                          <SessionAuth>
-                            <Orders />
-                          </SessionAuth>
-                        }
-                      />
-                       <Route
-                        path="/orders/:id"
-                        element={
-                          <SessionAuth>
-                            <OrderPage />
-                          </SessionAuth>
-                        }
-                      />
-                      {authInitialized && AuthRoutes()}
-                    </Routes>
-                  </Box>
-                </AppWrapper>
-              </CategoryContextProvider>
-            </BrowserRouter>
-          </ThemeProvider>
+          <WsWrapper>
+            <ThemeProvider theme={defaultTheme}>
+              <CssBaseline />
+              <BrowserRouter>
+                <CategoryContextProvider>
+                  <AppWrapper>
+                    <Box padding={1}>
+                      <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/catalog" element={<Catalog />} />
+                        <Route
+                          path="/checkout"
+                          element={
+                            <SessionAuth>
+                              <CheckOut />
+                            </SessionAuth>
+                          }
+                        />
+                        <Route
+                          path="/orders"
+                          element={
+                            <SessionAuth>
+                              <Orders />
+                            </SessionAuth>
+                          }
+                        />
+                        <Route
+                          path="/orders/:id"
+                          element={
+                            <SessionAuth>
+                              <OrderPage />
+                            </SessionAuth>
+                          }
+                        />
+                        {authInitialized && AuthRoutes()}
+                      </Routes>
+                    </Box>
+                  </AppWrapper>
+                </CategoryContextProvider>
+              </BrowserRouter>
+            </ThemeProvider>
+          </WsWrapper>
         </AuthWrapper>
       </InitializeDataWrapper>
     </Provider>

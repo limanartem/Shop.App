@@ -14,6 +14,6 @@ jest.mock('@shop.app/lib.express/dist', () => ({
 }));
 
 jest.mock('graphql-playground-middleware-express', () => () => () => {});
-jest.mock('../express/ws-server');
+jest.mock('../express/graphql-ws-server');
 
 export {};

@@ -1,5 +1,5 @@
 import { start } from './express/server';
-import { startWsServer } from './express/ws-server';
+import { startWsServer } from './express/graphql-ws-server';
 
 const { WEB_SERVER_PORT } = process.env;
 

@@ -2,11 +2,9 @@ import { CreateOrder, Order, OrdersResponse } from '../../model';
 import Session from 'supertokens-auth-react/recipe/session';
 import { env } from '../../config/environment';
 import { OrderService } from '.';
-import { createClient } from 'graphql-ws';
 
 const { REACT_APP_ORDERS_API_URL } = env;
 const graphQlUrl = `http://${REACT_APP_ORDERS_API_URL}/graphql`;
-const graphQlSubscriptionsUrl = `ws://${REACT_APP_ORDERS_API_URL}/subscriptions`;
 
 const fragments = {
   ORDER: `fragment orderFields on Order { 
@@ -45,16 +43,12 @@ const queries = {
   }, ${fragments.ORDER}`,
 };
 
-const subscriptions = {
+export const subscriptions = {
   SUBSCRIPTION_ORDER_CHANGED: `
   subscription {
     orderChanged { id }
   }`,
 };
-
-setTimeout(() => {
-  connectGraphQLWSSocket();
-}, 1000);
 
 const getGraphqlResult = async (response: Response) => {
   const result = await response.json();
@@ -144,33 +138,4 @@ const OrdersRestApi: OrderService = {
 
 export default OrdersRestApi;
 
-async function connectGraphQLWSSocket() {
-  console.log(
-    `Connecting to WS socket on "${graphQlSubscriptionsUrl}" and starting listening for events`,
-  );
 
-  const client = createClient({
-    url: graphQlSubscriptionsUrl,
-    connectionParams: {
-      authentication: `Bearer ${await Session.getAccessToken()}`,
-    },
-  });
-
-  client.on('error', (err) => {
-    console.log('WS client error:', err);
-  });
-
-  // subscription
-  (async () => {
-    const subscription = client.iterate({
-      query: subscriptions.SUBSCRIPTION_ORDER_CHANGED,
-    });
-
-    for await (const event of subscription) {
-      console.log('Received event:', event);
-
-      // complete a running subscription by breaking the iterator loop
-      //break;
-    }
-  })();
-}

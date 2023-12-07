@@ -1,6 +1,6 @@
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
-import { graphqlSchema } from '../express/graphql/schema';
+import { graphqlSchema } from './graphql/schema';
 import { execute, subscribe } from 'graphql';
 import { AddressInfo } from 'net';
 import { ConnectionInitMessage } from 'graphql-ws';

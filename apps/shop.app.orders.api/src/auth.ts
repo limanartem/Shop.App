@@ -78,7 +78,7 @@ export const decodeToken = (token: string): Promise<JwtPayload | null> =>
 
 const getSigningKey = (header: JwtHeader, callback: SigningKeyCallback) => {
   jwtClient.getSigningKey(header.kid, function (err, key) {
-    const signingKey = key!.getPublicKey();
+    const signingKey = key?.getPublicKey();
     callback(err, signingKey);
   });
 };
