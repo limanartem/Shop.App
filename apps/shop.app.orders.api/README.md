@@ -45,11 +45,11 @@ curl --location 'http://localhost:3003/auth/signin' \
 
 ## Environment variables
  
- * `WEB_SERVER_PORT`: The port number for the web server.
- * `CATALOG_API_URL`: The URL for the catalog API.
- * `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`: The host, port, and password for the Redis server.
- * `MONGODB_URL`: The URL for the MongoDB server.
- * `MONGO_DB_USERNAME`: The username for the MongoDB database.
- * `MONGO_DB_PASSWORD`: The password for the MongoDB database.
- * `AUTH_CORE_URL`: The URL for the authentication core API.
  * `AUTH_API_URL`: The URL for the authentication API.
+ * `AUTH_CORE_DOMAIN`: The URL for the authentication core API.
+ * `CATALOG_API_URL`: The URL for the catalog API.
+ * `MONGO_DB_PASSWORD`: The password for the MongoDB database.
+ * `MONGO_DB_USERNAME`: The username for the MongoDB database.
+ * `MONGODB_URL`: The URL for the MongoDB server.
+ * `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`: The host, port, and password for the Redis server.
+ * `WEB_SERVER_PORT`: The port number for the web server.

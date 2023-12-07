@@ -4,9 +4,9 @@ import supertokens from 'supertokens-node';
 import UserRoles from 'supertokens-node/recipe/userroles';
 
 const {
-  AUTH_CORE_URL = 'localhost:3567',
+  AUTH_CORE_DOMAIN = 'localhost:3567',
   WEB_API_PORT = 3003,
-  WEB_API_URL = 'localhost',
+  WEB_API_DOMAIN = 'localhost',
   PUBLIC_WEB_UI_DOMAIN = 'localhost:3000',
   API_USER_EMAIL = 'apiUser@shop.app',
   API_USER_PASSWORD = 'Qwerty123',
@@ -26,13 +26,13 @@ export const initAuth = () => {
   supertokens.init({
     framework: 'express',
     supertokens: {
-      connectionURI: `http://${AUTH_CORE_URL!}`,
+      connectionURI: `http://${AUTH_CORE_DOMAIN!}`,
       // apiKey: <API_KEY(if configured)>,
     },
     appInfo: {
       // learn more about this on https://supertokens.com/docs/thirdpartyemailpassword/appinfo
       appName: 'Shop.App',
-      apiDomain: `${WEB_API_URL}:${WEB_API_PORT}`,
+      apiDomain: `${WEB_API_DOMAIN}:${WEB_API_PORT}`,
       websiteDomain: PUBLIC_WEB_UI_DOMAIN,
       apiBasePath: '/auth',
       websiteBasePath: '/auth',

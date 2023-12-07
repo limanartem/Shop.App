@@ -21,24 +21,28 @@ const jwtClient = jwksClient({
  * Initializes the authentication configuration for the Shop.App Orders API.
  */
 export const initAuth = () => {
-  const {
-    AUTH_CORE_URL,
-    WEB_API_PORT,
-    WEB_API_URL,
-    WEB_UI_URL,
-  } = process.env;
+  const { AUTH_CORE_DOMAIN, WEB_SERVER_PORT, WEB_UI_URL } = process.env;
+
+  if (!AUTH_CORE_DOMAIN || !AUTH_API_URL || !WEB_SERVER_PORT) {
+    console.error('One or more required environment variables are not defined', {
+      AUTH_CORE_DOMAIN,
+      WEB_SERVER_PORT,
+      WEB_UI_URL,
+    });
+    throw new Error('One or more required environment variables are not defined');
+  }
 
   supertokens.init({
     framework: 'express',
     supertokens: {
-      connectionURI: `http://${AUTH_CORE_URL!}`,
+      connectionURI: `http://${AUTH_CORE_DOMAIN!}`,
       // apiKey: <API_KEY(if configured)>,
     },
     appInfo: {
       // learn more about this on https://supertokens.com/docs/thirdpartyemailpassword/appinfo
       appName: 'Shop.App',
-      apiDomain: `${WEB_API_URL}:${WEB_API_PORT}`,
-      websiteDomain: WEB_UI_URL,
+      apiDomain: `http://localhost:${WEB_SERVER_PORT}`,
+      websiteDomain: 'localhost',
       apiBasePath: '/auth',
     },
     recipeList: [

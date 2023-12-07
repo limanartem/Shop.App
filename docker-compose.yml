@@ -78,9 +78,9 @@ services:
       shop.app.auth.core:
         condition: service_healthy
     environment:
-      AUTH_CORE_URL: $AUTH_CORE_URL
+      AUTH_CORE_DOMAIN: $AUTH_CORE_DOMAIN
       WEB_API_PORT: 3003
-      WEB_API_URL: shop.app.auth.api
+      WEB_API_DOMAIN: shop.app.auth.api
       PUBLIC_WEB_UI_DOMAIN: $PUBLIC_WEB_UI_DOMAIN # need external domain for cors
       API_USER_EMAIL : $API_USER_EMAIL
       API_USER_PASSWORD : $API_USER_PASSWORD
@@ -163,16 +163,17 @@ services:
       shop.app.catalog.api:
         condition: service_started
     environment:
-      WEB_SERVER_PORT: 3001
-      MONGODB_URL: $MONGODB_URL
-      MONGO_DB_USERNAME: $MONGO_DB_USERNAME
-      MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
-      MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
-      AUTH_CORE_URL: $AUTH_CORE_URL
+      AUTH_API_URL: $AUTH_API_URL_PRIVATE
+      AUTH_CORE_DOMAIN: $AUTH_CORE_DOMAIN
       CATALOG_API_URL: http://shop.app.catalog.api:$CATALOG_API_PORT
+      MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
+      MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
+      MONGO_DB_USERNAME: $MONGO_DB_USERNAME
+      MONGODB_URL: $MONGODB_URL
       REDIS_HOST: $REDIS_HOST
-      REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
+      REDIS_PORT: $REDIS_PORT
+      WEB_SERVER_PORT: 3001
 
   # Shop products API
   shop.app.catalog.api:
