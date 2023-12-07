@@ -27,6 +27,14 @@ const getOrderFlow = (status: Status): OrderFlow | null => {
   }
 };
 
+/**
+ * Handles the PUT request for updating an order item.
+ * 
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A Promise that resolves to the updated order item payload.
+ * @throws Error if the order payload is invalid, or if the order id or product id is invalid.
+ */
 export async function putOrderItemHandler(req: SessionRequest, res: Response) {
   if (req.body == null) {
     throw new Error('Invalid order payload');
@@ -67,6 +75,14 @@ export async function putOrderItemHandler(req: SessionRequest, res: Response) {
   res.status(StatusCodes.OK).json(payload);
 }
 
+/**
+ * Handles the PUT request for updating an order.
+ * 
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A JSON response with the updated order payload.
+ * @throws Error if the order payload is invalid, the order id is invalid, or the user id is invalid.
+ */
 export async function putOrderHandler(req: SessionRequest, res: Response) {
   if (req.body == null) {
     throw new Error('Invalid order payload');
@@ -116,6 +132,12 @@ export async function putOrderHandler(req: SessionRequest, res: Response) {
   res.status(StatusCodes.OK).json(payload);
 }
 
+/**
+ * Retrieves the orders for a user and sends them as a JSON response.
+ * @param req - The request object containing the session information.
+ * @param res - The response object used to send the JSON response.
+ * @throws Error if the session is undefined.
+ */
 export async function getOrdersHandler(req: SessionRequest, res: Response) {
   if (req.session == null) {
     throw new Error('Undefined session');
@@ -128,6 +150,13 @@ export async function getOrdersHandler(req: SessionRequest, res: Response) {
   res.json({ orders });
 }
 
+/**
+ * Retrieves the order details for a given order ID.
+ * 
+ * @param req - The request object containing the session information.
+ * @param res - The response object used to send the order details.
+ * @throws Error if the session is undefined or the order ID is invalid.
+ */
 export async function getOrderHandler(req: SessionRequest, res: Response) {
   if (req.session == null) {
     throw new Error('Undefined session');
@@ -149,6 +178,14 @@ export async function getOrderHandler(req: SessionRequest, res: Response) {
   }
 }
 
+/**
+ * Handles the POST request for creating orders.
+ * 
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A Promise that resolves to the created order.
+ * @throws Error if the session is undefined or the order payload is invalid.
+ */
 export async function postOrdersHandler(req: SessionRequest, res: Response) {
   if (req.session == null) {
     throw new Error('Undefined session');

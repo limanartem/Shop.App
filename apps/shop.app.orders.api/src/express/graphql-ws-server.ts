@@ -7,6 +7,10 @@ import { ConnectionInitMessage } from 'graphql-ws';
 import { Server } from 'http';
 import { decodeToken } from '../auth';
 
+/**
+ * Starts the WebSocket server for handling GraphQL subscriptions.
+ * @param server The HTTP server instance to attach the WebSocket server to.
+ */
 export const startWsServer = (server: Server) => {
   console.log('Starting Web Socket Server...');
 

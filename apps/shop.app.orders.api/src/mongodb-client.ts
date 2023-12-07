@@ -53,6 +53,14 @@ const mapToClearIdDocument = <DocumentType extends Document = Document>(
   ...document,
 });
 
+/**
+ * Fetches documents from the MongoDB collection based on the provided criteria.
+ * 
+ * @template DocumentType - The type of the documents to fetch.
+ * @param criteria - The filter criteria to apply when fetching documents.
+ * @param collection - The name of the MongoDB collection to fetch documents from.
+ * @returns A promise that resolves to an array of fetched documents.
+ */
 export const fetchDocuments = async <DocumentType extends Document = Document>(
   criteria: Filter<WithId<Document>>,
   collection: DB_COLLECTION = DB_COLLECTION.ORDERS,
@@ -64,6 +72,13 @@ export const fetchDocuments = async <DocumentType extends Document = Document>(
     ).map(mapToClearIdDocument);
   });
 
+/**
+ * Fetches a document from the MongoDB collection based on the provided criteria.
+ * 
+ * @param criteria - The criteria used to filter the document.
+ * @param collection - The MongoDB collection to fetch the document from.
+ * @returns A promise that resolves to the fetched document or null if not found.
+ */
 export const fetchDocument = async <DocumentType extends Document = Document>(
   criteria: Filter<WithId<Document>>,
   collection: DB_COLLECTION = DB_COLLECTION.ORDERS,
@@ -79,6 +94,14 @@ export const fetchDocument = async <DocumentType extends Document = Document>(
     return null;
   });
 
+/**
+ * Updates a document in the MongoDB collection.
+ * 
+ * @param id - The ID of the document to update.
+ * @param data - The updated data to be set in the document.
+ * @param collection - The MongoDB collection to update the document in. Defaults to DB_COLLECTION.ORDERS.
+ * @returns A promise that resolves to the updated document with the ID, or null if the document was not found.
+ */
 export const updateDocument = async (
   id: string,
   data: any,
@@ -95,6 +118,14 @@ export const updateDocument = async (
     return updateResult;
   });
 
+/**
+ * Inserts a document into the specified collection in the MongoDB database.
+ * 
+ * @template T - The type of the document being inserted.
+ * @param data - The document to be inserted.
+ * @param collection - The collection in which the document should be inserted. Defaults to DB_COLLECTION.ORDERS.
+ * @returns A promise that resolves to an object containing the ID of the inserted document.
+ */
 export const insertDocument = async <T extends object>(
   data: T,
   collection: DB_COLLECTION = DB_COLLECTION.ORDERS,

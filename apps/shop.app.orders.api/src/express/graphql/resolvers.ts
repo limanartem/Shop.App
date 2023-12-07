@@ -8,6 +8,12 @@ import { PubSub, withFilter } from 'graphql-subscriptions';
 export const pubsub = new PubSub();
 export const ORDER_CHANGED = 'ORDER_CHANGED';
 
+/**
+ * Root resolver object for GraphQL.
+ * @typedef {Object} Resolvers
+ * @property {Object} Query - Query resolvers.
+ * @property {Object} Subscription - Subscription resolvers.
+ */
 const root: Resolvers = {
   Query: {
     orders: async (_: any, __: any, context: SessionContext, info: GraphQLResolveInfo) => {

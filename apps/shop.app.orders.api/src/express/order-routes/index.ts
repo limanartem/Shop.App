@@ -9,6 +9,10 @@ import {
   getOrderHandler,
 } from './handlers';
 
+/**
+ * Creates a router for handling order routes.
+ * @returns The express router.
+ */
 export const routerFactory = () => {
   const router = express.Router();
 

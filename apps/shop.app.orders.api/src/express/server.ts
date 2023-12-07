@@ -8,6 +8,10 @@ import { useGraphql } from './graphql';
 import { useTracing, useLogging} from '@shop.app/lib.express/dist';
 
 
+/**
+ * Starts the server.
+ * @returns {express.Express} The Express app instance.
+ */
 export const start = () => {
   initAuth();
 

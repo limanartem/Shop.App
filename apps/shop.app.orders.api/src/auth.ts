@@ -1,3 +1,7 @@
+/**
+ * This file contains authentication-related functions and middleware for the Shop.App Orders API.
+ */
+
 import { NextFunction, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import supertokens from 'supertokens-node';
@@ -13,6 +17,9 @@ const jwtClient = jwksClient({
   jwksUri: `http://${AUTH_API_URL}/auth/jwt/jwks.json`,
 });
 
+/**
+ * Initializes the authentication configuration for the Shop.App Orders API.
+ */
 export const initAuth = () => {
   const {
     AUTH_CORE_URL = 'localhost:3567',
@@ -41,6 +48,11 @@ export const initAuth = () => {
   });
 };
 
+/**
+ * Middleware function to verify the user's role.
+ * @param role - The role to be verified.
+ * @returns A middleware function that checks if the user has the specified role.
+ */
 export const verifyUserRole = (
   role: string,
 ): ((req: SessionRequest, res: Response, next: NextFunction) => Promise<void>) => {
@@ -63,6 +75,11 @@ export const verifyUserRole = (
   };
 };
 
+/**
+ * Decodes a JSON Web Token (JWT).
+ * @param token - The JWT to be decoded.
+ * @returns A promise that resolves to the decoded payload of the JWT, or null if the token is invalid.
+ */
 export const decodeToken = (token: string): Promise<JwtPayload | null> =>
   new Promise<JwtPayload | null>((resolve) => {
     JsonWebToken.verify(token, getSigningKey, {}, (err, decoded) => {
@@ -76,6 +93,11 @@ export const decodeToken = (token: string): Promise<JwtPayload | null> =>
     });
   });
 
+/**
+ * Retrieves the signing key for verifying a JWT.
+ * @param header - The header of the JWT.
+ * @param callback - The callback function to be called with the signing key.
+ */
 const getSigningKey = (header: JwtHeader, callback: SigningKeyCallback) => {
   jwtClient.getSigningKey(header.kid, function (err, key) {
     const signingKey = key?.getPublicKey();
