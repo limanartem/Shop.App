@@ -14,6 +14,12 @@ Provides REST and GraphQL APIs for handling orders - submitting new orders, gett
 * `npm run start-dev` - builds and starts local node.js express server
 * `npm run codegen` - generates typed GraphQL resolver placed under `./src/express/graphql/__generated__/resolver-types.ts` using config from `apps/shop.app.orders.api/graphql-codegen.config.ts`
 
+## Exposed endpoints
+* `http://<root>/orders` - all order related REST APIs
+* `http://<root>/graphql` - endpoint that supports graphql queries
+* `http://<root>/subscriptions` - endpoint that supports graphql subscriptions. Implemented using `graphql-subscriptions` with in-memory `PubSub` and `graphql-ws` WebSocket implementation. It is not recommended to use `PubSub` in production scenarios since it will not work in multi-node environment. See [Subscriptions in Apollo Server](https://www.apollographql.com/docs/apollo-server/data/subscriptions/) for more details on this topic and production ready  PubSub implementations (e.g. using Redis etc)
+* `http://<root>/playground` - graphql playground (see next section)
+
 ## GraphQL playground
 Express app exposes GraphQL playground using [graphql-playground-middleware-express](https://www.npmjs.com/package/graphql-playground-middleware-express) package, which currently is not maintained and uses express v4.16. 
 
