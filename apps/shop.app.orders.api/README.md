@@ -1,5 +1,5 @@
 # shop.app.orders.api
-Provides REST and GraphQL APIs for handling orders - submitting new orders, getting all users order, updating order status by other backend systems
+Provides REST and GraphQL APIs for handling orders - submitting new orders, getting all users order, updating order status by other backend systems, subscribing to order updates
 
 ## Requirements
 * node >= 21
@@ -44,10 +44,12 @@ curl --location 'http://localhost:3003/auth/signin' \
 ```
 
 ## Environment variables
-* `WEB_SERVER_PORT` 
-* `CATALOG_API_URL`
-* `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`
-* `MONGODB_URL`
-* `MONGO_DB_USERNAME`
-* `MONGO_DB_PASSWORD`
-* `AUTH_CORE_URL`
+ 
+ * `WEB_SERVER_PORT`: The port number for the web server.
+ * `CATALOG_API_URL`: The URL for the catalog API.
+ * `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`: The host, port, and password for the Redis server.
+ * `MONGODB_URL`: The URL for the MongoDB server.
+ * `MONGO_DB_USERNAME`: The username for the MongoDB database.
+ * `MONGO_DB_PASSWORD`: The password for the MongoDB database.
+ * `AUTH_CORE_URL`: The URL for the authentication core API.
+ * `AUTH_API_URL`: The URL for the authentication API.

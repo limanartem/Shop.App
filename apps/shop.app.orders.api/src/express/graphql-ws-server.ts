@@ -9,6 +9,7 @@ import { decodeToken } from '../auth';
 
 /**
  * Starts the WebSocket server for handling GraphQL subscriptions.
+ * See https://www.apollographql.com/docs/apollo-server/data/subscriptions/ for more details.
  * @param server The HTTP server instance to attach the WebSocket server to.
  */
 export const startWsServer = (server: Server) => {

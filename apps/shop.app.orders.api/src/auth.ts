@@ -14,7 +14,7 @@ import jwksClient from 'jwks-rsa';
 const { AUTH_API_URL } = process.env;
 
 const jwtClient = jwksClient({
-  jwksUri: `http://${AUTH_API_URL}/auth/jwt/jwks.json`,
+  jwksUri: `${AUTH_API_URL}/auth/jwt/jwks.json`,
 });
 
 /**
@@ -22,10 +22,10 @@ const jwtClient = jwksClient({
  */
 export const initAuth = () => {
   const {
-    AUTH_CORE_URL = 'localhost:3567',
-    WEB_API_PORT = 3003,
-    WEB_API_URL = 'localhost',
-    WEB_UI_URL = 'localhost:3002',
+    AUTH_CORE_URL,
+    WEB_API_PORT,
+    WEB_API_URL,
+    WEB_UI_URL,
   } = process.env;
 
   supertokens.init({
