@@ -56,3 +56,6 @@ The project is structured as a monorepo using npm workspaces. This structure pri
 - `shop.app.cache`: Key-Value caching service based on [Redis.io](https://redis.io).
 - `shop.app.messagebroker`: Message broker service providing [AMQP](https://www.amqp.org) messaging protocol powered by [RabbitMQ](https://www.rabbitmq.com), orchestrating order processing across different workloads.
 - `shop.app.orders.db`: NoSQL database managing orders placed by users via the `shop.app.orders.api` REST API. Utilizes [MongoDB](https://www.mongodb.com).
+
+## Troubleshooting
+* When running docker compose build on Windows machine some .sh file may fail to execute due to different line end feeding characters on Linux and Windows based systems. To quickly fix issue, in VS Code switch to CRLF EOL sequence see  https://essenceofcode.com/2019/11/20/linux-style-line-feeds-in-docker-desktop-on-windows/ for some additional information
