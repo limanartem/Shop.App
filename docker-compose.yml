@@ -73,6 +73,8 @@ services:
     networks:
       - app-private-network
       - app-public-network
+    links:
+      - shop.app.packages
     depends_on:
       shop.app.auth.core:
         condition: service_healthy
