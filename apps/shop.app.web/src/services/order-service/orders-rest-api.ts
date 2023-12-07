@@ -3,8 +3,8 @@ import Session from 'supertokens-auth-react/recipe/session';
 import { env } from '../../config/environment';
 import { OrderService } from '.';
 
-const { REACT_APP_ORDERS_API_URL } = env;
-const apiUrl = `http://${REACT_APP_ORDERS_API_URL}`;
+const { REACT_APP_ORDERS_API_HOST } = env;
+const apiUrl = `http://${REACT_APP_ORDERS_API_HOST}`;
 
 const getOrdersAsync = async (): Promise<OrdersResponse> => {
   console.log(`Fetching orders from ${apiUrl}/orders`);

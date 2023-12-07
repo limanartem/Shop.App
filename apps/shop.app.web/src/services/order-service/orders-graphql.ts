@@ -2,9 +2,10 @@ import { CreateOrder, Order, OrdersResponse } from '../../model';
 import Session from 'supertokens-auth-react/recipe/session';
 import { env } from '../../config/environment';
 import { OrderService } from '.';
+import rest from './orders-rest-api';
 
-const { REACT_APP_ORDERS_API_URL } = env;
-const graphQlUrl = `http://${REACT_APP_ORDERS_API_URL}/graphql`;
+const { REACT_APP_ORDERS_API_HOST } = env;
+const graphQlUrl = `http://${REACT_APP_ORDERS_API_HOST}/graphql`;
 
 const fragments = {
   ORDER: `fragment orderFields on Order { 
@@ -104,26 +105,6 @@ const getOrderAsync = async (id: string): Promise<Order | undefined> => {
   return order;
 };
 
-const createOrdersAsync = async (order: CreateOrder): Promise<{ id: string }> => {
-  console.log(`Creation new orders using POST ${REACT_APP_ORDERS_API_URL}/orders`);
-
-  const response = await fetch(`${REACT_APP_ORDERS_API_URL}/orders`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${await Session.getAccessToken()}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(order),
-  });
-
-  if (!response.ok) {
-    console.error({ status: response.status, statusText: response.statusText });
-    throw new Error('Unable to create order!');
-  }
-
-  return await response.json();
-};
-
 const OrdersRestApi: OrderService = {
   getOrdersAsync: function (): Promise<OrdersResponse> {
     return getOrdersAsync();
@@ -132,10 +113,9 @@ const OrdersRestApi: OrderService = {
     return getOrderAsync(id);
   },
   createOrdersAsync: function (order: CreateOrder): Promise<{ id: string }> {
-    return createOrdersAsync(order);
+    // Fallback to rest api for now
+    return rest.createOrdersAsync(order);
   },
 };
 
 export default OrdersRestApi;
-
-
