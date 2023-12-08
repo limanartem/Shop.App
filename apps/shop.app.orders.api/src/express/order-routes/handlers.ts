@@ -64,7 +64,8 @@ export async function putOrderItemHandler(req: SessionRequest, res: Response) {
   const orderFlow = getOrderFlow(payload.status);
 
   if (orderFlow) {
-    await sendMessage(orderFlow, {
+    // Fire and forget
+    sendMessage(orderFlow, {
       data: {
         orderId: orderId,
       },
@@ -115,6 +116,7 @@ export async function putOrderHandler(req: SessionRequest, res: Response) {
     return;
   }
 
+  console.log('Publishing order changed event', { id: orderId, userId: result.userId });
   pubsub.publish(ORDER_CHANGED, {
     orderChanged: { id: orderId, userId: result.userId, timestamp: new Date() },
   });
