@@ -20,6 +20,8 @@ import { OrderSummary } from './OrderSummary';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { useNavigate } from 'react-router-dom';
 import { OrderProductPlaceholder } from './OrderProductPlaceholder';
+import { useAppSelector } from '../../app/hooks';
+import { selectChangedOrderIds } from '../../app/reducers/notificationsReducer';
 
 function sortOrdersDesc(o2: Order, o1: Order): number {
   const o1Date = new Date(o1.createdAt).getTime();
@@ -32,12 +34,29 @@ export default function Orders() {
   const [expandedOrderId, setExpandedOrderId] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const changedOrderIds = useAppSelector(selectChangedOrderIds);
 
   const toggleAccordion = (orderId: any) => {
     setExpandedOrderId(expandedOrderId === orderId ? '' : orderId);
   };
 
   useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    // Check if changedOrderIds contained in orders
+    const orderIds = orders.map((order) => order.id);
+    console.info('changedOrderIds and orderIds', changedOrderIds, orderIds);
+    const hasChangedOrders = changedOrderIds?.some((changedOrderId) =>
+      orderIds.includes(changedOrderId),
+    );
+    if (hasChangedOrders) {
+      fetchOrders();
+    }
+  }, [changedOrderIds]);
+
+  function fetchOrders() {
     setLoading(true);
 
     const getOrders = async () => {
@@ -50,7 +69,7 @@ export default function Orders() {
     };
 
     getOrders();
-  }, []);
+  }
 
   return (
     <Card style={{ width: '100%' }} data-testid="feature-orders">

@@ -44,9 +44,6 @@ services:
         condition: service_healthy
     ports:
        - 3567:3567
-    # Use init-env.sh to create a .env file with random postgres credentials
-    # environment:
-    #   POSTGRESQL_CONNECTION_URI: "postgresql://supertokens_user:password@supertoken_db:5432/supertokens_db"
     environment:
       POSTGRESQL_HOST: shop.app.auth.db
       POSTGRESQL_USER: $POSTGRES_USER

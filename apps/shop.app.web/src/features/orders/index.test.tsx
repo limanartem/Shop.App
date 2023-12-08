@@ -1,11 +1,16 @@
 import '@testing-library/jest-dom';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, waitFor } from '@testing-library/react';
 import Orders from '.';
 import { Provider } from 'react-redux';
 import { buildStore } from '../../app/store';
+import { getOrdersAsync } from '../../services/order-service';
+import { randomUUID } from 'crypto';
+import { setChangedOrders } from '../../app/reducers/notificationsReducer';
+import { act } from 'react-dom/test-utils';
+import { delay, mockResolved } from '../../test-helpers';
 
 jest.mock('../../services/order-service', () => ({
-  getOrdersAsync: jest.fn(() => Promise.resolve({orders: []}))
+  getOrdersAsync: jest.fn(() => Promise.resolve({ orders: [] })),
 }));
 
 // Avoid loading store from the local storage
@@ -17,6 +22,7 @@ describe('Feature Orders', () => {
 
   beforeEach(async () => {
     store = buildStore();
+    jest.clearAllMocks();
   });
 
   afterEach(() => {
@@ -31,5 +37,79 @@ describe('Feature Orders', () => {
       </Provider>,
     );
     await expect(await screen.findByTestId('feature-orders')).toBeInTheDocument();
+  });
+
+  it('should fetch data from service', async () => {
+    render(
+      <Provider store={store}>
+        <Orders />
+      </Provider>,
+    );
+    expect(getOrdersAsync).toBeCalled();
+  });
+
+  it('should re-fetch if changed order is in the list', async () => {
+    const changedOrderId = randomUUID();
+    const items = [...Array(5).keys()].map((n) => ({
+      product: {
+        id: randomUUID(),
+        title: `Product ${n + 1}`,
+        description: `Product description ${n + 1}`,
+        price: (n + 1) * (Math.round(Math.random() * 10000) / 100) || 1,
+        currency: 'USD',
+      },
+      quantity: Math.round(Math.random() * 5 * (n + 1)) || 1,
+    }));
+
+    mockResolved(getOrdersAsync, {
+      orders: [
+        { id: changedOrderId, items },
+        { id: randomUUID(), items },
+      ],
+    });
+
+    render(
+      <Provider store={store}>
+        <Orders />
+      </Provider>,
+    );
+
+    await delay(100);
+    act(() => {
+      store.dispatch(setChangedOrders([changedOrderId]));
+    });
+    await waitFor(() => expect(getOrdersAsync).toBeCalledTimes(2));
+  });
+
+  it('should not re-fetch if changed order is not in the list', async () => {
+    const items = [...Array(5).keys()].map((n) => ({
+      product: {
+        id: randomUUID(),
+        title: `Product ${n + 1}`,
+        description: `Product description ${n + 1}`,
+        price: (n + 1) * (Math.round(Math.random() * 10000) / 100) || 1,
+        currency: 'USD',
+      },
+      quantity: Math.round(Math.random() * 5 * (n + 1)) || 1,
+    }));
+
+    mockResolved(getOrdersAsync, {
+      orders: [
+        { id: randomUUID(), items },
+        { id: randomUUID(), items },
+      ],
+    });
+
+    render(
+      <Provider store={store}>
+        <Orders />
+      </Provider>,
+    );
+
+    await delay(100);
+    act(() => {
+      store.dispatch(setChangedOrders([(randomUUID())]));
+    });
+    await waitFor(() => expect(getOrdersAsync).toBeCalledTimes(1));
   });
 });

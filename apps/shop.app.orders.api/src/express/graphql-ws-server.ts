@@ -48,15 +48,15 @@ export const startWsServer = (server: Server) => {
       onSubscribe: (ctx, message) => {
         console.log('Client subscribed', { ctx, message });
       },
-      onNext: (ctx, message, args, result) => {
+      /* onNext: (ctx, message, args, result) => {
         console.log('Next', { ctx, message, args, result });
-      },
+      }, */
       onError: (ctx, message, errors) => {
         console.error('Error', { ctx, message, errors });
       },
-      onComplete: (ctx, message) => {
+      /* onComplete: (ctx, message) => {
         console.log('Complete', { ctx, message });
-      },
+      }, */
       context: (ctx) => ({
         userId: ctx.extra?.userId,
       }),
