@@ -7,8 +7,8 @@ namespace Shop.App.Catalog.Api.Models
     public required string Name { get; set; }
 
     // Navigation Property
-    public virtual required Category ParentCategory { get; set; }
-    public virtual required ICollection<Category> SubCategories { get; set; }
-    public virtual required ICollection<Product> Products { get; set; }
+    public virtual Category? ParentCategory { get; set; }
+    public virtual ICollection<Category>? SubCategories { get; set; }
+    public virtual ICollection<Product>? Products { get; set; }
   }
 }

@@ -23,10 +23,10 @@ namespace Shop.App.Catalog.Api.Db
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
       // Retrieve the connection string from environment variables
-      string host = Environment.GetEnvironmentVariable("DB_HOST") ?? throw new ConfigurationErrorsException("DB_HOST environment variable is not set.");
-      string database = Environment.GetEnvironmentVariable("DB_DATABASE") ?? throw new ConfigurationErrorsException("DB_DATABASE environment variable is not set.");
-      string user = Environment.GetEnvironmentVariable("DB_USER") ?? throw new ConfigurationErrorsException("DB_USER environment variable is not set.");
-      string password = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? throw new ConfigurationErrorsException("DB_PASSWORD environment variable is not set.");
+      string host = Environment.GetEnvironmentVariable("DB_HOST");
+      string database = Environment.GetEnvironmentVariable("DB_DATABASE");
+      string user = Environment.GetEnvironmentVariable("DB_USER");
+      string password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
       string? connectionString = string.IsNullOrEmpty(host)
         ? _configuration.GetConnectionString("defaultConnectionString")

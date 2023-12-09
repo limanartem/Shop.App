@@ -1,19 +1,16 @@
 namespace Shop.App.Catalog.Api.Tests.IntegrationTests;
 
 using System.Net.Http.Json;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using Shop.App.Catalog.Api.Interfaces;
 using Shop.App.Catalog.Api.Models;
 using System.Text.Json;
 
 [Collection("Sequential")]
+[Trait("Category", "Integration")]
 public class ProductEndpointsTests : IClassFixture<TestWebApplicationFactory<Program>>
 {
     private readonly TestWebApplicationFactory<Program> _factory;
     private readonly HttpClient _httpClient;
-    private readonly Moq.Mock<ICatalogService> _catalogServiceMock = new Moq.Mock<ICatalogService>();
-
 
     public ProductEndpointsTests(TestWebApplicationFactory<Program> factory)
     {
@@ -22,7 +19,7 @@ public class ProductEndpointsTests : IClassFixture<TestWebApplicationFactory<Pro
     }
 
     [Fact]
-    public async Task GetProductsShouldReturnProducts()
+    public async Task GetProducts_ReturnsProducts()
     {
         var response = await _httpClient.GetFromJsonAsync<List<Product>>("/products");
         Assert.NotNull(response);
@@ -33,7 +30,7 @@ public class ProductEndpointsTests : IClassFixture<TestWebApplicationFactory<Pro
     }
 
     [Fact]
-    public async Task GetProductsByCategoryShouldReturnProducts()
+    public async Task GetProductsByCategory_ReturnsProducts()
     {
         const int expectedCategory = 69;
         var response = await _httpClient.GetFromJsonAsync<List<Product>>($"/products?categoryId={expectedCategory}");
@@ -45,7 +42,7 @@ public class ProductEndpointsTests : IClassFixture<TestWebApplicationFactory<Pro
     }
 
     [Fact]
-    public async Task SearchProductsByIdShouldReturnProducts()
+    public async Task SearchProductsById_ReturnsProducts()
     {
         var expectedIDs = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
         var response = await _httpClient.PostAsJsonAsync("/products/search", expectedIDs);
@@ -60,7 +57,7 @@ public class ProductEndpointsTests : IClassFixture<TestWebApplicationFactory<Pro
     }
 
     [Fact]
-    public async Task GetCategoriesShouldReturnCategories()
+    public async Task GetCategories_ReturnsCategories()
     {
         var response = await _httpClient.GetFromJsonAsync<List<JsonElement>>("/productCategories");
         Assert.NotNull(response);
