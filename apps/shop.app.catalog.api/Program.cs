@@ -47,3 +47,6 @@ ProductRoutes.Configure(app);
 app.UseCors("myAppCors");
 
 app.Run();
+
+public partial class Program
+{ }

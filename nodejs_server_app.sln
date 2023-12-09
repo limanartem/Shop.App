@@ -5,6 +5,10 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shop.app.catalog.api", "apps\shop.app.catalog.api\shop.app.catalog.api.csproj", "{B2EEE6F7-8111-4A58-A9C6-7FEE90FCFD40}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{0D88A422-3ED2-4E07-AD64-B8DEA75AB360}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shop.app.catalog.api.tests", "apps\shop.app.catalog.api.tests\shop.app.catalog.api.tests.csproj", "{EA9560AF-1CFD-4A85-9C40-BA8BFCDF1414}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,11 +19,18 @@ Global
 		{B2EEE6F7-8111-4A58-A9C6-7FEE90FCFD40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2EEE6F7-8111-4A58-A9C6-7FEE90FCFD40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2EEE6F7-8111-4A58-A9C6-7FEE90FCFD40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA9560AF-1CFD-4A85-9C40-BA8BFCDF1414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA9560AF-1CFD-4A85-9C40-BA8BFCDF1414}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA9560AF-1CFD-4A85-9C40-BA8BFCDF1414}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA9560AF-1CFD-4A85-9C40-BA8BFCDF1414}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D98E119E-C11C-44C3-9E41-F163347447B6}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EA9560AF-1CFD-4A85-9C40-BA8BFCDF1414} = {0D88A422-3ED2-4E07-AD64-B8DEA75AB360}
 	EndGlobalSection
 EndGlobal
