@@ -1,6 +1,7 @@
 # Build Status
 
-[![Build Status](https://github.com/limanartem/Shop.App/actions/workflows/nodejs.yml/badge.svg)](https://github.com/limanartem/Shop.App/actions/workflows/nodejs.yml)
+[![Build Status Node.js](https://github.com/limanartem/Shop.App/actions/workflows/nodejs.yml/badge.svg)](https://github.com/limanartem/Shop.App/actions/workflows/nodejs.yml) [![Build Status .NET](https://github.com/limanartem/Shop.App/actions/workflows/dotnet8.yml/badge.svg)](https://github.com/limanartem/Shop.App/actions/workflows/dotnet8.yml)
+
 
 # Shop.App
 Prototype of the shop app implementation used as a playground for integrating various distributed components.
