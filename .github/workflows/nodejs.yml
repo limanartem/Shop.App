@@ -36,8 +36,7 @@ jobs:
           npm run test
 
       - name: Shop.App.Web Tests
-        working-directory: ./apps/shop.app.web
-        
+        working-directory: ./apps/shop.app.web       
         run: |
           npm install
           npm run lint
