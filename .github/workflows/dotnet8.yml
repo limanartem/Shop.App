@@ -26,6 +26,9 @@ jobs:
     - name: Build
       working-directory: ./apps/shop.app.catalog.api
       run: dotnet build --no-restore
+    - name: Build Test
+      working-directory: ./apps/shop.app.catalog.api.tests
+      run: dotnet build
     - name: Test
       working-directory: ./apps/shop.app.catalog.api.tests
-      run: dotnet test --verbosity normal
+      run: dotnet test --no-restore --verbosity normal
