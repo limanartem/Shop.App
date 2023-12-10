@@ -1,4 +1,4 @@
-namespace Shop.App.Catalog.Api.Tests.IntegrationTests;
+namespace Shop.App.Catalog.Api.Tests;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;

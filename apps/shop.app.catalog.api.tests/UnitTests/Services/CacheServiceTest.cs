@@ -1,4 +1,4 @@
-namespace Shop.App.Catalog.Api.Tests.IntegrationTests;
+namespace Shop.App.Catalog.Api.Tests.UnitTests;
 
 using Moq;
 using Shop.App.Catalog.Api.Interfaces;
