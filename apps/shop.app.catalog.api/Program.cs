@@ -18,7 +18,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>();
-builder.Services.AddSingleton<ICatalogService, CatalogService>();
+builder.Services.AddScoped<ICatalogService, CatalogService>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddSingleton<ICacheDatabaseProvider, CacheDbContext>();
 
