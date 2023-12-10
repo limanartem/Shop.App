@@ -15,6 +15,11 @@ public class CacheService : ICacheService
   private const int CATEGORIES_CACHE_TTL_SECONDS = 60 * 60; // 1 hour in seconds
   public const string CATEGORIES_CACHE_KEY = "CATEGORIES";
   private readonly IDatabase _database;
+  private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+  {
+    ReferenceHandler = ReferenceHandler.IgnoreCycles,
+    UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip
+  };
 
   public CacheService(ICacheDatabaseProvider redis)
   {
@@ -33,40 +38,50 @@ public class CacheService : ICacheService
     {
       if (!_database.IsConnected(CATEGORIES_CACHE_KEY))
       {
-        Console.WriteLine("Redis connection error. Returning categories from database.");
+        Console.WriteLine("Redis connection error. Returning categories from the database.");
         return getCategories();
       }
+
       var categories = await _database.StringGetAsync(CATEGORIES_CACHE_KEY);
 
       if (categories.IsNull)
       {
-        var categories1 = getCategories();
-        var categoriesFromDb = categories1 is IAsyncEnumerable<Category>
-          ? await categories1.AsQueryable().ToListAsync()
-          : categories1.ToList();
-        await _database.StringSetAsync(CATEGORIES_CACHE_KEY,
-          new RedisValue(JsonSerializer.Serialize(
-            categoriesFromDb.ToArray(),
-            new JsonSerializerOptions()
-            {
-              ReferenceHandler = ReferenceHandler.IgnoreCycles
-            })
-           ), TimeSpan.FromSeconds(CATEGORIES_CACHE_TTL_SECONDS)
-        );
+        var categoriesFromDb = await GetCategoriesFromDatabase(getCategories);
+        await CacheCategories(categoriesFromDb);
         return categoriesFromDb.AsQueryable();
       }
 
-      return JsonSerializer.Deserialize<Category[]>(categories.ToString(), new JsonSerializerOptions()
-      {
-        ReferenceHandler = ReferenceHandler.IgnoreCycles,
-        UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip
-      }) ?? [];
+      return DeserializeCategories(categories);
     }
     catch (RedisConnectionException ex)
     {
       Console.Error.WriteLine(ex.ToString());
-      Console.WriteLine("Redis connection error. Returning categories from database.");
+      Console.WriteLine("Redis connection error. Returning categories from the database.");
       return getCategories();
     }
+  }
+
+  private static async Task<IEnumerable<Category>> GetCategoriesFromDatabase(Func<IEnumerable<Category>> getCategories)
+  {
+    var categories = getCategories();
+    var categoriesFromDb = categories is IAsyncEnumerable<Category>
+      ? await categories.AsQueryable().ToListAsync()
+      : categories.ToList();
+    return categoriesFromDb;
+  }
+
+  private async Task CacheCategories(IEnumerable<Category> categoriesFromDb)
+  {
+    await _database.StringSetAsync(CATEGORIES_CACHE_KEY,
+      new RedisValue(JsonSerializer.Serialize(
+        categoriesFromDb.ToArray(),
+        _jsonSerializerOptions)
+      ), TimeSpan.FromSeconds(CATEGORIES_CACHE_TTL_SECONDS));
+  }
+
+  private static IEnumerable<Category> DeserializeCategories(RedisValue categories)
+  {
+    return JsonSerializer.Deserialize<Category[]>(categories.ToString(), _jsonSerializerOptions)
+      ?? Array.Empty<Category>();
   }
 }
