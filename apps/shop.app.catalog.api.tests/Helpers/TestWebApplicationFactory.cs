@@ -1,4 +1,4 @@
-namespace Shop.App.Catalog.Api.Tests.IntegrationTests;
+namespace Shop.App.Catalog.Api.Tests;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -25,31 +25,28 @@ public class TestWebApplicationFactory<TProgram>
       catalogServiceMock.Setup(s => s.Products())
           .Returns(new List<Product>
           {
-            new Product
-            {
-                Id = Guid.NewGuid(),
-                Title = "Test Product",
-                Description = "Test Product Description",
-                Price = 100,
-                Currency = "EUR",
-                CategoryId = 1
+            new Product {
+              Id = Guid.NewGuid(),
+              Title = "Test Product",
+              Description = "Test Product Description",
+              Price = 100,
+              Currency = "EUR",
+              CategoryId = 1,
             },
-            new Product
-            {
+            new() {
                 Id = Guid.NewGuid(),
                 Title = "Test Product 2",
                 Description = "Test Product Description 2",
                 Price = 200.50M,
                 Currency = "EUR",
-                CategoryId = 2
+                CategoryId = 2,
             }
           }.AsQueryable());
 
       catalogServiceMock.Setup(s => s.Products(It.IsAny<int>()))
         .Returns((int categoryId) => Task.FromResult(new List<Product>
         {
-          new Product
-          {
+          new() {
               Id = Guid.NewGuid(),
               Title = "Test Product",
               Description = "Test Product Description",
@@ -57,8 +54,7 @@ public class TestWebApplicationFactory<TProgram>
               Currency = "EUR",
               CategoryId = categoryId
           },
-          new Product
-          {
+          new() {
               Id = Guid.NewGuid(),
               Title = "Test Product 2",
               Description = "Test Product Description 2",
@@ -82,21 +78,19 @@ public class TestWebApplicationFactory<TProgram>
         .AsQueryable());
 
       catalogServiceMock.Setup(s => s.Categories())
-        .Returns(new List<Category>
+        .Returns(Task.FromResult(new List<Category>
         {
-            new Category
-            {
+            new() {
               Id = 1,
               Name = "Test Category 1",
               ParentCategoryId = null
             },
-            new Category
-            {
+            new() {
               Id = 2,
               Name = "Test Category 2",
               ParentCategoryId = 1
             }
-        }.AsQueryable());
+        }.AsQueryable()));
 
       services.AddSingleton(catalogServiceMock.Object);
     });

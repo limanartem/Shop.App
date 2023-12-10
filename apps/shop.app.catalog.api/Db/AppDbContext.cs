@@ -1,19 +1,28 @@
 namespace Shop.App.Catalog.Api.Db
 {
+  using System.Configuration;
   using Microsoft.EntityFrameworkCore;
   using Microsoft.Extensions.Configuration;
   using Shop.App.Catalog.Api.Models;
 
+  /// <summary>
+  /// Represents the database context for the application.
+  /// </summary>
   public class AppDbContext : DbContext
   {
-    public DbSet<Category> Categories { get; set; }
-    public DbSet<Product> Products { get; set; }
+    public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<Product> Products { get; set; }
 
     private readonly IConfiguration _configuration;
 
     public AppDbContext(IConfiguration configuration)
     {
       _configuration = configuration;
+    }
+
+    public AppDbContext()
+    {
+      // Required for testing
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

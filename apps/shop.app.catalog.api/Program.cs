@@ -5,29 +5,38 @@ using Microsoft.AspNetCore.Diagnostics;
 using Shop.App.Catalog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure CORS policy
 builder.Services.AddCors(options =>
 {
   options.AddPolicy("myAppCors", policy =>
   {
     policy.WithOrigins("*")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        .AllowAnyHeader()
+        .AllowAnyMethod();
   });
 });
 
 builder.Services.AddDbContext<AppDbContext>();
 builder.Services.AddScoped<ICatalogService, CatalogService>();
+builder.Services.AddSingleton<ICacheService, CacheService>();
+builder.Services.AddSingleton<ICacheDatabaseProvider, CacheDbContext>();
+
+// Configure JSON serialization options
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
   // options.SerializerOptions.MaxDepth = 2;
   // options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 });
-builder.Services.AddProblemDetails();
-builder.Services.Configure<RouteHandlerOptions>(options => options.ThrowOnBadRequest = true);
 
+builder.Services.AddProblemDetails();
+
+// Configure RouteHandlerOptions to throw on bad request
+builder.Services.Configure<RouteHandlerOptions>(options => options.ThrowOnBadRequest = true);
 
 var app = builder.Build();
 
+// Configure global exception handling
 app.UseExceptionHandler(exceptionHandlerApp =>
 {
   exceptionHandlerApp.Run(async httpContext =>
@@ -42,8 +51,10 @@ app.UseExceptionHandler(exceptionHandlerApp =>
 
 app.UseStatusCodePages();
 
+// Configure product routes
 ProductRoutes.Configure(app);
 
+// Apply CORS policy
 app.UseCors("myAppCors");
 
 app.Run();

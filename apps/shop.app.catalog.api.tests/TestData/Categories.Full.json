@@ -1,0 +1,567 @@
+[
+  {
+    "$id": "1",
+    "Id": 1,
+    "ParentCategoryId": null,
+    "Name": "Electronics",
+    "ParentCategory": null,
+    "SubCategories": {
+      "$id": "2",
+      "$values": [
+        {
+          "$id": "3",
+          "Id": 6,
+          "ParentCategoryId": 1,
+          "Name": "Smartphones",
+          "ParentCategory": { "$ref": "1" },
+          "SubCategories": {
+            "$id": "4",
+            "$values": [
+              {
+                "$id": "5",
+                "Id": 21,
+                "ParentCategoryId": 6,
+                "Name": "High-End Smartphones",
+                "ParentCategory": { "$ref": "3" },
+                "SubCategories": {
+                  "$id": "6",
+                  "$values": [
+                    {
+                      "$id": "7",
+                      "Id": 43,
+                      "ParentCategoryId": 21,
+                      "Name": "Premium Smartphones",
+                      "ParentCategory": { "$ref": "5" },
+                      "SubCategories": null,
+                      "Products": null
+                    },
+                    {
+                      "$id": "8",
+                      "Id": 44,
+                      "ParentCategoryId": 21,
+                      "Name": "Budget Smartphones",
+                      "ParentCategory": { "$ref": "5" },
+                      "SubCategories": null,
+                      "Products": null
+                    }
+                  ]
+                },
+                "Products": null
+              },
+              {
+                "$id": "9",
+                "Id": 22,
+                "ParentCategoryId": 6,
+                "Name": "Budget Smartphones",
+                "ParentCategory": { "$ref": "3" },
+                "SubCategories": {
+                  "$id": "10",
+                  "$values": [
+                    {
+                      "$id": "11",
+                      "Id": 45,
+                      "ParentCategoryId": 22,
+                      "Name": "Gaming Laptops",
+                      "ParentCategory": { "$ref": "9" },
+                      "SubCategories": null,
+                      "Products": null
+                    },
+                    {
+                      "$id": "12",
+                      "Id": 46,
+                      "ParentCategoryId": 22,
+                      "Name": "Business Laptops",
+                      "ParentCategory": { "$ref": "9" },
+                      "SubCategories": null,
+                      "Products": null
+                    }
+                  ]
+                },
+                "Products": null
+              }
+            ]
+          },
+          "Products": null
+        },
+        {
+          "$id": "13",
+          "Id": 7,
+          "ParentCategoryId": 1,
+          "Name": "Laptops",
+          "ParentCategory": { "$ref": "1" },
+          "SubCategories": {
+            "$id": "14",
+            "$values": [
+              {
+                "$id": "15",
+                "Id": 23,
+                "ParentCategoryId": 7,
+                "Name": "Gaming Laptops",
+                "ParentCategory": { "$ref": "13" },
+                "SubCategories": {
+                  "$id": "16",
+                  "$values": [
+                    {
+                      "$id": "17",
+                      "Id": 47,
+                      "ParentCategoryId": 23,
+                      "Name": "Casual Men\u0027s Shirts",
+                      "ParentCategory": { "$ref": "15" },
+                      "SubCategories": null,
+                      "Products": null
+                    },
+                    {
+                      "$id": "18",
+                      "Id": 48,
+                      "ParentCategoryId": 23,
+                      "Name": "Formal Men\u0027s Shirts",
+                      "ParentCategory": { "$ref": "15" },
+                      "SubCategories": null,
+                      "Products": null
+                    }
+                  ]
+                },
+                "Products": null
+              },
+              {
+                "$id": "19",
+                "Id": 24,
+                "ParentCategoryId": 7,
+                "Name": "Business Laptops",
+                "ParentCategory": { "$ref": "13" },
+                "SubCategories": {
+                  "$id": "20",
+                  "$values": [
+                    {
+                      "$id": "21",
+                      "Id": 49,
+                      "ParentCategoryId": 24,
+                      "Name": "Summer Dresses",
+                      "ParentCategory": { "$ref": "19" },
+                      "SubCategories": null,
+                      "Products": null
+                    },
+                    {
+                      "$id": "22",
+                      "Id": 50,
+                      "ParentCategoryId": 24,
+                      "Name": "Evening Gowns",
+                      "ParentCategory": { "$ref": "19" },
+                      "SubCategories": null,
+                      "Products": null
+                    }
+                  ]
+                },
+                "Products": null
+              }
+            ]
+          },
+          "Products": null
+        },
+        {
+          "$id": "23",
+          "Id": 8,
+          "ParentCategoryId": 1,
+          "Name": "Accessories",
+          "ParentCategory": { "$ref": "1" },
+          "SubCategories": null,
+          "Products": null
+        }
+      ]
+    },
+    "Products": null
+  },
+  {
+    "$id": "24",
+    "Id": 2,
+    "ParentCategoryId": null,
+    "Name": "Clothes",
+    "ParentCategory": null,
+    "SubCategories": {
+      "$id": "25",
+      "$values": [
+        {
+          "$id": "26",
+          "Id": 9,
+          "ParentCategoryId": 2,
+          "Name": "Men\u0027s Clothing",
+          "ParentCategory": { "$ref": "24" },
+          "SubCategories": {
+            "$id": "27",
+            "$values": [
+              {
+                "$id": "28",
+                "Id": 25,
+                "ParentCategoryId": 9,
+                "Name": "Men\u0027s Shirts",
+                "ParentCategory": { "$ref": "26" },
+                "SubCategories": {
+                  "$id": "29",
+                  "$values": [
+                    {
+                      "$id": "30",
+                      "Id": 51,
+                      "ParentCategoryId": 25,
+                      "Name": "Superhero Shirts",
+                      "ParentCategory": { "$ref": "28" },
+                      "SubCategories": null,
+                      "Products": null
+                    },
+                    {
+                      "$id": "31",
+                      "Id": 52,
+                      "ParentCategoryId": 25,
+                      "Name": "Casual Men\u0027s Pants",
+                      "ParentCategory": { "$ref": "28" },
+                      "SubCategories": null,
+                      "Products": null
+                    }
+                  ]
+                },
+                "Products": null
+              },
+              {
+                "$id": "32",
+                "Id": 26,
+                "ParentCategoryId": 9,
+                "Name": "Men\u0027s Pants",
+                "ParentCategory": { "$ref": "26" },
+                "SubCategories": {
+                  "$id": "33",
+                  "$values": [
+                    {
+                      "$id": "34",
+                      "Id": 53,
+                      "ParentCategoryId": 26,
+                      "Name": "Formal Women\u0027s Dresses",
+                      "ParentCategory": { "$ref": "32" },
+                      "SubCategories": null,
+                      "Products": null
+                    }
+                  ]
+                },
+                "Products": null
+              }
+            ]
+          },
+          "Products": null
+        },
+        {
+          "$id": "35",
+          "Id": 10,
+          "ParentCategoryId": 2,
+          "Name": "Women\u0027s Clothing",
+          "ParentCategory": { "$ref": "24" },
+          "SubCategories": {
+            "$id": "36",
+            "$values": [
+              {
+                "$id": "37",
+                "Id": 27,
+                "ParentCategoryId": 10,
+                "Name": "Women\u0027s Dresses",
+                "ParentCategory": { "$ref": "35" },
+                "SubCategories": null,
+                "Products": null
+              },
+              {
+                "$id": "38",
+                "Id": 28,
+                "ParentCategoryId": 10,
+                "Name": "Women\u0027s Skirts",
+                "ParentCategory": { "$ref": "35" },
+                "SubCategories": null,
+                "Products": null
+              }
+            ]
+          },
+          "Products": null
+        },
+        {
+          "$id": "39",
+          "Id": 11,
+          "ParentCategoryId": 2,
+          "Name": "Footwear",
+          "ParentCategory": { "$ref": "24" },
+          "SubCategories": null,
+          "Products": null
+        }
+      ]
+    },
+    "Products": null
+  },
+  {
+    "$id": "40",
+    "Id": 3,
+    "ParentCategoryId": null,
+    "Name": "Toys",
+    "ParentCategory": null,
+    "SubCategories": {
+      "$id": "41",
+      "$values": [
+        {
+          "$id": "42",
+          "Id": 12,
+          "ParentCategoryId": 3,
+          "Name": "Action Figures",
+          "ParentCategory": { "$ref": "40" },
+          "SubCategories": {
+            "$id": "43",
+            "$values": [
+              {
+                "$id": "44",
+                "Id": 29,
+                "ParentCategoryId": 12,
+                "Name": "Superhero Action Figures",
+                "ParentCategory": { "$ref": "42" },
+                "SubCategories": null,
+                "Products": null
+              },
+              {
+                "$id": "45",
+                "Id": 30,
+                "ParentCategoryId": 12,
+                "Name": "Animal Toy Figures",
+                "ParentCategory": { "$ref": "42" },
+                "SubCategories": null,
+                "Products": null
+              }
+            ]
+          },
+          "Products": null
+        },
+        {
+          "$id": "46",
+          "Id": 13,
+          "ParentCategoryId": 3,
+          "Name": "Board Games",
+          "ParentCategory": { "$ref": "40" },
+          "SubCategories": {
+            "$id": "47",
+            "$values": [
+              {
+                "$id": "48",
+                "Id": 31,
+                "ParentCategoryId": 13,
+                "Name": "Strategic Board Games",
+                "ParentCategory": { "$ref": "46" },
+                "SubCategories": null,
+                "Products": null
+              },
+              {
+                "$id": "49",
+                "Id": 32,
+                "ParentCategoryId": 13,
+                "Name": "Family Board Games",
+                "ParentCategory": { "$ref": "46" },
+                "SubCategories": null,
+                "Products": null
+              }
+            ]
+          },
+          "Products": null
+        },
+        {
+          "$id": "50",
+          "Id": 14,
+          "ParentCategoryId": 3,
+          "Name": "Outdoor Toys",
+          "ParentCategory": { "$ref": "40" },
+          "SubCategories": null,
+          "Products": null
+        }
+      ]
+    },
+    "Products": null
+  },
+  {
+    "$id": "51",
+    "Id": 4,
+    "ParentCategoryId": null,
+    "Name": "PC Accessories",
+    "ParentCategory": null,
+    "SubCategories": {
+      "$id": "52",
+      "$values": [
+        {
+          "$id": "53",
+          "Id": 15,
+          "ParentCategoryId": 4,
+          "Name": "Keyboards",
+          "ParentCategory": { "$ref": "51" },
+          "SubCategories": {
+            "$id": "54",
+            "$values": [
+              {
+                "$id": "55",
+                "Id": 33,
+                "ParentCategoryId": 15,
+                "Name": "Mechanical Keyboards",
+                "ParentCategory": { "$ref": "53" },
+                "SubCategories": null,
+                "Products": null
+              },
+              {
+                "$id": "56",
+                "Id": 34,
+                "ParentCategoryId": 15,
+                "Name": "Wireless Keyboards",
+                "ParentCategory": { "$ref": "53" },
+                "SubCategories": null,
+                "Products": null
+              }
+            ]
+          },
+          "Products": null
+        },
+        {
+          "$id": "57",
+          "Id": 16,
+          "ParentCategoryId": 4,
+          "Name": "Mice",
+          "ParentCategory": { "$ref": "51" },
+          "SubCategories": {
+            "$id": "58",
+            "$values": [
+              {
+                "$id": "59",
+                "Id": 35,
+                "ParentCategoryId": 16,
+                "Name": "Wired Mice",
+                "ParentCategory": { "$ref": "57" },
+                "SubCategories": null,
+                "Products": null
+              },
+              {
+                "$id": "60",
+                "Id": 36,
+                "ParentCategoryId": 16,
+                "Name": "Wireless Mice",
+                "ParentCategory": { "$ref": "57" },
+                "SubCategories": null,
+                "Products": null
+              }
+            ]
+          },
+          "Products": null
+        },
+        {
+          "$id": "61",
+          "Id": 17,
+          "ParentCategoryId": 4,
+          "Name": "Monitors",
+          "ParentCategory": { "$ref": "51" },
+          "SubCategories": null,
+          "Products": null
+        }
+      ]
+    },
+    "Products": null
+  },
+  {
+    "$id": "62",
+    "Id": 5,
+    "ParentCategoryId": null,
+    "Name": "Home \u0026 Furniture",
+    "ParentCategory": null,
+    "SubCategories": {
+      "$id": "63",
+      "$values": [
+        {
+          "$id": "64",
+          "Id": 18,
+          "ParentCategoryId": 5,
+          "Name": "Living Room",
+          "ParentCategory": { "$ref": "62" },
+          "SubCategories": {
+            "$id": "65",
+            "$values": [
+              {
+                "$id": "66",
+                "Id": 37,
+                "ParentCategoryId": 18,
+                "Name": "Living Room Sofas",
+                "ParentCategory": { "$ref": "64" },
+                "SubCategories": null,
+                "Products": null
+              },
+              {
+                "$id": "67",
+                "Id": 38,
+                "ParentCategoryId": 18,
+                "Name": "Living Room Coffee Tables",
+                "ParentCategory": { "$ref": "64" },
+                "SubCategories": null,
+                "Products": null
+              }
+            ]
+          },
+          "Products": null
+        },
+        {
+          "$id": "68",
+          "Id": 19,
+          "ParentCategoryId": 5,
+          "Name": "Bedroom",
+          "ParentCategory": { "$ref": "62" },
+          "SubCategories": {
+            "$id": "69",
+            "$values": [
+              {
+                "$id": "70",
+                "Id": 39,
+                "ParentCategoryId": 19,
+                "Name": "Bedroom Beds",
+                "ParentCategory": { "$ref": "68" },
+                "SubCategories": null,
+                "Products": null
+              },
+              {
+                "$id": "71",
+                "Id": 40,
+                "ParentCategoryId": 19,
+                "Name": "Bedroom Wardrobes",
+                "ParentCategory": { "$ref": "68" },
+                "SubCategories": null,
+                "Products": null
+              }
+            ]
+          },
+          "Products": null
+        },
+        {
+          "$id": "72",
+          "Id": 20,
+          "ParentCategoryId": 5,
+          "Name": "Kitchen",
+          "ParentCategory": { "$ref": "62" },
+          "SubCategories": {
+            "$id": "73",
+            "$values": [
+              {
+                "$id": "74",
+                "Id": 41,
+                "ParentCategoryId": 20,
+                "Name": "Kitchen Cookware",
+                "ParentCategory": { "$ref": "72" },
+                "SubCategories": null,
+                "Products": null
+              },
+              {
+                "$id": "75",
+                "Id": 42,
+                "ParentCategoryId": 20,
+                "Name": "Kitchen Utensils",
+                "ParentCategory": { "$ref": "72" },
+                "SubCategories": null,
+                "Products": null
+              }
+            ]
+          },
+          "Products": null
+        }
+      ]
+    },
+    "Products": null
+  }
+]
