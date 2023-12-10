@@ -10,7 +10,7 @@ namespace Shop.App.Catalog.Api.Interfaces {
     /// Gets all categories.
     /// </summary>
     /// <returns>An <see cref="IQueryable{T}"/> of <see cref="Category"/>.</returns>
-    IQueryable<Category> Categories();
+    Task<IQueryable<Category>> Categories();
 
     /// <summary>
     /// Gets all products.

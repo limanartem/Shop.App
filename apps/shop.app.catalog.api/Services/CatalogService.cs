@@ -11,19 +11,21 @@ namespace Shop.App.Catalog.Api.Services
   public class CatalogService : ICatalogService
   {
     private readonly AppDbContext context;
+    private readonly ICacheService cacheService;
 
-    public CatalogService(AppDbContext context)
+    public CatalogService(AppDbContext context, ICacheService cacheService)
     {
       this.context = context;
+      this.cacheService = cacheService;
     }
 
     /// <summary>
     /// Retrieves all categories.
     /// </summary>
     /// <returns>An <see cref="IQueryable{T}"/> of <see cref="Category"/> representing all categories.</returns>
-    public IQueryable<Category> Categories()
+    public async Task<IQueryable<Category>> Categories()
     {
-      return context.Categories;
+      return (await cacheService.Categories(() => context.Categories)).AsQueryable();
     }
 
     /// <summary>
@@ -59,7 +61,7 @@ namespace Shop.App.Catalog.Api.Services
 
     private async Task<IEnumerable<int>> GetAllNestedCategories(int parentCategoryId)
     {
-      var categories = await Categories().ToListAsync();
+      var categories = await Categories();
       var categoryIds = new HashSet<int>();
       var stack = new Stack<int>();
       stack.Push(parentCategoryId);

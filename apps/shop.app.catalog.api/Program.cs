@@ -18,7 +18,9 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>();
-builder.Services.AddScoped<ICatalogService, CatalogService>();
+builder.Services.AddSingleton<ICatalogService, CatalogService>();
+builder.Services.AddSingleton<ICacheService, CacheService>();
+builder.Services.AddSingleton<ICacheDatabaseProvider, CacheDbContext>();
 
 // Configure JSON serialization options
 builder.Services.ConfigureHttpJsonOptions(options =>

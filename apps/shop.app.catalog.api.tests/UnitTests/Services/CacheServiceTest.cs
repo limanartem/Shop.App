@@ -35,7 +35,7 @@ public class CacheServiceTests
         var cacheService = new CacheService(mockProvider.Object);
 
         // Act
-        var result = await cacheService.Categories(() => Task.FromResult<IEnumerable<Category>>(expectedCategories));
+        var result = await cacheService.Categories(() => expectedCategories.AsQueryable());
 
         // Assert
         Assert.Equivalent(expectedCategories, result);

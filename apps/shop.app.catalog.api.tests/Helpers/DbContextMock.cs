@@ -20,6 +20,15 @@ public static class DbContextMock
     return dbContext.Object;
   }
 
+    public static Mock<TContext> ContextMock<TData, TContext>(
+      IEnumerable<TData> data,
+      Expression<Func<TContext, DbSet<TData>>> dbSetSelectionExpression)
+        where TData : class
+        where TContext : DbContext
+  {
+    return ContextMock(null, data, dbSetSelectionExpression);
+  }
+
   public static Mock<TContext> ContextMock<TData, TContext>(
     this Mock<TContext>? mock,
     IEnumerable<TData> data,
@@ -57,9 +66,13 @@ public static class DbContextMock
   {
     Mock<DbSet<TData>> dbSetMock = new Mock<DbSet<TData>>();
     Mock<TContext> dbContext = mock ?? new Mock<TContext>();
+    
     dbSetMock.As<IAsyncEnumerable<TData>>()
       .Setup(s => s.GetAsyncEnumerator(default))
       .Returns(data.GetAsyncEnumerator(default));
+    dbSetMock.As<IQueryable<TData>>().Setup(s => s.GetEnumerator()).Returns(() => data.ToEnumerable().GetEnumerator());
+
+
     dbContext
       .Setup(dbSetSelectionExpression)
       .Returns(dbSetMock.Object);

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Shop.App.Catalog.Api.Interfaces;
 using Shop.App.Catalog.Api.Models;
 using StackExchange.Redis;
@@ -23,18 +24,21 @@ public class CacheService : ICacheService
   /// </summary>
   /// <param name="getCategories">A function that retrieves the categories from the database.</param>
   /// <returns>The categories.</returns>
-  public async Task<IEnumerable<Category>> Categories(Func<Task<IEnumerable<Category>>> getCategories)
+  public async Task<IEnumerable<Category>> Categories(Func<IEnumerable<Category>> getCategories)
   {
     var categories = await _database.StringGetAsync("categories");
 
     if (categories.IsNull)
     {
-      var categoriesFromDb = await getCategories();
+      var categories1 = getCategories();
+      var categoriesFromDb = categories1 is IAsyncEnumerable<Category>
+        ? await categories1.AsQueryable().ToListAsync()
+        : categories1.ToList();
       await _database.StringSetAsync("categories",
         new RedisValue(JsonSerializer.Serialize(categoriesFromDb.ToArray())));
-      return categoriesFromDb;
+      return categoriesFromDb.AsQueryable();
     }
 
-    return JsonSerializer.Deserialize<Category[]>(categories.ToString());
+    return JsonSerializer.Deserialize<Category[]>(categories.ToString()).AsQueryable();
   }
 }

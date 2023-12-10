@@ -78,7 +78,7 @@ public class TestWebApplicationFactory<TProgram>
         .AsQueryable());
 
       catalogServiceMock.Setup(s => s.Categories())
-        .Returns(new List<Category>
+        .Returns(Task.FromResult(new List<Category>
         {
             new() {
               Id = 1,
@@ -90,7 +90,7 @@ public class TestWebApplicationFactory<TProgram>
               Name = "Test Category 2",
               ParentCategoryId = 1
             }
-        }.AsQueryable());
+        }.AsQueryable()));
 
       services.AddSingleton(catalogServiceMock.Object);
     });

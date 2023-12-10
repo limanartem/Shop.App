@@ -20,7 +20,12 @@ namespace Shop.App.Catalog
       async (HttpContext context) =>
       {
         var catalogService = context.RequestServices.GetService<ICatalogService>();
-        var categories = catalogService?.Categories();
+        if (catalogService == null)
+        {
+          throw new NullReferenceException($"Not able to resolve {typeof(ICatalogService)} from service container");
+        }
+
+        var categories = await catalogService.Categories();
 
         await context.Response.WriteAsJsonAsync(
           categories?
@@ -39,7 +44,12 @@ namespace Shop.App.Catalog
           try
           {
             var catalogService = context.RequestServices.GetService<ICatalogService>();
-            var products = catalogService?.Products(ids);
+            if (catalogService == null)
+            {
+              throw new NullReferenceException($"Not able to resolve {typeof(ICatalogService)} from service container");
+            }
+
+            var products = catalogService.Products(ids);
 
             await context.Response.WriteAsJsonAsync(
               products?
