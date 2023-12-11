@@ -1,4 +1,4 @@
-import { createOrder, getOrdersExpanded, updateOrder, getOrderExpanded } from '../data-utils';
+import { createOrder, getOrdersExpanded, updateOrder, getOrderExpanded } from '../domain/orders';
 import request from 'supertest';
 import { start } from '../express/server';
 import { StatusCodes } from 'http-status-codes';
@@ -7,13 +7,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { SessionRequest, middleware } from 'supertokens-node/framework/express';
 import { NextFunction } from 'express';
 import { CreateOrderRequest, ProductItem } from '../model';
-import { sendMessage } from '../amqp-utils';
+import { sendMessage } from '../utils/amqp';
 import { ObjectId } from 'mongodb';
-import { verifyUserRole } from '../auth';
+import { verifyUserRole } from '../utils/auth';
 import { OrderStatuses } from '../model/orders-model';
 import { mockImpl } from './utils';
 
-jest.mock('../data-utils', () => ({
+jest.mock('../domain/orders', () => ({
   createOrder: jest.fn(),
   getOrdersExpanded: jest.fn(),
   getOrderExpanded: jest.fn(),
@@ -21,7 +21,7 @@ jest.mock('../data-utils', () => ({
   updateOrder: jest.fn(() => Promise.resolve(true)),
 }));
 
-jest.mock('../auth', () => ({
+jest.mock('../utils/auth', () => ({
   verifyUserRole: jest.fn(() => () => {}),
   initAuth: jest.fn(() => () => {}),
 }));
@@ -35,7 +35,7 @@ jest.mock('supertokens-node/framework/express', () => ({
   middleware: jest.fn(() => () => {}),
 }));
 
-jest.mock('../amqp-utils');
+jest.mock('../utils/amqp');
 
 const mockSession = (expectedUserId: string) => {
   mockImpl(middleware, () => {

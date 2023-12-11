@@ -1,6 +1,6 @@
 import express from 'express';
 import { middleware, errorHandler } from 'supertokens-node/framework/express';
-import { initAuth } from '../auth';
+import { initAuth } from '../utils/auth';
 import { routerFactory } from './order-routes';
 import cors from 'cors';
 import { StatusCodes } from 'http-status-codes';
