@@ -1,24 +1,24 @@
 /**
  * Express middleware for CSRF protection.
  * Generates and validates CSRF tokens using the double submit cookie pattern.
- * 
+ *
  * @remarks
  * This middleware uses the `csrf-csrf` library to handle CSRF protection.
  * It generates a CSRF token and attaches it to the response as a JSON object.
  * The token can then be used to validate subsequent requests.
- * 
+ *
  * @example
  * // Generate CSRF token
  * router.get('/csrf-token', (req, res) => {
  *   const csrfToken = generateToken(req, res);
  *   res.json({ csrfToken });
  * });
- * 
+ *
  * // Validate CSRF token
  * router.post('/csrf-token-check', doubleCsrfProtection, (req, res) => {
  *   res.json({ message: 'CSRF token accepted' });
  * });
- * 
+ *
  * @returns The router middleware for CSRF protection.
  */
 import express from 'express';
@@ -60,3 +60,5 @@ export const routerFactory = () => {
 
   return router;
 };
+
+export { doubleCsrfProtection as csrfMiddleware };

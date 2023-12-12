@@ -8,6 +8,7 @@ import {
   putOrderItemHandler,
   getOrderHandler,
 } from './handlers';
+import { csrfMiddleware } from '../csrf';
 
 /**
  * Creates a router for handling order routes.
@@ -17,7 +18,7 @@ export const routerFactory = () => {
   const router = express.Router();
 
   router
-    .post('/orders', verifySession(), postOrdersHandler)
+    .post('/orders', verifySession(), csrfMiddleware, postOrdersHandler)
     .get('/orders', verifySession(), getOrdersHandler)
     .get('/orders/:id', verifySession(), getOrderHandler)
     .put('/order/:id', verifySession(), verifyUserRole('api'), putOrderHandler) //TODO: should be deprecated

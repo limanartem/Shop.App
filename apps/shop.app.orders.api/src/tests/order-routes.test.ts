@@ -35,7 +35,6 @@ jest.mock('supertokens-node/framework/express', () => ({
   middleware: jest.fn(() => () => {}),
 }));
 
-jest.mock('../utils/amqp');
 
 const mockSession = (expectedUserId: string) => {
   mockImpl(middleware, () => {
