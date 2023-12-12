@@ -46,7 +46,7 @@ export const initAuth = () => {
       apiBasePath: '/auth',
     },
     recipeList: [
-      Session.init(), // initializes session features
+      Session.init(), // initializes session features 
       UserRoles.init(),
     ],
   });

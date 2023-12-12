@@ -18,7 +18,8 @@ export const routerFactory = () => {
   const router = express.Router();
 
   router
-    .post('/orders', verifySession(), csrfMiddleware, postOrdersHandler)
+    .post('/orders', verifySession(), postOrdersHandler)
+    .post('/orders-csrf', verifySession(), csrfMiddleware, postOrdersHandler)
     .get('/orders', verifySession(), getOrdersHandler)
     .get('/orders/:id', verifySession(), getOrderHandler)
     .put('/order/:id', verifySession(), verifyUserRole('api'), putOrderHandler) //TODO: should be deprecated
