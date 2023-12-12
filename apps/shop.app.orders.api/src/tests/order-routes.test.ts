@@ -1,6 +1,6 @@
 import { createOrder, getOrdersExpanded, updateOrder, getOrderExpanded } from '../domain/orders';
 import request from 'supertest';
-import { start } from '../express/server';
+import { start } from '../express/express-server';
 import { StatusCodes } from 'http-status-codes';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { v4 as uuidv4 } from 'uuid';
