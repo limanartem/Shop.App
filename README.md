@@ -6,7 +6,7 @@
 # Shop.App
 Prototype of the shop app implementation used as a playground for integrating various distributed components.
 
-## Project Setup
+## Project Structure
 The project is structured as a monorepo using npm workspaces. This structure primarily applies to node.js-based projects, although other projects (e.g., .NET projects) would follow a similar arrangement.
 
 - Standalone applications reside in the `/apps` folder and do not rely on each other from a package reference standpoint.
@@ -14,15 +14,17 @@ The project is structured as a monorepo using npm workspaces. This structure pri
   - Each package in the `/packages` folder needs to be built before consuming the project as it relies on the existence of `@package-name/dist`.
   - In a Docker environment, this is resolved by creating the base image `shop.app.packages`, already containing pre-built packages placed into the `/app/packages` folder within the docker image (refer to example `apps/shop.app.orders.api/Dockerfile`).
 
+## Running apps
+- Each app can be launched from its respective `/apps` folder using `npm run start`.
+  - Apps may require specific environment variables for external dependencies. If running them in a container, ensure they expose ports, as some services reside in a private network and don't expose ports to the host.
+- Additionally, apps can be started from the root folder (e.g., `npm run start-web` starts `shop.app.web`).
+  - When running an app from the CLI, ensure to stop the corresponding container to avoid port conflicts.
+
 ## Setting Up with Docker
 - The `.env` file contains most environment variables used by different docker services.
 - Running `docker-compose up --build -d` starts all containers, rebuilding them upfront.
 - Once started, the web app will be accessible at `http://localhost:3000/`.
   - To allow access from other computers on the local network, change all instances of `localhost` in the `.env` file to your local IP address (e.g., `192.168.0.1`) for proper CORS configuration for APIs.
-- Each app can be launched from its respective `/apps` folder using `npm run start`.
-  - Apps may require specific environment variables for external dependencies. If running them in a container, ensure they expose ports, as some services reside in a private network and don't expose ports to the host.
-- Additionally, apps can be started from the root folder (e.g., `npm run start-web` starts `shop.app.web`).
-  - When running an app from the CLI, ensure to stop the corresponding container to avoid port conflicts.
 - To test with ports not exposed for apps from app-private-network network run: `docker-compose -f docker-compose.yml -f docker-compose.no-ports.yml up --build -d`
 
 ## Docker Compose Commands Quick Reference

@@ -4,12 +4,12 @@ import supertokens from 'supertokens-node';
 import UserRoles from 'supertokens-node/recipe/userroles';
 
 const {
-  AUTH_CORE_DOMAIN = 'localhost:3567',
-  WEB_API_PORT = 3003,
-  WEB_API_DOMAIN = 'localhost',
-  PUBLIC_WEB_UI_DOMAIN = 'localhost:3000',
-  API_USER_EMAIL = 'apiUser@shop.app',
-  API_USER_PASSWORD = 'Qwerty123',
+  AUTH_CORE_DOMAIN,
+  WEB_API_PORT,
+  WEB_API_DOMAIN,
+  PUBLIC_WEB_UI_DOMAIN,
+  API_USER_EMAIL,
+  API_USER_PASSWORD,
 } = process.env;
 
 type SignUpInResponseType = {

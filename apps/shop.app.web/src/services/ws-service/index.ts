@@ -27,10 +27,17 @@ export async function startListening(dispatch: ReturnType<typeof useAppDispatch>
     `Connecting to WS socket on "${graphQlSubscriptionsUrl}" and starting listening for events`,
   );
 
+  const accessToken = await Session.getAccessToken();
+
+  if (!accessToken) { 
+    console.log('No access token found. Not connecting to WS socket');
+    return;
+  }
+
   client = createClient({
     url: graphQlSubscriptionsUrl,
     connectionParams: {
-      authentication: `Bearer ${await Session.getAccessToken()}`,
+      authentication: `Bearer ${accessToken}`,
     },
   });
 

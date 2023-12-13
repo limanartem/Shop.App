@@ -5,7 +5,7 @@ import { execute, subscribe } from 'graphql';
 import { AddressInfo } from 'net';
 import { ConnectionInitMessage } from 'graphql-ws';
 import { Server } from 'http';
-import { decodeToken } from '../auth';
+import { decodeToken } from '../utils/auth';
 
 /**
  * Starts the WebSocket server for handling GraphQL subscriptions.

@@ -4,15 +4,15 @@
  * functions for caching and retrieving data from the database.
  */
 import { ObjectId } from 'mongodb';
-import { getObject as getCachedObject, updateObject as updateCacheObject } from './cache-utils';
-import { ProductItem, Order, OrderItemEnhanced, UpdateOrder, OrderItem } from './model';
+import { getObject as getCachedObject, updateObject as updateCacheObject } from '../utils/cache';
+import { ProductItem, Order, OrderItemEnhanced, UpdateOrder, OrderItem } from '../model';
 import {
   WithClearId,
   fetchDocument,
   fetchDocuments,
   insertDocument,
   updateDocument,
-} from './mongodb-client';
+} from '../utils/mongodb';
 const { CATALOG_API_URL } = process.env;
 const ORDERS_CACHE_GROUP = 'orders';
 
