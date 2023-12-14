@@ -169,7 +169,7 @@ services:
       shop.app.cache:
         condition: service_started
       shop.app.orders.db:
-        condition: service_started
+        condition: service_healthy
       shop.app.messagebroker:
         condition: service_healthy
       shop.app.catalog.api:
@@ -223,6 +223,8 @@ services:
     depends_on:
       shop.app.messagebroker:
         condition: service_healthy
+      shop.app.orders.db:
+        condition: service_healthy
     environment:
       MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       WORKER_TYPE: pending
@@ -244,6 +246,8 @@ services:
     depends_on:
       shop.app.messagebroker:
         condition: service_healthy
+      shop.app.orders.db:
+        condition: service_healthy
     environment:
       MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       WORKER_TYPE: payment
@@ -264,6 +268,8 @@ services:
       - app-private-network
     depends_on:
       shop.app.messagebroker:
+        condition: service_healthy
+      shop.app.orders.db:
         condition: service_healthy
     environment:
       MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
