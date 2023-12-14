@@ -22,5 +22,5 @@ export const sendMessage = async (
   const queue = `orders.queue.${flow}`;
   const routingKey = flow;
 
-  await messaging.sendMessage(queue, routingKey, message, exchange);
+  await messaging.sendMessage({queue, routingKey, exchange} , message);
 };

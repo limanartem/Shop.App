@@ -7,6 +7,7 @@ import {
 } from 'mongodb';
 
 const { MONGODB_URL, MONGO_DB_USERNAME, MONGO_DB_PASSWORD } = process.env;
+const CONNECT_DB_WATCH_RETRY_DELAY = 5000;
 
 enum DB_COLLECTION {
   ORDERS = 'orders',
@@ -25,7 +26,12 @@ const getClient = () =>
     },
   });
 
-export default async function streamEvents() {
+/**
+ * Streams events from the database collection and listens for updates to the "ORDERS" collection.
+ *
+ * @returns A Promise that resolves to void.
+ */
+export default async function streamEvents(): Promise<void> {
   try {
     console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
     const client = getClient();
@@ -46,11 +52,27 @@ export default async function streamEvents() {
 
         // TODO: for now do nothing with the change set, just logging it
         console.log({ changeSet });
+      })
+      .on('error', (error) => {
+        console.error('Error while watching for updates to orders collection', error);
+      })
+      .on('close', () => {
+        console.log('Connection to db closed. Reconnecting...');
+        setTimeout(() => {
+          streamEvents();
+        }, CONNECT_DB_WATCH_RETRY_DELAY);
       });
   } catch (error) {
-    console.error('Error while watching for updates to orders collection', error);
+    console.error(
+      `Error while watching for updates to orders collection. Will retry in ${CONNECT_DB_WATCH_RETRY_DELAY} milliseconds`,
+      error,
+    );
+    return new Promise((resolve) => setTimeout(resolve, CONNECT_DB_WATCH_RETRY_DELAY)).then(() =>
+      streamEvents(),
+    );
   }
 }
+
 function getChangeSet(
   change:
     | ChangeStreamInsertDocument<Document & { status: string }>
@@ -58,7 +80,7 @@ function getChangeSet(
 ) {
   switch (change.operationType) {
     case 'insert':
-      return{
+      return {
         id: change.fullDocument?._id.toHexString(),
         status: change.fullDocument?.status,
         operationType: change.operationType,

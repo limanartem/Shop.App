@@ -69,3 +69,6 @@ To share common logic across different apps add new package under `/packages` fo
 
 ## Troubleshooting
 * When running docker compose build on Windows machine some .sh file may fail to execute due to different line end feeding characters on Linux and Windows based systems. To quickly fix issue, in VS Code switch to CRLF EOL sequence see  https://essenceofcode.com/2019/11/20/linux-style-line-feeds-in-docker-desktop-on-windows/ for some additional information
+* To get logs from container's health check use
+  * `docker inspect --format "{{json .State.Health}}" <container name> | jq      `
+  * or `docker inspect --format "{{json .State.Health }}"  <container name>  | jq '.Log[].Output'  `
