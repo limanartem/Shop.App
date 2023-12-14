@@ -20,20 +20,27 @@ The project is structured as a monorepo using npm workspaces. This structure pri
 - Additionally, apps can be started from the root folder (e.g., `npm run start-web` starts `shop.app.web`).
   - When running an app from the CLI, ensure to stop the corresponding container to avoid port conflicts.
 
-## Setting Up with Docker
+## Running with Docker
 - The `.env` file contains most environment variables used by different docker services.
 - Running `docker-compose up --build -d` starts all containers, rebuilding them upfront.
 - Once started, the web app will be accessible at `http://localhost:3000/`.
   - To allow access from other computers on the local network, change all instances of `localhost` in the `.env` file to your local IP address (e.g., `192.168.0.1`) for proper CORS configuration for APIs.
 - To test with ports not exposed for apps from app-private-network network run: `docker-compose -f docker-compose.yml -f docker-compose.no-ports.yml up --build -d`
 
-## Docker Compose Commands Quick Reference
+### Docker Compose Commands Quick Reference
 - `docker-compose down -v {service name}`: Takes down service volume, useful for re-running init scripts for the database.
 - `docker-compose up --build -d {service name}`: Starts/restarts a single container.
 - `docker-compose build --no-cache`: Rebuilds all containers without using cache.
   - Add `--progress plain` to view more command outputs.
 - `docker-compose up --build`: Starts and rebuilds all containers.
   - Add `--remove-orphans` to remove orphan containers 
+
+## Adding re-usable packages
+To share common logic across different apps add new package under `/packages` folder. This will be automatically recognized by npm workspace and will allow adding local references from `package` to `app`. Note, that package project should be built prior to dependant app. See more about [npm workspace](https://ruanmartinelli.com/posts/npm-7-workspaces-1/)
+* How to add reference `package a` in `app a`:
+  `root> npm install ./packages/<package a> --workspace ./apps/<app a>`
+* Update docker image for packages here - `packages/Dockerfile` and add build step for package
+* Update github workflow config - `.github/workflows/nodejs.yml` and add build step for new package
 
 ## Architecture Overview
 ![Architecture Overview](media/Shop.App.Architecture_1.png)

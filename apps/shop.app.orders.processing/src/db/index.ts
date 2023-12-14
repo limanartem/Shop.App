@@ -1,0 +1,75 @@
+import {
+  MongoClient,
+  ServerApiVersion,
+  Document,
+  ChangeStreamInsertDocument,
+  ChangeStreamUpdateDocument,
+} from 'mongodb';
+
+const { MONGODB_URL, MONGO_DB_USERNAME, MONGO_DB_PASSWORD } = process.env;
+
+enum DB_COLLECTION {
+  ORDERS = 'orders',
+  PAYMENT = 'payment',
+}
+const getClient = () =>
+  new MongoClient(MONGODB_URL!, {
+    auth: {
+      username: MONGO_DB_USERNAME,
+      password: MONGO_DB_PASSWORD,
+    },
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    },
+  });
+
+export default async function streamEvents() {
+  try {
+    console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
+    const client = getClient();
+    await client.connect();
+    console.log(`Starting watching for updates to "${DB_COLLECTION.ORDERS}" collection...`);
+    client
+      .db()
+      .collection(DB_COLLECTION.ORDERS)
+      .watch<
+        Document & { status: string },
+        | ChangeStreamInsertDocument<Document & { status: string }>
+        | ChangeStreamUpdateDocument<Document & { status: string }>
+      >([{ $match: { operationType: { $in: ['insert', 'update'] } } }])
+      .on('change', (change) => {
+        console.log('Order updated!');
+
+        const changeSet = getChangeSet(change);
+
+        // TODO: for now do nothing with the change set, just logging it
+        console.log({ changeSet });
+      });
+  } catch (error) {
+    console.error('Error while watching for updates to orders collection', error);
+  }
+}
+function getChangeSet(
+  change:
+    | ChangeStreamInsertDocument<Document & { status: string }>
+    | ChangeStreamUpdateDocument<Document & { status: string }>,
+) {
+  switch (change.operationType) {
+    case 'insert':
+      return{
+        id: change.fullDocument?._id.toHexString(),
+        status: change.fullDocument?.status,
+        operationType: change.operationType,
+      };
+      break;
+    case 'update':
+      return {
+        id: change.documentKey._id.toHexString(),
+        status: change.updateDescription?.updatedFields?.status,
+        operationType: change.operationType,
+      };
+  }
+  return null;
+}

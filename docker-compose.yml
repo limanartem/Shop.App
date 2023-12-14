@@ -101,8 +101,8 @@ services:
       - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
       - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
     ports:
-      - 5672
-      - 15672
+      - 5672:5672
+      - 15672:15672
     networks:
       - app-private-network
     healthcheck:
@@ -114,18 +114,31 @@ services:
   # Shop orders database
   shop.app.orders.db:
     image: mongo:latest
+    command: mongod --bind_ip_all --replSet rs0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017'}]}) }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      start_period: 0s
+      start_interval: 1s
+      retries: 30
     environment:
-      MONGO_INITDB_ROOT_USERNAME: $MONGO_INITDB_ROOT_USERNAME
-      MONGO_INITDB_ROOT_PASSWORD: $MONGO_INITDB_ROOT_PASSWORD
+      MONGO_ROOT_USERNAME: $MONGO_INITDB_ROOT_USERNAME
+      MONGO_ROOT_PASSWORD: $MONGO_INITDB_ROOT_PASSWORD
       MONGO_DB_USERNAME: $MONGO_DB_USERNAME
       MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
+      MONGO_DB_READ_USERNAME: $MONGO_DB_READ_USERNAME
+      MONGO_DB_READ_PASSWORD: $MONGO_DB_READ_PASSWORD
       MONGO_INITDB_DATABASE: $MONGO_INITDB_DATABASE
     ports:
       - '27017:27017'
     networks:
       - app-private-network
     volumes:
-      - mongodb-data7:/data/db
+      - mongodb-data:/data/db
+      #- ./docker-support/shop.app.orders.db/replica.key:/data/replica.key.dev
       - ./docker-support/shop.app.orders.db/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   # Shared packages
@@ -212,8 +225,8 @@ services:
       MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       WORKER_TYPE: pending
       MONGODB_URL: $MONGODB_URL
-      MONGO_DB_USERNAME: $MONGO_DB_USERNAME
-      MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
+      MONGO_DB_USERNAME: $MONGO_DB_READ_USERNAME
+      MONGO_DB_PASSWORD: $MONGO_DB_READ_PASSWORD
       AUTH_API_URL: $AUTH_API_URL_PRIVATE
       API_USER_EMAIL: $API_USER_EMAIL
       API_USER_PASSWORD: $API_USER_PASSWORD
@@ -233,8 +246,8 @@ services:
       MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       WORKER_TYPE: payment
       MONGODB_URL: $MONGODB_URL
-      MONGO_DB_USERNAME: $MONGO_DB_USERNAME
-      MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
+      MONGO_DB_USERNAME: $MONGO_DB_READ_USERNAME
+      MONGO_DB_PASSWORD: $MONGO_DB_READ_PASSWORD
       AUTH_API_URL: $AUTH_API_URL_PRIVATE
       API_USER_EMAIL: $API_USER_EMAIL
       API_USER_PASSWORD: $API_USER_PASSWORD
@@ -254,8 +267,8 @@ services:
       MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       WORKER_TYPE: dispatch
       MONGODB_URL: $MONGODB_URL
-      MONGO_DB_USERNAME: $MONGO_DB_USERNAME
-      MONGO_DB_PASSWORD: $MONGO_DB_PASSWORD
+      MONGO_DB_USERNAME: $MONGO_DB_READ_USERNAME
+      MONGO_DB_PASSWORD: $MONGO_DB_READ_PASSWORD
       AUTH_API_URL: $AUTH_API_URL_PRIVATE
       API_USER_EMAIL: $API_USER_EMAIL
       API_USER_PASSWORD: $API_USER_PASSWORD
@@ -281,7 +294,7 @@ services:
 volumes:
   cache:
     driver: local
-  mongodb-data7:
+  mongodb-data:
     driver: local
   shop.app.auth.db_volume:
     driver: local
