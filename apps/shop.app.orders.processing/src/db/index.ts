@@ -6,13 +6,14 @@ import {
   ChangeStreamUpdateDocument,
 } from 'mongodb';
 
-const { MONGODB_URL, MONGO_DB_USERNAME, MONGO_DB_PASSWORD } = process.env;
-const CONNECT_DB_WATCH_RETRY_DELAY = 5000;
-
 enum DB_COLLECTION {
   ORDERS = 'orders',
   PAYMENT = 'payment',
 }
+
+const { MONGODB_URL, MONGO_DB_USERNAME, MONGO_DB_PASSWORD } = process.env;
+const CONNECT_DB_WATCH_RETRY_DELAY = 5000;
+
 const getClient = () =>
   new MongoClient(MONGODB_URL!, {
     auth: {
@@ -37,6 +38,7 @@ export default async function streamEvents(): Promise<void> {
     const client = getClient();
     await client.connect();
     console.log(`Starting watching for updates to "${DB_COLLECTION.ORDERS}" collection...`);
+
     client
       .db()
       .collection(DB_COLLECTION.ORDERS)
@@ -45,23 +47,9 @@ export default async function streamEvents(): Promise<void> {
         | ChangeStreamInsertDocument<Document & { status: string }>
         | ChangeStreamUpdateDocument<Document & { status: string }>
       >([{ $match: { operationType: { $in: ['insert', 'update'] } } }])
-      .on('change', (change) => {
-        console.log('Order updated!');
-
-        const changeSet = getChangeSet(change);
-
-        // TODO: for now do nothing with the change set, just logging it
-        console.log({ changeSet });
-      })
-      .on('error', (error) => {
-        console.error('Error while watching for updates to orders collection', error);
-      })
-      .on('close', () => {
-        console.log('Connection to db closed. Reconnecting...');
-        setTimeout(() => {
-          streamEvents();
-        }, CONNECT_DB_WATCH_RETRY_DELAY);
-      });
+      .on('change', handleOrderChange)
+      .on('error', handleWatchError)
+      .on('close', handleWatchClose);
   } catch (error) {
     console.error(
       `Error while watching for updates to orders collection. Will retry in ${CONNECT_DB_WATCH_RETRY_DELAY} milliseconds`,
@@ -71,6 +59,28 @@ export default async function streamEvents(): Promise<void> {
       streamEvents(),
     );
   }
+}
+
+function handleOrderChange(
+  change:
+    | ChangeStreamInsertDocument<Document & { status: string }>
+    | ChangeStreamUpdateDocument<Document & { status: string }>,
+) {
+  console.log('Order updated!');
+  const changeSet = getChangeSet(change);
+  // TODO: for now do nothing with the change set, just logging it
+  console.log({ changeSet });
+}
+
+function handleWatchError(error: any) {
+  console.error('Error while watching for updates to orders collection', error);
+}
+
+function handleWatchClose() {
+  console.log('Connection to db closed. Reconnecting...');
+  setTimeout(() => {
+    streamEvents();
+  }, CONNECT_DB_WATCH_RETRY_DELAY);
 }
 
 function getChangeSet(
@@ -85,13 +95,13 @@ function getChangeSet(
         status: change.fullDocument?.status,
         operationType: change.operationType,
       };
-      break;
     case 'update':
       return {
         id: change.documentKey._id.toHexString(),
         status: change.updateDescription?.updatedFields?.status,
         operationType: change.operationType,
       };
+    default:
+      return null;
   }
-  return null;
 }
