@@ -122,8 +122,9 @@ services:
       test: mongosh ./mongo-init.js
       interval: 5s
       timeout: 30s
-      start_period: 0s
-      start_interval: 1s
+      # below is not supported by docker-compose v2.3
+      #start_period: 0s
+      #start_interval: 1s
       retries: 30
     environment:
       MONGO_ROOT_USERNAME: $MONGO_INITDB_ROOT_USERNAME
