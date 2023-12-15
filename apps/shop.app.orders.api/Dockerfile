@@ -13,9 +13,7 @@ WORKDIR /app/apps/shop.app.orders.api
 COPY --from=builder /app/apps/shop.app.orders.api/dist /app/apps/shop.app.orders.api/dist
 # Adding shared packages
 COPY --from=builder /app/packages ../../packages
-
 ENV NODE_ENV=production
-
 COPY package*.json ./
 RUN npm install --omit=dev --legacy-peer-deps
 #COPY . .

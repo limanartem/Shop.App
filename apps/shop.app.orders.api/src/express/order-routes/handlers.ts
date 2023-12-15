@@ -1,10 +1,10 @@
 import type { Response } from 'express';
-import { createOrder, getOrderExpanded, getOrdersExpanded, updateOrder } from '../../data-utils';
+import { createOrder, getOrderExpanded, getOrdersExpanded, updateOrder } from '../../domain/orders';
 import { SessionRequest } from 'supertokens-node/framework/express';
 import { CreateOrderRequest, Order, CreateOrderRequestPayloadSchema } from '../../model';
 import { StatusCodes } from 'http-status-codes';
 import Joi from 'joi';
-import { sendMessage } from '../../amqp-utils';
+import { sendMessage } from '../../utils/amqp';
 import {
   OrderFlow,
   Status,

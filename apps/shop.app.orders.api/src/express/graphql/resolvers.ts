@@ -1,4 +1,4 @@
-import { getOrder, getOrderExpanded, getOrders, getOrdersExpanded } from '../../data-utils';
+import { getOrder, getOrderExpanded, getOrders, getOrdersExpanded } from '../../domain/orders';
 import { ResolverFn, Resolvers } from './__generated__/resolver-types';
 import { SessionContext } from '.';
 import { GraphQLResolveInfo } from 'graphql';

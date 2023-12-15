@@ -1,13 +1,16 @@
 import express from 'express';
-import { middleware, errorHandler } from 'supertokens-node/framework/express';
-import { initAuth } from '../auth';
-import { routerFactory } from './order-routes';
+import {
+  middleware as authMiddleware,
+  errorHandler as authErrorHandler,
+} from 'supertokens-node/framework/express';
+import { initAuth } from '../utils/auth';
+import { routerFactory as ordersRouterFactory } from './order-routes';
 import cors from 'cors';
 import { StatusCodes } from 'http-status-codes';
 import { useGraphql } from './graphql';
-import { useTracing, useLogging} from '@shop.app/lib.express/dist';
-
-
+import { useTracing, useLogging } from '@shop.app/lib.express/dist';
+import { routerFactory as csrfRouterFactory } from './csrf';
+import cookeParser from 'cookie-parser';
 /**
  * Starts the server.
  * @returns {express.Express} The Express app instance.
@@ -25,12 +28,15 @@ export const start = () => {
       credentials: true,
     }),
   );
-  app.use(middleware());
+  app.disable('x-powered-by');
+  app.use(authMiddleware());
   useTracing(app);
   useLogging(app);
-  
-  app.use('/', routerFactory());
-  app.use(errorHandler());
+
+  app.use(cookeParser());
+  app.use('/', ordersRouterFactory());
+  app.use('/', csrfRouterFactory());
+  app.use(authErrorHandler());
   useGraphql(app);
 
   app.use((err: any, req: any, res: any, next: any) => {

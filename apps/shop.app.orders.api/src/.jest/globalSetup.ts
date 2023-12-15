@@ -15,5 +15,15 @@ jest.mock('@shop.app/lib.express/dist', () => ({
 
 jest.mock('graphql-playground-middleware-express', () => () => () => {});
 jest.mock('../express/graphql-ws-server');
+jest.mock('../express/csrf', () => ({
+  csrfMiddleware: jest.fn((_: any, __: any, next: NextFunction) => {
+    return next();
+  }),
+  routerFactory: jest.fn(() => (_: any, __: any, next: NextFunction) => {
+    return next();
+  }),
+}));
+
+jest.mock('../utils/amqp');
 
 export {};

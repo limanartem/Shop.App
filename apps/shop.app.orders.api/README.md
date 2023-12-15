@@ -3,8 +3,10 @@ Provides REST and GraphQL APIs for handling orders - submitting new orders, gett
 
 ## Requirements
 * node >= 21
+  
 
 ## Setup
+* `nvm use`, run to ensure you are on a required node version
 * Ensure that packages from `./packages/*` are built
 * `npm i `  to install dependencies
 * `npm run start-dev` to build and run app locally

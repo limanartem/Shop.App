@@ -1,6 +1,6 @@
 import express from 'express';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
-import { verifyUserRole } from '../../auth';
+import { verifyUserRole } from '../../utils/auth';
 import {
   postOrdersHandler,
   getOrdersHandler,
@@ -8,6 +8,7 @@ import {
   putOrderItemHandler,
   getOrderHandler,
 } from './handlers';
+import { csrfMiddleware } from '../csrf';
 
 /**
  * Creates a router for handling order routes.
@@ -18,6 +19,7 @@ export const routerFactory = () => {
 
   router
     .post('/orders', verifySession(), postOrdersHandler)
+    .post('/orders-csrf', verifySession(), csrfMiddleware, postOrdersHandler)
     .get('/orders', verifySession(), getOrdersHandler)
     .get('/orders/:id', verifySession(), getOrderHandler)
     .put('/order/:id', verifySession(), verifyUserRole('api'), putOrderHandler) //TODO: should be deprecated
