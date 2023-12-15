@@ -15,15 +15,15 @@ The project is structured as a monorepo using npm workspaces. This structure pri
   - In a Docker environment, this is resolved by creating the base image `shop.app.packages`, already containing pre-built packages placed into the `/app/packages` folder within the docker image (refer to example `apps/shop.app.orders.api/Dockerfile`).
 
 ## Running apps
-- Each app can be launched from its respective `/apps` folder using `npm run start`.
-  - Apps may require specific environment variables for external dependencies. If running them in a container, ensure they expose ports, as some services reside in a private network and don't expose ports to the host.
+- Each app can be launched from its respective `/apps` folder using `npm run start` or `npm run start-dev`.
+  - Apps may require specific environment variables for external dependencies, which would normally be set in `.env` file depending on the project. If dependencies are running in container, ensure they expose ports, as some services reside in a private network and don't expose ports to the host.
 - Additionally, apps can be started from the root folder (e.g., `npm run start-web` starts `shop.app.web`).
   - When running an app from the CLI, ensure to stop the corresponding container to avoid port conflicts.
 
 ## Running with Docker
-- The `.env` file contains most environment variables used by different docker services.
+- The root `.env` file contains most environment variables used by different docker services.
 - Running `docker-compose up --build -d` starts all containers, rebuilding them upfront.
-- Once started, the web app will be accessible at `http://localhost:3000/`.
+- Once started, the web app will be accessible at `http://localhost:3000`.
   - To allow access from other computers on the local network, change all instances of `localhost` in the `.env` file to your local IP address (e.g., `192.168.0.1`) for proper CORS configuration for APIs.
 - To test with ports not exposed for apps from app-private-network network run: `docker-compose -f docker-compose.yml -f docker-compose.no-ports.yml up --build -d`
 
@@ -36,18 +36,18 @@ The project is structured as a monorepo using npm workspaces. This structure pri
   - Add `--remove-orphans` to remove orphan containers 
 
 ## Adding re-usable packages
-To share common logic across different apps add new package under `/packages` folder. This will be automatically recognized by npm workspace and will allow adding local references from `package` to `app`. Note, that package project should be built prior to dependant app. See more about [npm workspace](https://ruanmartinelli.com/posts/npm-7-workspaces-1/)
-* Add reference `package a` in `app a`:
+To share common logic across different apps add new package under `/packages` folder. This will be automatically recognized by npm workspace and will allow adding local references from `package` to `app`. Note, that package project should be built prior to dependant app. See more about [npm workspace](https://ruanmartinelli.com/posts/npm-7-workspaces-1/). Follow below steps when adding new package project
+1. Add reference `package a` in `app a`:
   `root> npm install ./packages/<package a> --workspace ./apps/<app a>`
-* Update docker image for packages here - `packages/Dockerfile` and add build step for package
-* Add link to `shop.app.packages` image to dependant container so that build order is correct and `shop.app.packages` image is built before any container that uses it
-  
-  ```
-  container_app_a:
-    links:
-      - shop.app.packages
-  ```
-* Update github workflow config - `.github/workflows/nodejs.yml` and add build step for new package
+1. Update docker image for packages here - `packages/Dockerfile` and add build step for package
+1. Add link to `shop.app.packages` image to dependant container so that build order is correct and `shop.app.packages` image is built before any container that uses it
+    
+    ```
+    container_app_a:
+      links:
+        - shop.app.packages
+    ```
+1. Update github workflow config - `.github/workflows/nodejs.yml` and add build step for new package
 
 ## Architecture Overview
 ![Architecture Overview](media/Shop.App.Architecture_1.png)
