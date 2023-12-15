@@ -4,7 +4,7 @@
  * but since migration from standalone MongoDB to MongoDB replica set, it is not possible to run this script when the container starts.
  *  therefore it runs as part of healthcheck script, see  https://github.com/docker-library/mongo/issues/339#issuecomment-485578503:
  *  "
- *      The docker-entrypoint-initdb.d scripts run during an initialization period (and only if the database is empty), 
+ *      The docker-entrypoint-initdb.d scripts run during an initialization period (and only if the database is empty),
  *      during which the  container is only listening on localhost so trying to initiate a cluster during that period isn't
  *      possible as it won't resolve it's own container hostname.
  *  "
@@ -27,6 +27,7 @@ if (MONGO_DB_INIT_RS === 'true') {
   if (!ismaster) {
     console.log('Primary is not ready, initialize replication set ...');
     try {
+      // TODO: read rs config from external file
       rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'host.docker.internal:27017' }] });
     } catch (err) {
       console.error('Error during rs.initiate', err);
