@@ -27,7 +27,14 @@ jobs:
         run: |
           npm install
           npm run build
-  
+
+      - name: Shop.App.Packages lib.messaging
+        working-directory: ./packages/shop.app.lib.messaging
+        run: |
+          npm install
+          npm run build
+            
+
       - name: Shop.App.Orders.Api Tests
         working-directory: ./apps/shop.app.orders.api
         run: |

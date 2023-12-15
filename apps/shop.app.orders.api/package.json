@@ -23,6 +23,7 @@
   "dependencies": {
     "@graphql-tools/schema": "^10.0.2",
     "@shop.app/lib.express": "file:../../packages/shop.app.lib.express",
+    "@shop.app/lib.messaging": "file:../../packages/shop.app.lib.messaging",
     "@types/uuid": "^9.0.6",
     "amqplib": "^0.10.3",
     "cls-rtracer": "^2.6.3",
