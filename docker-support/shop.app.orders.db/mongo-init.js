@@ -1,16 +1,32 @@
-if (!db.isMaster().ismaster) {
-  console.log('Error: primary not ready, initialize ...');
-  rs.initiate();
-  quit(1);
+/**
+ * Initializes the MongoDB replication set and creates necessary users and collections.
+ * If the primary is not ready, it attempts to initialize the replication set.
+ * It checks if the specified users are already created and creates them if necessary.
+ * It also checks if the "orders" collection is already created and creates it if necessary.
+ * @param {string} process.env.MONGO_ROOT_USERNAME - The username for the root user.
+ * @param {string} process.env.MONGO_ROOT_PASSWORD - The password for the root user.
+ * @param {string} process.env.MONGO_DB_USERNAME - The username for the database user.
+ * @param {string} process.env.MONGO_DB_PASSWORD - The password for the database user.
+ * @param {string} process.env.MONGO_DB_READ_USERNAME - The username for the read-only database user.
+ * @param {string} process.env.MONGO_DB_READ_PASSWORD - The password for the read-only database user.
+ * @param {string} process.env.MONGO_INITDB_DATABASE - The name of the database.
+ */
+
+const { MONGO_DB_INIT_RS = 'true' } = process.env;
+
+if (MONGO_DB_INIT_RS === 'true') {
+  const { ismaster } = db.isMaster();
+  if (!ismaster) {
+    console.log('Primary is not ready, initialize replication set ...');
+    try {
+      rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'host.docker.internal:27017' }] });
+    } catch (err) {
+      console.error('Error during rs.initiate', err);
+    }
+    quit(1);
+  }
 }
-
-// check if user with process.env.MONGO_ROOT_USERNAME name  already created
-
 ensureUserCreated(process.env.MONGO_ROOT_USERNAME, process.env.MONGO_ROOT_PASSWORD, []);
-
-//rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'host.docker.internal:27017' }] });
-
-//console.log('Replica set rs0 initialized');
 
 //db = db.getSiblingDB('admin');
 //db.auth(process.env.MONGO_ROOT_USERNAME, process.env.MONGO_ROOT_PASSWORD);
@@ -37,7 +53,7 @@ if (!db.getCollectionNames().includes('orders')) {
   db.orders.createIndex({ userId: 1 });
   console.log('Collection orders created');
 } else {
-    console.log('Collection orders already exists');
+  console.log('Collection orders already exists');
 }
 
 quit(0);

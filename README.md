@@ -37,9 +37,16 @@ The project is structured as a monorepo using npm workspaces. This structure pri
 
 ## Adding re-usable packages
 To share common logic across different apps add new package under `/packages` folder. This will be automatically recognized by npm workspace and will allow adding local references from `package` to `app`. Note, that package project should be built prior to dependant app. See more about [npm workspace](https://ruanmartinelli.com/posts/npm-7-workspaces-1/)
-* How to add reference `package a` in `app a`:
+* Add reference `package a` in `app a`:
   `root> npm install ./packages/<package a> --workspace ./apps/<app a>`
 * Update docker image for packages here - `packages/Dockerfile` and add build step for package
+* Add link to `shop.app.packages` image to dependant container so that build order is correct and `shop.app.packages` image is built before any container that uses it
+  
+  ```
+  container_app_a:
+    links:
+      - shop.app.packages
+  ```
 * Update github workflow config - `.github/workflows/nodejs.yml` and add build step for new package
 
 ## Architecture Overview

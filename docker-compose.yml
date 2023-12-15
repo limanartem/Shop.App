@@ -225,6 +225,8 @@ services:
         condition: service_healthy
       shop.app.orders.db:
         condition: service_healthy
+    links:
+      - shop.app.packages
     environment:
       MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       WORKER_TYPE: pending
@@ -248,6 +250,8 @@ services:
         condition: service_healthy
       shop.app.orders.db:
         condition: service_healthy
+    links:
+      - shop.app.packages
     environment:
       MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       WORKER_TYPE: payment
@@ -271,6 +275,8 @@ services:
         condition: service_healthy
       shop.app.orders.db:
         condition: service_healthy
+    links:
+      - shop.app.packages
     environment:
       MESSAGE_BROKER_URL: $MESSAGE_BROKER_URL
       WORKER_TYPE: dispatch
