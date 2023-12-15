@@ -1,5 +1,13 @@
 /**
  * Initializes the MongoDB replication set and creates necessary users and collections.
+ * Previously this script was triggered during db initialization via placing it to /docker-entrypoint-initdb.d,
+ * but since migration from standalone MongoDB to MongoDB replica set, it is not possible to run this script when the container starts.
+ *  therefore it runs as part of healthcheck script, see  https://github.com/docker-library/mongo/issues/339#issuecomment-485578503:
+ *  "
+ *      The docker-entrypoint-initdb.d scripts run during an initialization period (and only if the database is empty), 
+ *      during which the  container is only listening on localhost so trying to initiate a cluster during that period isn't
+ *      possible as it won't resolve it's own container hostname.
+ *  "
  * If the primary is not ready, it attempts to initialize the replication set.
  * It checks if the specified users are already created and creates them if necessary.
  * It also checks if the "orders" collection is already created and creates it if necessary.
