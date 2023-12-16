@@ -301,10 +301,20 @@ services:
       REACT_APP_ORDERS_API_HOST: $ORDERS_API_HOST
       REACT_APP_CATALOG_API_URL: $CATALOG_API_URL
       REACT_APP_AUTH_API_URL: $AUTH_API_URL
+      REACT_APP_CDN_URL: $CDN_URL
     depends_on:
       - shop.app.orders.api
       - shop.app.catalog.api
       - shop.app.auth.api
+
+  shop.app.cdn:
+    build:
+      context: ./apps/shop.app.cdn
+    ports:
+      - '3005:80'
+    networks:
+        - app-public-network
+    
 
 volumes:
   cache:
