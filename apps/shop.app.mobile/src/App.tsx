@@ -6,6 +6,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Catalog from './features/catalog';
 import { getHeaderTitle } from '@react-navigation/elements';
+import { Provider } from 'react-redux';
+import { store } from './app/store';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +22,7 @@ export default function App() {
   //const Drawer = createDrawerNavigator();
 
   return (
-    <>
+    <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Catalog"
@@ -32,7 +34,7 @@ export default function App() {
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>
-    </>
+    </Provider>
   );
 }
 

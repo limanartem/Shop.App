@@ -2,6 +2,7 @@ import { registerRootComponent } from 'expo';
 import * as React from 'react';
 import { MD3LightTheme as DefaultTheme, PaperProvider } from 'react-native-paper';
 
+
 import App from './App';
 
 const theme = {
@@ -9,7 +10,7 @@ const theme = {
   colors: {
     ...DefaultTheme.colors,
     primary: '#FF5733',
-    secondary: 'amber',
+    secondary: '#FFECB3',
   },
 };
 
