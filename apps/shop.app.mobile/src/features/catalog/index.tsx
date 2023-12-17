@@ -6,8 +6,10 @@ import ProductCard from './ProductCard';
 import { ProductPlaceholder } from './ProductPlaceholder';
 
 function Catalog() {
-  const [productsLoading, setProductsLoading] = useState(false);
-  const [products, setProducts] = useState<ProductItem[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [products, setProducts] = useState<ProductItem[]>(
+    [...Array(4).keys()].map(() => ({} as any)),
+  );
 
   useEffect(() => {
     console.log('Catalog:fetching products');
@@ -26,22 +28,17 @@ function Catalog() {
 
   return (
     <View>
-      {productsLoading ? (
-        <ProductPlaceholder />
-      ) : (
-        <VirtualizedList
-          initialNumToRender={4}
-          renderItem={({ item }: { item: ProductItem }) => <ProductCard product={item} />}
-          keyExtractor={(item) => item.id}
-          getItemCount={() => products.length}
-          getItem={(_, index) => products[index]}
-        />
-      )}
+      <VirtualizedList
+        initialNumToRender={4}
+        renderItem={({ item }: { item: ProductItem }) =>
+          productsLoading ? <ProductPlaceholder /> : <ProductCard product={item} />
+        }
+        keyExtractor={(item) => item.id}
+        getItemCount={() => products.length}
+        getItem={(_, index) => products[index]}
+      />
     </View>
   );
 }
-
-
-
 
 export default Catalog;

@@ -1,29 +1,47 @@
-import React from 'react';
-import { Text, View, StyleSheet, Image, ActivityIndicator } from 'react-native';
-import Constants from 'expo-constants';
-import { Card, Paragraph } from 'react-native-paper';
-
-const thirdLayout = [
-  {
-    width: 220,
-    height: 20,
-    marginBottom: 8,
-  },
-  {
-    width: 180,
-    height: 20,
-  },
-];
+import React, { useEffect, useRef } from 'react';
+import { StyleSheet, Animated } from 'react-native';
+import { Card } from 'react-native-paper';
 
 export function ProductPlaceholder() {
+  const colorAnimation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animateColors = () => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(colorAnimation, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: false,
+          }),
+          Animated.timing(colorAnimation, {
+            toValue: 0,
+            duration: 1000,
+            useNativeDriver: false,
+          }),
+        ]),
+      ).start();
+    };
+
+    animateColors();
+
+    return () => {
+      colorAnimation.setValue(0);
+    };
+  }, [colorAnimation]);
+
+  const backgroundColor = colorAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#eee', '#ddd'],
+  });
+
   return (
     <Card style={styles.card}>
       <Card.Content>
-        <View style={styles.imagePlaceholder} />
-        <Paragraph style={styles.placeholder}>&nbsp;</Paragraph>
-        <Paragraph style={styles.placeholder}>&nbsp;</Paragraph>
-        <Paragraph style={styles.placeholder}>&nbsp;</Paragraph>
-        <ActivityIndicator animating={true} color="#000" style={styles.loader} />
+        <Animated.View style={[styles.placeholder, { backgroundColor }]} />
+        <Animated.View style={[styles.placeholder, { backgroundColor }]} />
+        <Animated.View style={[styles.imagePlaceholder, { backgroundColor }]} />
+        <Animated.View style={[styles.placeholder, { backgroundColor }]} />
       </Card.Content>
     </Card>
   );
@@ -50,7 +68,7 @@ const styles = StyleSheet.create({
   },
   imagePlaceholder: {
     backgroundColor: '#eee',
-    height: 200, // Set the height of the placeholder image
+    height: 200,
     borderRadius: 5,
     marginBottom: 10,
   },

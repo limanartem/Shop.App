@@ -4,9 +4,12 @@ import { MMKV } from 'react-native-mmkv';
 export let storage: MMKV;
 
 try {
-  // This would only work in bare flow
+  // This will not work on managed flow
   storage = new MMKV();
-} catch (error) {}
+  console.log('MMKV storage initialized');
+} catch (error) {
+  console.error('MMKV storage initialization failed', error);
+}
 
 export interface PersistentState {
   persistent: boolean;
