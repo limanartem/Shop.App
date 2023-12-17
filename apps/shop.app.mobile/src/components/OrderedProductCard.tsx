@@ -1,9 +1,10 @@
 import { StyleSheet, Image } from 'react-native';
 import { ShoppingCartItem } from '../model';
-import { getProductImage } from '../utils/product-utils';
+import { ProductFallbackImage, getProductImage } from '../utils/product-utils';
 import { Card, IconButton, Text } from 'react-native-paper';
 import { useAppDispatch } from '../app/hooks';
 import { removeFromCart } from '../app/reducers/shoppingCartReducer';
+import { useState } from 'react';
 
 type Props = {
   item: ShoppingCartItem;
@@ -13,6 +14,7 @@ type Props = {
 const OrderedProductCard = ({ item, flow }: Props) => {
   const { title, description, price, currency } = item.product;
   const product = item.product;
+  const [imageUrl, setImageUrl] = useState(getProductImage(product));
 
   const dispatch = useAppDispatch();
 
@@ -39,7 +41,11 @@ const OrderedProductCard = ({ item, flow }: Props) => {
         title={title}
         subtitle={description}
         left={(props) => (
-          <Image source={{ uri: getProductImage(product) }} style={{ width: 40, height: 40 }} />
+          <Image
+            source={{ uri: imageUrl }}
+            onError={() => setImageUrl(ProductFallbackImage)}
+            style={{ width: 40, height: 40 }}
+          />
         )}
         right={(props) => (
           <IconButton icon="cart-minus" mode="outlined" onPress={handleRemoveFromCart} />

@@ -9,6 +9,7 @@ import { selectItems, addToCart, removeFromCart } from '../../app/reducers/shopp
 const ProductCard = ({ product }: { product: ProductItem }) => {
   const theme = useTheme();
   const { title, description, price, currency } = product;
+  const [imageUrl, setImageUrl] = useState(getProductImage(product));
   const items = useAppSelector(selectItems);
   const dispatch = useAppDispatch();
 
@@ -57,7 +58,11 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
   return (
     <Card style={styles.container}>
       <Card.Title title={title} subtitle={description} />
-      <Card.Cover source={{ uri: getProductImage(product) }} style={styles.cardCover} />
+      <Card.Cover
+        source={{ uri: imageUrl }}
+        style={styles.cardCover}
+        onError={() => setImageUrl(ProductFallbackImage)}
+      />
       <Card.Actions>
         <View>
           <Text variant="titleMedium">
