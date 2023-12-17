@@ -8,6 +8,7 @@ import Catalog from './features/catalog';
 import { getHeaderTitle } from '@react-navigation/elements';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
+import ShoppingCart from './features/shopping-cart';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ export default function App() {
           }}
         >
           <Stack.Screen name="Catalog" component={Catalog} options={{ title: 'Products' }} />
+          <Stack.Screen name="ShoppingCart" component={ShoppingCart} options={{ title: 'Shopping Cart' }} />
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>
