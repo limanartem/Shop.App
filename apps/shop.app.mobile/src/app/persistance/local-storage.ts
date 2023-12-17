@@ -4,6 +4,7 @@ import { MMKV } from 'react-native-mmkv';
 export let storage: MMKV;
 
 try {
+  // This would only work in bare flow
   storage = new MMKV();
 } catch (error) {}
 

@@ -21,7 +21,7 @@ const AppBar = ({ title }: { title: string }) => {
   return (
     <Appbar.Header style={styles.appBar}>
       <Appbar.Action icon="menu" onPress={() => {}} />
-      <Image source={require('assets/logo/shop.app.logo.png')} style={{ width: 40, height: 40 }} />
+      <Image source={require('../../assets/logo/shop.app.logo.png')} style={{ width: 40, height: 40 }} />
       <Appbar.Content title={title} />
       <Appbar.Action icon="magnify" onPress={() => {}} />
       <View>
