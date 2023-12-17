@@ -5,6 +5,7 @@ import { ProductFallbackImage, getProductImage } from '../../utils/product-utils
 import { Badge, Button, Card, IconButton, Text, useTheme } from 'react-native-paper';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { selectItems, addToCart, removeFromCart } from '../../app/reducers/shoppingCartReducer';
+import { Rating, AirbnbRating } from 'react-native-ratings';
 
 const ProductCard = ({ product }: { product: ProductItem }) => {
   const theme = useTheme();
@@ -63,7 +64,14 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
         style={styles.cardCover}
         onError={() => setImageUrl(ProductFallbackImage)}
       />
-      <Card.Actions>
+      <Card.Actions >
+        <View>
+          <Rating
+            readonly={true}
+            imageSize={15}
+            startingValue={Math.random() * 5 + 1}
+          />
+        </View>
         <View>
           <Text variant="titleMedium">
             {price.toFixed(2)} {currency}
