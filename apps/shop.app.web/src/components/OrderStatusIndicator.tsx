@@ -13,7 +13,7 @@ const statusColor = (status?: string) => {
   }
 };
 
-export function StatusIndicator({ status }: { status?: string }) {
+export function OrderStatusIndicator({ status }: { status?: string }) {
   return (
     <Chip
       label={status}

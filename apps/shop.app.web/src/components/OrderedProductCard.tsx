@@ -5,7 +5,7 @@ import { getProductImage, ProductFallbackImage } from '../utils/product-utils';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import { removeFromCart } from '../app/reducers/shoppingCartReducer';
 import { ProductItem } from '../model';
-import { StatusIndicator } from '../features/shopping-cart/StatusIndicator';
+import { OrderStatusIndicator } from './OrderStatusIndicator';
 
 type Props = {
   item: ShoppingCartItem;
@@ -52,7 +52,7 @@ function ItemAction({ item, flow }: Props) {
           </Button>
         </Tooltip>
       )}
-      {flow === 'orderDetails' && <StatusIndicator status={item.status || 'pending'} />}
+      {flow === 'orderDetails' && <OrderStatusIndicator status={item.status || 'pending'} />}
     </>
   );
 }

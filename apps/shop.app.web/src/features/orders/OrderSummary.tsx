@@ -1,6 +1,6 @@
 import { Order } from '../../model';
 import { Typography, Grid } from '@mui/material';
-import { StatusIndicator } from '../shopping-cart/StatusIndicator';
+import { OrderStatusIndicator } from '../../components/OrderStatusIndicator';
 import { DateTime } from '../../components';
 
 const calculateTotal = (order: Order) => {
@@ -17,7 +17,7 @@ export function OrderSummary({ order }: { order: Order }) {
     <Grid container>
       <Grid item textAlign="left">
         <Typography color="text.secondary" gutterBottom variant="body2">
-          <StatusIndicator status={order.status} />
+          <OrderStatusIndicator status={order.status} />
           &nbsp;Order placed on <DateTime date={order.createdAt} />
         </Typography>
       </Grid>

@@ -11,7 +11,7 @@ import {
   CardHeader,
   Button,
 } from '@mui/material';
-import { StatusIndicator } from '../shopping-cart/StatusIndicator';
+import { OrderStatusIndicator } from '../../components/OrderStatusIndicator';
 import { OrderProgressIndicator } from './OrderProgressIndicator';
 import { DateTime, MainContentContainer, OrderedProductCard } from '../../components';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -156,7 +156,7 @@ export function OrderDetails({ order }: { order: Order }) {
             <DateTime date={order.createdAt} />
           </SummaryItem>
           <SummaryItem title="Status" wrapInContainer={true}>
-            <StatusIndicator status={order.status} />
+            <OrderStatusIndicator status={order.status} />
           </SummaryItem>
         </SummaryCard>
       </Grid>
