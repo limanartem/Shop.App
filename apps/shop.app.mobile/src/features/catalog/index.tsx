@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
-import { ProductItem } from '../../model';
-import { getProductsAsync } from '../../services/catalog-service';
-import { View, VirtualizedList, StyleSheet, Text } from 'react-native';
+import { View, VirtualizedList, StyleSheet } from 'react-native';
 import ProductCard from './ProductCard';
 import { ProductPlaceholder } from './ProductPlaceholder';
-import { Badge, FAB, Icon, MD2Colors, MD3Colors, useTheme } from 'react-native-paper';
+import { Badge, FAB, Icon, MD2Colors, Text, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../app/hooks';
+import { ProductItem } from '@shop.app/lib.client-data/dist/model';
+import { catalogServiceClient } from '../../services';
 
 function Catalog() {
   const [productsLoading, setProductsLoading] = useState(true);
   const [products, setProducts] = useState<ProductItem[]>(
-    [...Array(4).keys()].map(() => ({} as any)),
+    [...Array(4).keys()].map((i) => ({id: i} as any)),
   );
   const [state, setState] = useState({ open: false });
 
@@ -54,12 +54,14 @@ function Catalog() {
   useEffect(() => {
     console.log('Catalog:fetching products');
     setProductsLoading(true);
-    getProductsAsync({})
+    catalogServiceClient
+      .getProductsAsync({})
       .then((products) => {
         setProducts(products);
       })
       .catch((error) => {
         console.error('Catalog:fetching products', error);
+        setProducts([]);
       })
       .finally(() => {
         setProductsLoading(false);
@@ -69,15 +71,21 @@ function Catalog() {
   return (
     <>
       <View style={styles.container}>
-        <VirtualizedList
-          initialNumToRender={4}
-          renderItem={({ item }: { item: ProductItem }) =>
-            productsLoading ? <ProductPlaceholder /> : <ProductCard product={item} />
-          }
-          keyExtractor={(item) => item.id}
-          getItemCount={() => products.length}
-          getItem={(_, index) => products[index]}
-        />
+        {products.length > 0 ? (
+          <VirtualizedList
+            initialNumToRender={4}
+            renderItem={({ item }: { item: ProductItem }) =>
+              productsLoading ? <ProductPlaceholder /> : <ProductCard product={item} />
+            }
+            keyExtractor={(item) => item.id}
+            getItemCount={() => products.length}
+            getItem={(_, index) => products[index]}
+          />
+        ) : (
+          <Text variant="bodyLarge" style={{ textAlign: 'center', margin: 20 }}>
+            No products
+          </Text>
+        )}
       </View>
       <FAB.Group
         open={open}

@@ -21,7 +21,11 @@ function ItemImage({ item, flow }: Props) {
       style={{ width: width, minWidth: width }}
       image={getProductImage(item.product)}
       alt={item.product.title}
-      onError={(e: any) => (e.target.src = ProductFallbackImage)}
+      onError={(e: any) => {
+        if (e.target.src != ProductFallbackImage) {
+          e.target.src = ProductFallbackImage;
+        }
+      }}
     />
   );
 }

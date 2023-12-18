@@ -1,8 +1,6 @@
-import { useAppDispatch } from '../../redux/hooks';
 import { Client, createClient } from 'graphql-ws';
 import Session from 'supertokens-auth-react/recipe/session';
 import { subscriptions } from '../order-service/orders-graphql';
-import { setChangedOrders } from '../../redux/reducers/notificationsReducer';
 
 export class GraphQlWsClient {
   private client?: Client;
@@ -20,10 +18,12 @@ export class GraphQlWsClient {
    * Requires the user to be authenticated otherwise will throw an error.
    * Previously connected sockets will be closed.
    *
-   * @param dispatch - The dispatch function from the Redux store.
-   * @returns A promise that resolves when the connection is established.
+   * @param onChangedOrders - A callback function that will be called when orders are changed.
+   *                          It receives an array of order IDs as a parameter.
+   *                          It can be an async function that returns a Promise.
+   * @returns A Promise that resolves when the WebSocket connection is successfully started.
    */
-  public async startListening(dispatch: ReturnType<typeof useAppDispatch>) {
+  public async startListening(onChangedOrders: (ids: string[]) => void | Promise<void>) {
     await this.stopListening();
 
     console.log(
@@ -57,7 +57,7 @@ export class GraphQlWsClient {
     console.log('Connected to WS socket. Subscribing to updates');
 
     this.iterateMessages<{ orderChanged: { id: string } }>(
-      (message) => dispatch(setChangedOrders([message.orderChanged.id])),
+      async (message) => await onChangedOrders([message.orderChanged.id]),
       subscriptions.SUBSCRIPTION_ORDER_CHANGED,
     );
   }

@@ -13,6 +13,7 @@
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",
     "@reduxjs/toolkit": "^2.0.1",
+    "@shop.app/lib.client-data": "file:../../packages/shop.app.lib.client-data",
     "@types/react-redux": "^7.1.33",
     "expo": "~49.0.15",
     "expo-splash-screen": "~0.20.5",

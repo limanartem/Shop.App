@@ -62,15 +62,13 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
       <Card.Cover
         source={{ uri: imageUrl }}
         style={styles.cardCover}
-        onError={() => setImageUrl(ProductFallbackImage)}
+        onError={() => {
+          if (imageUrl != ProductFallbackImage) setImageUrl(ProductFallbackImage);
+        }}
       />
-      <Card.Actions >
+      <Card.Actions>
         <View>
-          <Rating
-            readonly={true}
-            imageSize={15}
-            startingValue={Math.random() * 5 + 1}
-          />
+          <Rating readonly={true} imageSize={15} startingValue={Math.random() * 5 + 1} />
         </View>
         <View>
           <Text variant="titleMedium">

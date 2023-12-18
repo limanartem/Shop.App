@@ -67,7 +67,6 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
       minHeight: 160,
       maxHeight: 160,
     },
-
   }));
 
   return (
@@ -78,7 +77,11 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
             key={i}
             component="img"
             image={getProductImage(product, i)}
-            onError={(e: any) => (e.target.src = ProductFallbackImage)}
+            onError={(e: any) => {
+              if (e.target.src != ProductFallbackImage) {
+                e.target.src = ProductFallbackImage;
+              }
+            }}
           />
         ))}
       </CarouselExt>
