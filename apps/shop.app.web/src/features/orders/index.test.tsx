@@ -3,14 +3,16 @@ import { render, screen, cleanup, waitFor } from '@testing-library/react';
 import Orders from '.';
 import { Provider } from 'react-redux';
 import { buildStore } from '../../app/store';
-import { getOrdersAsync } from '../../services/order-service';
+import { orderServiceClient } from '../../services';
 import { randomUUID } from 'crypto';
 import { setChangedOrders } from '../../app/reducers/notificationsReducer';
 import { act } from 'react-dom/test-utils';
 import { delay, mockResolved } from '../../test-helpers';
 
-jest.mock('../../services/order-service', () => ({
-  getOrdersAsync: jest.fn(() => Promise.resolve({ orders: [] })),
+jest.mock('../../services', () => ({
+  orderServiceClient: {
+    getOrdersAsync: jest.fn(() => Promise.resolve({ orders: [] })),
+  },
 }));
 
 // Avoid loading store from the local storage
@@ -45,7 +47,7 @@ describe('Feature Orders', () => {
         <Orders />
       </Provider>,
     );
-    expect(getOrdersAsync).toBeCalled();
+    expect(orderServiceClient.getOrdersAsync).toBeCalled();
   });
 
   it('should re-fetch if changed order is in the list', async () => {
@@ -61,7 +63,7 @@ describe('Feature Orders', () => {
       quantity: Math.round(Math.random() * 5 * (n + 1)) || 1,
     }));
 
-    mockResolved(getOrdersAsync, {
+    mockResolved(orderServiceClient.getOrdersAsync, {
       orders: [
         { id: changedOrderId, items },
         { id: randomUUID(), items },
@@ -78,7 +80,7 @@ describe('Feature Orders', () => {
     act(() => {
       store.dispatch(setChangedOrders([changedOrderId]));
     });
-    await waitFor(() => expect(getOrdersAsync).toBeCalledTimes(2));
+    await waitFor(() => expect(orderServiceClient.getOrdersAsync).toBeCalledTimes(2));
   });
 
   it('should not re-fetch if changed order is not in the list', async () => {
@@ -93,7 +95,7 @@ describe('Feature Orders', () => {
       quantity: Math.round(Math.random() * 5 * (n + 1)) || 1,
     }));
 
-    mockResolved(getOrdersAsync, {
+    mockResolved(orderServiceClient.getOrdersAsync, {
       orders: [
         { id: randomUUID(), items },
         { id: randomUUID(), items },
@@ -108,8 +110,8 @@ describe('Feature Orders', () => {
 
     await delay(100);
     act(() => {
-      store.dispatch(setChangedOrders([(randomUUID())]));
+      store.dispatch(setChangedOrders([randomUUID()]));
     });
-    await waitFor(() => expect(getOrdersAsync).toBeCalledTimes(1));
+    await waitFor(() => expect(orderServiceClient.getOrdersAsync).toBeCalledTimes(1));
   });
 });

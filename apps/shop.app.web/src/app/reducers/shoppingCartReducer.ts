@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ProductItem, ShoppingCartItem } from '../../model';
 import { RootState } from '../store';
 import { PersistentState } from '../persistance/local-storage';
+import { ShoppingCartItem, ProductItem } from '@shop.app/lib.client-data/dist/model';
 
 interface ShoppingCartState extends PersistentState {
   items: ShoppingCartItem[];

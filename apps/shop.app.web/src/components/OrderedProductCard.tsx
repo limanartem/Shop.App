@@ -1,11 +1,10 @@
-import { ShoppingCartItem } from '../model';
 import { Button, Card, CardContent, CardMedia, Tooltip, Typography } from '@mui/material';
 import { useAppDispatch } from '../app/hooks';
 import { getProductImage, ProductFallbackImage } from '../utils/product-utils';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import { removeFromCart } from '../app/reducers/shoppingCartReducer';
-import { ProductItem } from '../model';
 import { OrderStatusIndicator } from './OrderStatusIndicator';
+import { ShoppingCartItem, ProductItem } from '@shop.app/lib.client-data/dist/model';
 
 type Props = {
   item: ShoppingCartItem;

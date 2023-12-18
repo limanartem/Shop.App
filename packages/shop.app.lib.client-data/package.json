@@ -1,6 +1,7 @@
 {
   "name": "@shop.app/lib.client-data",
   "version": "1.0.0",
+  "type": "commonjs",
   "description": "Package for client data handling - redux store, data services, data models etc",
   "scripts": {
     "clean": "npx rimraf dist",

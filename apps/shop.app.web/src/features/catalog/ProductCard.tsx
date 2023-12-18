@@ -15,7 +15,6 @@ import {
   Rating,
   Box,
 } from '@mui/material';
-import { ProductItem } from '../../model';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { addToCart, removeFromCart, selectItems } from '../../app/reducers/shoppingCartReducer';
 import AddShoppingCart from '@mui/icons-material/AddShoppingCart';
@@ -23,6 +22,7 @@ import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import { ProductFallbackImage, getProductImage } from '../../utils/product-utils';
 import Carousel from 'react-material-ui-carousel';
 import { CarouselProps } from 'react-material-ui-carousel/dist/components/types';
+import { ProductItem } from '@shop.app/lib.client-data/dist/model';
 
 const ProductCard = ({ product }: { product: ProductItem }) => {
   const { title, description, price, currency } = product;

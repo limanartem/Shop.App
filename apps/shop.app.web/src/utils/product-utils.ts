@@ -1,5 +1,5 @@
+import { ProductItem } from '@shop.app/lib.client-data/dist/model';
 import { env } from '../config/environment';
-import { ProductItem } from '../model';
 
 const { REACT_APP_CDN_URL } = env;
 

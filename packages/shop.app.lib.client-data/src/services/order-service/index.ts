@@ -9,13 +9,10 @@ export interface OrderService {
 }
 
 export class OrderServiceClient implements OrderService {
-  private env: Record<string, string>;
   private service: OrderService;
 
   constructor(env: Record<string, string>) {
-    this.env = env;
-
-    const { REACT_APP_ORDERS_API_PROVIDER = 'graphql' } = this.env;
+    const { REACT_APP_ORDERS_API_PROVIDER = 'graphql' } = env;
     this.service = REACT_APP_ORDERS_API_PROVIDER === 'graphql' ? graphQl(env) : rest(env);
   }
   public async getOrdersAsync(): Promise<OrdersResponse> {

@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { PersistentState } from '../persistance/local-storage';
-import { CheckoutPaymentInfo, CheckoutShippingInfo } from '../../model';
+import { CheckoutPaymentInfo, CheckoutShippingInfo } from '@shop.app/lib.client-data/dist/model';
 
 export type FlowStep = 'confirmItems' | 'shipping' | 'payment' | 'review';
 export const CHECKOUT_FLOW_STEPS: FlowStep[] = ['confirmItems', 'shipping', 'payment', 'review'];

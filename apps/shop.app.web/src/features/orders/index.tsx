@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import { getOrdersAsync } from '../../services/order-service';
-import { Order } from '../../model';
 import {
   Accordion,
   AccordionSummary,
@@ -22,6 +20,8 @@ import { useNavigate } from 'react-router-dom';
 import { OrderProductPlaceholder } from './OrderProductPlaceholder';
 import { useAppSelector } from '../../app/hooks';
 import { selectChangedOrderIds } from '../../app/reducers/notificationsReducer';
+import { Order } from '@shop.app/lib.client-data/dist/model';
+import { orderServiceClient } from '../../services';
 
 function sortOrdersDesc(o2: Order, o1: Order): number {
   const o1Date = new Date(o1.createdAt).getTime();
@@ -61,7 +61,7 @@ export default function Orders() {
 
     const getOrders = async () => {
       try {
-        const result = await getOrdersAsync();
+        const result = await orderServiceClient.getOrdersAsync();
         setOrders(result.orders);
       } finally {
         setLoading(false);

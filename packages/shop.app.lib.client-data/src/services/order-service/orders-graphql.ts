@@ -2,6 +2,7 @@
 import { CreateOrder, Order, OrdersResponse } from '../../model';
 import Session from 'supertokens-auth-react/recipe/session';
 import { OrderService } from '.';
+import rest from './orders-rest-api';
 
 function init(env: Record<string, string>) {
   const { REACT_APP_ORDERS_API_HOST } = env;
@@ -105,9 +106,9 @@ function init(env: Record<string, string>) {
     getOrderAsync: function (id: string): Promise<Order | undefined> {
       return getOrderAsync(id);
     },
-    createOrdersAsync: function (_: CreateOrder): Promise<{ id: string }> {
+    createOrdersAsync: function (order: CreateOrder): Promise<{ id: string }> {
       // Fallback to rest api for now
-      throw new Error('Not implemented');
+      return rest(env).createOrdersAsync(order);
     },
   };
   return OrdersRestApi;

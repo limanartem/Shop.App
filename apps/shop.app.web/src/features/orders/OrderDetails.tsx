@@ -1,4 +1,3 @@
-import { Order } from '../../model';
 import {
   Typography,
   List,
@@ -16,10 +15,11 @@ import { OrderProgressIndicator } from './OrderProgressIndicator';
 import { DateTime, MainContentContainer, OrderedProductCard } from '../../components';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getOrderAsync } from '../../services/order-service';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { selectChangedOrderIds } from '../../app/reducers/notificationsReducer';
 import { useAppSelector } from '../../app/hooks';
+import { orderServiceClient } from '../../services';
+import { Order } from '@shop.app/lib.client-data/dist/model';
 
 const calculateTotal = (order: Order) => {
   return (
@@ -100,7 +100,7 @@ export function OrderPage() {
   function fetchOrder() {
     const getOrder = async () => {
       if (id != null) {
-        const result = await getOrderAsync(id);
+        const result = await orderServiceClient.getOrderAsync(id);
         setOrder(result);
       }
     };

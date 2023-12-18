@@ -4,7 +4,7 @@ import valid from 'card-validator';
 import { isValidIBAN } from 'ibantools';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { previousStep, setCheckoutPayment } from '../../app/reducers/checkOutReducer';
-import { CreditCardDetails, BankDetails } from '../../model';
+import { CreditCardDetails, BankDetails } from '@shop.app/lib.client-data/dist/model';
 
 export function StepPaymentDetails() {
   const { payment } = useAppSelector((state) => state.checkout);

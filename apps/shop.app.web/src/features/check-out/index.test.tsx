@@ -5,18 +5,19 @@ import { Provider } from 'react-redux';
 import { randomUUID } from 'crypto';
 import { addToCart } from '../../app/reducers/shoppingCartReducer';
 import { buildStore } from '../../app/store';
-import { ShoppingCartItem } from '../../model';
 import { FlowStep } from '../../app/reducers/checkOutReducer';
 import { DateTime } from 'luxon';
-import { createOrdersAsync } from '../../services/order-service';
+import { orderServiceClient } from '../../services';
+import { ShoppingCartItem } from '@shop.app/lib.client-data/dist/model';
 
-jest.mock('../../services/catalog-service', () => ({
-  getProductsAsync: jest.fn().mockResolvedValue([]),
-  getCategoriesAsync: jest.fn().mockResolvedValue([]),
-}));
-
-jest.mock('../../services/order-service', () => ({
-  createOrdersAsync: jest.fn().mockResolvedValue([]),
+jest.mock('../../services', () => ({
+  catalogServiceClient: {
+    getProductsAsync: jest.fn().mockResolvedValue([]),
+    getCategoriesAsync: jest.fn().mockResolvedValue([]),
+  },
+  orderServiceClient: {
+    createOrdersAsync: jest.fn().mockResolvedValue([]),
+  },
 }));
 
 // Avoid loading store from the local storage
@@ -308,9 +309,11 @@ describe('Feature Checkout', () => {
         await proceedToPayment();
         await fillInPayment();
         await proceedToReview();
-        (createOrdersAsync as jest.Mock).mockResolvedValue({ id: expectedOrderId });
+        jest
+          .spyOn(orderServiceClient, 'createOrdersAsync')
+          .mockResolvedValue({ id: expectedOrderId });
         const { stepElement } = await submit('review');
-        await waitFor(() => expect(createOrdersAsync).toHaveBeenCalled());
+        await waitFor(() => expect(orderServiceClient.createOrdersAsync).toHaveBeenCalled());
         const successText = await within(stepElement).findByText(
           'Order has been successfully placed and is being processed!',
           {

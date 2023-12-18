@@ -1,7 +1,7 @@
-import { Order } from '../../model';
 import { Typography, Grid } from '@mui/material';
 import { OrderStatusIndicator } from '../../components/OrderStatusIndicator';
 import { DateTime } from '../../components';
+import { Order } from '@shop.app/lib.client-data/dist/model';
 
 const calculateTotal = (order: Order) => {
   return (

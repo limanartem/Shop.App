@@ -3,10 +3,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { TreeView } from '@mui/x-tree-view/TreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import { ProductCategory } from '../model';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectCategory, setCategory } from '../app/reducers/searchReducer';
+import { ProductCategory } from '@shop.app/lib.client-data/dist/model';
 
 interface RenderTree {
   id: number;

@@ -1,11 +1,11 @@
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Alert, Box, Button, ButtonGroup, Grid } from '@mui/material';
 import { previousStep, placeOrder } from '../../app/reducers/checkOutReducer';
-import { createOrdersAsync } from '../../services/order-service';
 import CircularProgress from '@mui/material/CircularProgress';
 import { FormEventHandler, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import config from '../../config';
+import { orderServiceClient } from '../../services';
 
 export function StepReview() {
   const dispatch = useAppDispatch();
@@ -29,7 +29,7 @@ export function StepReview() {
 
     const createOrder = async () => {
       try {
-        const result = await createOrdersAsync({
+        const result = await orderServiceClient.createOrdersAsync({
           items: items.map((item) => ({
             productId: item.product.id,
             quantity: item.quantity,
