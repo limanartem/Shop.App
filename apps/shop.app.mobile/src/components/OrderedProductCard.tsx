@@ -1,10 +1,10 @@
 import { StyleSheet, Image } from 'react-native';
-import { ShoppingCartItem } from '../model';
 import { ProductFallbackImage, getProductImage } from '../utils/product-utils';
 import { Card, IconButton, Text } from 'react-native-paper';
 import { useAppDispatch } from '../app/hooks';
 import { removeFromCart } from '../app/reducers/shoppingCartReducer';
 import { useState } from 'react';
+import { ShoppingCartItem } from '@shop.app/lib.client-data/dist/model';
 
 type Props = {
   item: ShoppingCartItem;

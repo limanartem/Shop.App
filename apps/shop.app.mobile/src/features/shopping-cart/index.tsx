@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { View, VirtualizedList, StyleSheet } from 'react-native';
-import { ShoppingCartItem } from '../../model';
 import OrderedProductCard from '../../components/OrderedProductCard';
 import { Button, Divider, Text } from 'react-native-paper';
+import { ShoppingCartItem } from '@shop.app/lib.client-data/dist/model';
 
 export default function ShoppingCart() {
   const items = useAppSelector((state) => state.shoppingCart.items);

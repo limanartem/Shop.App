@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
 import { View, VirtualizedList, StyleSheet } from 'react-native';
-import { ProductItem } from '../../model';
 import { ProductFallbackImage, getProductImage } from '../../utils/product-utils';
 import { Badge, Button, Card, IconButton, Text, useTheme } from 'react-native-paper';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { selectItems, addToCart, removeFromCart } from '../../app/reducers/shoppingCartReducer';
 import { Rating, AirbnbRating } from 'react-native-ratings';
+import { ProductItem } from '@shop.app/lib.client-data/dist/model';
 
 const ProductCard = ({ product }: { product: ProductItem }) => {
   const theme = useTheme();
