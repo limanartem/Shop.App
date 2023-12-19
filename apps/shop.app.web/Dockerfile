@@ -1,6 +1,8 @@
 # Stage 1: Build the React app
-FROM node:21.1.0-slim as builder
-WORKDIR /app
+
+FROM shop.app.packages as builder
+
+WORKDIR /app/apps/shop.app.web
 COPY package*.json ./
 RUN npm install
 COPY . .
@@ -9,7 +11,7 @@ RUN npm run build
 
 # Stage 2: Create the production image
 FROM nginx:latest
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/apps/shop.app.web/build /usr/share/nginx/html
 EXPOSE 80
 
 # Copy .env file and shell script to container

@@ -1,8 +1,8 @@
 import { CreateOrder, Order, OrdersResponse } from '../../model';
-import Session from 'supertokens-auth-react/recipe/session';
 import { OrderService } from '.';
+import { GetAccessTokenFunc } from '..';
 
-function init(env: Record<string, string>) {
+function init(env: Record<string, string>, getAccessToken: GetAccessTokenFunc) {
   const { REACT_APP_ORDERS_API_HOST } = env;
   const apiUrl = `http://${REACT_APP_ORDERS_API_HOST}`;
 
@@ -12,7 +12,7 @@ function init(env: Record<string, string>) {
     const response = await fetch(`${apiUrl}/orders`, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${await Session.getAccessToken()}`,
+        Authorization: `Bearer ${await getAccessToken()}`,
       },
     });
 
@@ -30,7 +30,7 @@ function init(env: Record<string, string>) {
     const response = await fetch(`${apiUrl}/orders/${id}`, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${await Session.getAccessToken()}`,
+        Authorization: `Bearer ${await getAccessToken()}`,
       },
     });
 
@@ -48,7 +48,7 @@ function init(env: Record<string, string>) {
     const response = await fetch(`${apiUrl}/orders`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${await Session.getAccessToken()}`,
+        Authorization: `Bearer ${await getAccessToken()}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(order),

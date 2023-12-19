@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { CreateOrder, Order, OrdersResponse } from '../../model';
-import Session from 'supertokens-auth-react/recipe/session';
 import { OrderService } from '.';
 import rest from './orders-rest-api';
+import { GetAccessTokenFunc } from '..';
 
-function init(env: Record<string, string>) {
+function init(env: Record<string, string>, getAccessToken: GetAccessTokenFunc) {
   const { REACT_APP_ORDERS_API_HOST } = env;
   const graphQlUrl = `http://${REACT_APP_ORDERS_API_HOST}/graphql`;
 
@@ -54,12 +54,15 @@ function init(env: Record<string, string>) {
   };
 
   const getOrdersAsync = async (): Promise<OrdersResponse> => {
-    console.log(`Fetching orders from ${graphQlUrl}`);
+    const token = await getAccessToken();
+    if (token == null) {
+      throw new Error('User is not logged in');
+    }
 
     const response = await fetch(graphQlUrl, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${await Session.getAccessToken()}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -81,7 +84,7 @@ function init(env: Record<string, string>) {
     const response = await fetch(`${graphQlUrl}`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${await Session.getAccessToken()}`,
+        Authorization: `Bearer ${await getAccessToken()}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -108,7 +111,7 @@ function init(env: Record<string, string>) {
     },
     createOrdersAsync: function (order: CreateOrder): Promise<{ id: string }> {
       // Fallback to rest api for now
-      return rest(env).createOrdersAsync(order);
+      return rest(env, getAccessToken).createOrdersAsync(order);
     },
   };
   return OrdersRestApi;

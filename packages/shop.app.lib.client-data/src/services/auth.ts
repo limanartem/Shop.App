@@ -17,7 +17,7 @@ export class AuthServiceClient {
    * @throws An error if unable to get user details.
    */
   public async getUserAsync(): Promise<User> {
-    console.log(`Fetching user from ${this.authApiUrl}`);
+    console.log(`Fetching user from ${this.authApiUrl}/user`);
 
     const response = await fetch(`${this.authApiUrl}/user`, {
       method: 'GET',

@@ -1,6 +1,6 @@
 {
   "name": "@shop.app/lib.client-data",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "commonjs",
   "description": "Package for client data handling - redux store, data services, data models etc",
   "scripts": {
@@ -16,9 +16,10 @@
   "license": "ISC",
   "dependencies": {
     "graphql-ws": "^5.14.2",
-    "supertokens-auth-react": "^0.35.6"
+    "supertokens-web-js": "^0.8.0"
   },
   "devDependencies": {
+    "@types/react": "^18.2.45",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
   }

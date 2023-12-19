@@ -2,16 +2,17 @@
   "compilerOptions": {
     "module": "CommonJS",
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "ESNext",
     "noImplicitAny": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": ".",
-    "noEmit": false, 
+    "noEmit": false,
     "declaration": true,
     "strict": true,
+    "lib": ["dom", "dom.iterable", "esnext"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

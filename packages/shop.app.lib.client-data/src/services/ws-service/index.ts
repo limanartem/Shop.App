@@ -1,15 +1,17 @@
 import { Client, createClient } from 'graphql-ws';
-import Session from 'supertokens-auth-react/recipe/session';
 import { subscriptions } from '../order-service/orders-graphql';
+import { GetAccessTokenFunc } from '..';
 
 export class GraphQlWsClient {
   private client?: Client;
   private graphQlSubscriptionsUrl: string;
+  private getAccessToken: GetAccessTokenFunc;
 
-  constructor(env: Record<string, string>) {
+  constructor(env: Record<string, string>, getAccessToken: GetAccessTokenFunc) {
     const { REACT_APP_ORDERS_API_HOST } = env;
 
     this.graphQlSubscriptionsUrl = `ws://${REACT_APP_ORDERS_API_HOST}/subscriptions`;
+    this.getAccessToken = getAccessToken;
   }
 
   /**
@@ -30,7 +32,7 @@ export class GraphQlWsClient {
       `Connecting to WS socket on "${this.graphQlSubscriptionsUrl}" and starting listening for events`,
     );
 
-    const accessToken = await Session.getAccessToken();
+    const accessToken = await this.getAccessToken();
 
     if (!accessToken) {
       console.log('No access token found. Not connecting to WS socket');
