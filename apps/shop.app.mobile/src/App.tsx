@@ -15,7 +15,7 @@ import Orders from './features/orders';
 
 const Stack = createNativeStackNavigator();
 
-function AppBarHeader({ route, options }) {
+function AppBarHeader({ route, options }: { route: any; options: any }) {
   const title = getHeaderTitle(options, route.name);
 
   return <AppBar title={title} />;
@@ -49,4 +49,3 @@ export default function App() {
     </Provider>
   );
 }
-

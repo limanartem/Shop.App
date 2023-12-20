@@ -35,7 +35,7 @@ export default function ShoppingCart() {
           </Text>
         </View>
         <View style={{}}>
-          <Button mode="contained" onPress={() => navigate.navigate('Checkout')}>
+          <Button mode="contained" onPress={() => navigate.navigate('Checkout' as never)}>
             Checkout
           </Button>
         </View>

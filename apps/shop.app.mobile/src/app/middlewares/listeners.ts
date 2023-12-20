@@ -1,7 +1,6 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import { placeOrder, resetCheckout } from '../reducers/checkOutReducer';
 import { clearCart, addToCart, removeFromCart } from '../reducers/shoppingCartReducer';
-import { setUser } from '../reducers/authReducer';
 
 /**
  * Creates a middleware that listens for the completion of the checkout process.
