@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",
+    "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",
     "@reduxjs/toolkit": "^2.0.1",
@@ -26,8 +27,10 @@
     "react-native-mmkv-storage": "^0.9.1",
     "react-native-paper": "^5.11.4",
     "react-native-ratings": "^8.1.0",
+    "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.6",
-    "react-redux": "^9.0.4"
+    "react-redux": "^9.0.4",
+    "supertokens-react-native": "^4.0.8"
   },
   "devDependencies": {
     "@babel/core": "^7.23.6",

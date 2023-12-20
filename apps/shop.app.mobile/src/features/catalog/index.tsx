@@ -2,16 +2,17 @@ import { useEffect, useState } from 'react';
 import { View, VirtualizedList, StyleSheet } from 'react-native';
 import ProductCard from './ProductCard';
 import { ProductPlaceholder } from './ProductPlaceholder';
-import { Badge, FAB, Icon, MD2Colors, Text, useTheme } from 'react-native-paper';
+import { Badge, FAB, Icon, MD2Colors, Text, useTheme, ActivityIndicator } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../app/hooks';
 import { ProductItem } from '@shop.app/lib.client-data/dist/model';
 import { catalogServiceClient } from '../../services';
+import LoadingIndicator from '../../components/LoadingIndicator';
 
 function Catalog() {
   const [productsLoading, setProductsLoading] = useState(true);
   const [products, setProducts] = useState<ProductItem[]>(
-    [...Array(4).keys()].map((i) => ({id: i} as any)),
+    [...Array(4).keys()].map((i) => ({ id: i } as any)),
   );
   const [state, setState] = useState({ open: false });
 
@@ -71,6 +72,7 @@ function Catalog() {
   return (
     <>
       <View style={styles.container}>
+        {productsLoading && <LoadingIndicator size="large" />}
         {products.length > 0 ? (
           <VirtualizedList
             initialNumToRender={4}
@@ -106,7 +108,7 @@ function Catalog() {
             icon: 'cart-variant',
             label: 'View cart',
             color: theme.colors.primary,
-            onPress: () => navigation.navigate({ name: 'ShoppingCart' }),
+            onPress: () => navigation.navigate('ShoppingCart' as never),
           },
           {
             icon: 'cart-check',

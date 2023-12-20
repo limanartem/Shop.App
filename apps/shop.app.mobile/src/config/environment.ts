@@ -3,7 +3,7 @@ import {
   REACT_APP_CATALOG_API_URL,
   REACT_APP_AUTH_API_URL,
   REACT_APP_ORDERS_API_PROVIDER,
-  REACT_APP_CDN_URL
+  REACT_APP_CDN_URL,
 } from '@env';
 
 const env =  {

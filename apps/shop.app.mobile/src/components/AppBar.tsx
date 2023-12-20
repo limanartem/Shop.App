@@ -1,12 +1,21 @@
 import * as React from 'react';
-import { Appbar, Badge, useTheme } from 'react-native-paper';
-import { StyleSheet, Image, View } from 'react-native';
-import { useAppSelector } from '../app/hooks';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { Appbar, useTheme, Menu, Divider } from 'react-native-paper';
+import { StyleSheet } from 'react-native';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { useNavigation } from '@react-navigation/native';
+import { signOut } from '../app/reducers/authReducer';
+import { useState } from 'react';
 
 const AppBar = ({ title }: { title: string }) => {
   const navigation = useNavigation();
   const theme = useTheme();
+  const dispatch = useAppDispatch();
+  const [menuVisible, setMenuVisible] = useState(false);
+  const user = useAppSelector((state) => state.auth.user);
+  const isLoggedIn = React.useCallback(() => user != null, [user]);
+
+  const closeMenu = () => setMenuVisible(false);
+
   const styles = StyleSheet.create({
     appBar: {},
     badge: {
@@ -32,7 +41,7 @@ const AppBar = ({ title }: { title: string }) => {
       */}
       <Appbar.Content title={title} />
       {/* <Appbar.Action icon="magnify" onPress={() => {}} /> */}
-       {/*
+      {/*
       <View>
         <Appbar.Action icon="cart" onPress={() => {}} />  
         <Appbar.Action
@@ -45,7 +54,48 @@ const AppBar = ({ title }: { title: string }) => {
         </Badge>
       </View>
       */}
-      <Appbar.Action icon="account-circle" onPress={() => {}} />
+
+      <Menu
+        visible={menuVisible}
+        onDismiss={closeMenu}
+        anchorPosition="bottom"
+        anchor={
+          <Appbar.Action
+            icon="account-circle"
+            onPress={() => {
+              setMenuVisible(true);
+            }}
+          />
+        }
+      >
+        {!isLoggedIn() ? (
+          <Menu.Item
+            onPress={() => {
+              setMenuVisible(false);
+              navigation.navigate('SignIn' as never);
+            }}
+            title="Sign-in"
+          />
+        ) : (
+          <>
+            <Menu.Item
+              onPress={() => {
+                setMenuVisible(false);
+                dispatch(signOut());
+              }}
+              title="Sign out"
+            />
+            <Divider />
+            <Menu.Item
+              onPress={() => {
+                setMenuVisible(false);
+                navigation.navigate('Orders' as never);
+              }}
+              title="Orders"
+            />
+          </>
+        )}
+      </Menu>
     </Appbar.Header>
   );
 };

@@ -9,6 +9,9 @@ import { getHeaderTitle } from '@react-navigation/elements';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
 import ShoppingCart from './features/shopping-cart';
+import LoginForm from './features/auth/signIn';
+import { AuthWrapper } from './components/AuthWrapper';
+import Orders from './features/orders';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,31 +23,30 @@ function AppBarHeader({ route, options }) {
 
 export default function App() {
   const theme = useTheme();
-  //const Drawer = createDrawerNavigator();
 
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Catalog"
-          screenOptions={{
-            header: (props) => <AppBarHeader {...props} />,
-          }}
-        >
-          <Stack.Screen name="Catalog" component={Catalog} options={{ title: 'Products' }} />
-          <Stack.Screen name="ShoppingCart" component={ShoppingCart} options={{ title: 'Shopping Cart' }} />
-        </Stack.Navigator>
-        <StatusBar style="auto" />
-      </NavigationContainer>
+      <AuthWrapper>
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName="Catalog"
+            screenOptions={{
+              header: (props) => <AppBarHeader {...props} />,
+            }}
+          >
+            <Stack.Screen name="Catalog" component={Catalog} options={{ title: 'Products' }} />
+            <Stack.Screen
+              name="ShoppingCart"
+              component={ShoppingCart}
+              options={{ title: 'Shopping Cart' }}
+            />
+            <Stack.Screen name="SignIn" component={LoginForm} options={{ title: 'Sign In' }} />
+            <Stack.Screen name="Orders" component={Orders} options={{ title: 'Orders' }} />
+          </Stack.Navigator>
+          <StatusBar style="auto" />
+        </NavigationContainer>
+      </AuthWrapper>
     </Provider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
