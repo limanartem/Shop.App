@@ -40,7 +40,8 @@ export default function App() {
               component={ShoppingCart}
               options={{ title: 'Shopping Cart' }}
             />
-            <Stack.Screen name="SignIn" component={LoginForm} options={{ title: 'Sign In' }} />
+            <Stack.Screen name="SignIn" component={LoginForm} initialParams={{ mode: 'login'}} options={{ title: 'Sign In' }} />
+            <Stack.Screen name="SignUp" component={LoginForm} initialParams={{ mode: 'register'}} options={{ title: 'Sign Up' }} />
             <Stack.Screen name="Orders" component={Orders} options={{ title: 'Orders' }} />
           </Stack.Navigator>
           <StatusBar style="auto" />

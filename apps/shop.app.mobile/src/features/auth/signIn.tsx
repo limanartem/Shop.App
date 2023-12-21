@@ -3,17 +3,23 @@ import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, useTheme, Icon, Card, HelperText } from 'react-native-paper';
 import { TextInput as RNTextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { signIn } from '../../app/reducers/authReducer';
+import { signIn, signUp } from '../../app/reducers/authReducer';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useAppDispatch } from '../../app/hooks';
 
-const LoginForm = () => {
+type Mode = 'login' | 'register';
+
+const LoginForm = ({ route }) => {
+  const { mode }: { mode: Mode } = route.params;
   const theme = useTheme();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
 
+  const nameRef = useRef<RNTextInput>(null);
   const emailRef = useRef<RNTextInput>(null);
   const passwordRef = useRef<RNTextInput>(null);
+
+  const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('abc@dot.com');
   const [password, setPassword] = React.useState('Qwerty123');
   const [isEmailValid, setEmailValid] = React.useState(false);
@@ -22,7 +28,7 @@ const LoginForm = () => {
   const [isLoggingIn, setIsLoggingIn] = React.useState(false);
 
   const validateEmail = (email: string) => {
-    // Simple email validation logic, you can use a library for more comprehensive validation
+    // TODO: use a library for more comprehensive validation
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   };
 
@@ -48,6 +54,28 @@ const LoginForm = () => {
       });
   };
 
+  const handleRegister = async () => {
+    setLoginError(null);
+    setIsLoggingIn(true);
+
+    dispatch(signUp({ email, password, name }))
+      .then(unwrapResult)
+      .then((result) => {
+        if (result.success) {
+          navigation.navigate('Catalog' as never);
+        } else {
+          setLoginError('Cannot register');
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        setLoginError('Error occurred while registering');
+      })
+      .finally(() => {
+        setIsLoggingIn(false);
+      });
+  };
+
   const onBlurEmail = () => {
     setEmailInputFocused(false);
     setEmailValid(validateEmail(email));
@@ -59,6 +87,9 @@ const LoginForm = () => {
     setEmailValid(validateEmail(email));
   };
 
+  const handleNameSubmit = () => {
+    emailRef.current?.focus();
+  };
   const handleEmailSubmit = () => {
     if (validateEmail(email)) {
       passwordRef.current?.focus();
@@ -66,12 +97,22 @@ const LoginForm = () => {
   };
 
   const handlePasswordSubmit = () => {
-    if (isEmailValid && password !== '') {
-      handleLogin();
+    switch (mode) {
+      case 'login':
+        if (isEmailValid && password !== '') {
+          handleLogin();
+          break;
+        }
+      case 'register':
+        if (isEmailValid && password !== '' && name !== '') {
+          handleRegister();
+          break;
+        }
     }
   };
 
   const hasErrors = () => isEmailValid === false && email !== '' && !emailInputFocused;
+  const nameHasErrors = () => name === '' && mode == 'register';
 
   const styles = StyleSheet.create({
     container: {
@@ -115,9 +156,30 @@ const LoginForm = () => {
           <View style={styles.userSkeleton}>
             <Icon source="account-circle-outline" size={80} color={theme.colors.primary} />
           </View>
+          {mode == 'register' && (
+            <>
+              <TextInput
+                ref={nameRef}
+                autoFocus
+                label="Name"
+                value={name}
+                onChangeText={(text) => setName(text)}
+                onSubmitEditing={handleNameSubmit}
+                returnKeyType="next"
+                style={styles.input}
+                error={nameHasErrors()}
+                disabled={isLoggingIn}
+              />
+              {nameHasErrors() && (
+                <HelperText type="error" padding="none">
+                  Name is required!
+                </HelperText>
+              )}
+            </>
+          )}
           <TextInput
             ref={emailRef}
-            autoFocus
+            autoFocus={mode == 'login'}
             label="Email"
             value={email}
             onChangeText={onChangeEmail}
@@ -153,18 +215,46 @@ const LoginForm = () => {
               {loginError}
             </HelperText>
           )}
-          <Button
-            mode="contained"
-            onPress={handleLogin}
-            style={styles.button}
-            disabled={isLoggingIn || !isEmailValid || password === ''}
-            loading={isLoggingIn}
-          >
-            Login
-          </Button>
-          <Button mode="text" disabled={isLoggingIn}>
-            Register
-          </Button>
+          {mode == 'login' && (
+            <>
+              <Button
+                mode="contained"
+                onPress={handleLogin}
+                style={styles.button}
+                disabled={isLoggingIn || !isEmailValid || password === ''}
+                loading={isLoggingIn}
+              >
+                Login
+              </Button>
+              <Button
+                mode="text"
+                disabled={isLoggingIn}
+                onPress={() => navigation.navigate('SignUp' as never)}
+              >
+                Register
+              </Button>
+            </>
+          )}
+          {mode == 'register' && (
+            <>
+              <Button
+                mode="contained"
+                onPress={handleRegister}
+                style={styles.button}
+                disabled={isLoggingIn || !isEmailValid || password === '' || name === ''}
+                loading={isLoggingIn}
+              >
+                Register
+              </Button>
+              <Button
+                mode="text"
+                disabled={isLoggingIn}
+                onPress={() => navigation.navigate('SignIn' as never)}
+              >
+                Login
+              </Button>
+            </>
+          )}
         </Card.Content>
       </Card>
     </View>

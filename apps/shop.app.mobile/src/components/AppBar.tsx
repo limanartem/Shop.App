@@ -62,6 +62,7 @@ const AppBar = ({ title }: { title: string }) => {
         anchor={
           <Appbar.Action
             icon="account-circle"
+            color={isLoggedIn() ? theme.colors.primary : undefined}
             onPress={() => {
               setMenuVisible(true);
             }}

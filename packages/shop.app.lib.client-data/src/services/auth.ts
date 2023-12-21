@@ -46,12 +46,13 @@ const buildSignInPayload = (email: string, password: string): SignInPayload => (
 
 const buildSignUpPayload = (email: string, password: string, name?: string): SignUpPayload => {
   const signInPayload = buildSignInPayload(email, password);
-  if (name) {
+  // TODO: Uncomment this when the API supports it.
+  /* if (name) {
     signInPayload.formFields.push({
       id: 'name',
       value: name,
     });
-  }
+  } */
   return signInPayload;
 };
 

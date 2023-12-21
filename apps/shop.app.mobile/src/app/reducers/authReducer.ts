@@ -59,6 +59,19 @@ export const signIn = createAsyncThunk(
   },
 );
 
+export const signUp = createAsyncThunk(
+  '/auth/signup',
+  async (args: { email: string; password: string; name: string }) => {
+    const { email, password, name } = args;
+    const signupResponse = await authServiceClient.signUpAsync(email, password, name);
+
+    if (signupResponse.status === 'OK' && signupResponse.user) {
+      return { user: signupResponse.user, success: true };
+    }
+    return { success: false };
+  },
+);
+
 /**
  * Signs out the user.
  */
@@ -96,6 +109,15 @@ export const authSlice = createSlice({
         state.user = action.payload.success ? action.payload.user : null;
       })
       .addCase(refreshAuthSession.rejected, (state) => {
+        state.user = null;
+      })
+      .addCase(signUp.pending, (state) => {
+        state.user = null;
+      })
+      .addCase(signUp.fulfilled, (state, action) => {
+        state.user = action.payload.success ? action.payload.user : null;
+      })
+      .addCase(signUp.rejected, (state) => {
         state.user = null;
       }),
 });
