@@ -1,0 +1,22 @@
+ type ShoppingCart {
+    id: ID
+    userId: ID
+    items: [ShoppingCartItem]
+  }
+
+  type ShoppingCartItem {
+    productId: String
+    quantity: Int
+    product: ProductItem
+  }
+
+  type ProductItem {
+    id: ID
+    title: String
+    description: String
+    price: Float
+    currency: String
+  }
+  type Query {
+    shoppingCart: ShoppingCart
+  }

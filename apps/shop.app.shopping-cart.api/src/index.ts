@@ -1,30 +1,13 @@
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
+import { readFileSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const typeDefs = `#graphql
-  type ShoppingCart {
-    id: ID
-    userId: ID
-    items: [ShoppingCartItem]
-  }
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  type ShoppingCartItem {
-    productId: String
-    quantity: Int
-    product: ProductItem
-  }
-
-  type ProductItem {
-    id: ID
-    title: String
-    description: String
-    price: Float
-    currency: String
-  }
-  type Query {
-    shoppingCart: ShoppingCart
-  }
-`;
+const typeDefs = readFileSync(path.join(__dirname, 'schema.graphql'), { encoding: 'utf-8' });
 
 const resolvers = {
   Query: {
