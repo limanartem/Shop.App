@@ -76,6 +76,20 @@ To share common logic across different apps add new package under `/packages` fo
 
 ## Troubleshooting
 * When running docker compose build on Windows machine some .sh file may fail to execute due to different line end feeding characters on Linux and Windows based systems. To quickly fix issue, in VS Code switch to CRLF EOL sequence see  https://essenceofcode.com/2019/11/20/linux-style-line-feeds-in-docker-desktop-on-windows/ for some additional information
+  * Apply this to `apps/shop.app.web/scripts/update-env.sh`
 * To get logs from container's health check use
   * `docker inspect --format "{{json .State.Health}}" <container name> | jq      `
   * or `docker inspect --format "{{json .State.Health }}"  <container name>  | jq '.Log[].Output'  `
+* In case you are working behind the proxy that amends ssl certificates chain breaking ssl validation for some tools, follow below workarounds:
+  * For node based issues execute following command: 
+    * `export NODE_TLS_REJECT_UNAUTHORIZED=0`
+  * For .net on Linux:
+    * Export certificates you see in a chain (e.g. in browser) to local folder
+    * Copy files to certs store and install them, see example in `apps/shop.app.catalog.api/Dockerfile`:
+    
+      ```
+      cp *.cer /usr/local/share/ca-certificates/.
+      cp *.cer /etc/ssl/certs/.
+      apt-get install ca-certificates
+
+      ```
