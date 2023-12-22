@@ -1,0 +1,22 @@
+{
+  "name": "@shop.app/shopping-cart.api",
+  "version": "1.0.0",
+  "description": "GraphQL APIs for shopping cart of registered user",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start-dev": "npm run build && node ./dist/index.js",
+    "start": "node ./dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.9.5",
+    "graphql": "^16.8.1"
+  }
+}
