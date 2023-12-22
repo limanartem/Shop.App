@@ -5,6 +5,7 @@ import CheckoutReducer from './reducers/checkOutReducer';
 import CategoriesReducer from './reducers/categoriesReducer';
 import AuthReducer from './reducers/authReducer';
 import NotificationsReducer from './reducers/notificationsReducer';
+import OrdersReducer from './reducers/ordersReducer';
 import middlewares from './middlewares/listeners';
 import { loadFromLocalStorage, saveToLocalStorage } from './persistance/local-storage';
 
@@ -17,6 +18,7 @@ export const buildStore = () => {
       categories: CategoriesReducer,
       auth: AuthReducer,
       notifications: NotificationsReducer,
+      orders: OrdersReducer,
     },
     preloadedState: loadFromLocalStorage(),
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().prepend(middlewares),

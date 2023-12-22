@@ -47,7 +47,7 @@ const LoginForm = ({ route }) => {
       })
       .catch((error) => {
         console.error(error);
-        setLoginError('Error occurred while logging in');
+        setLoginError('Error occurred while logging in. Please try again');
       })
       .finally(() => {
         setIsLoggingIn(false);
@@ -69,7 +69,7 @@ const LoginForm = ({ route }) => {
       })
       .catch((error) => {
         console.error(error);
-        setLoginError('Error occurred while registering');
+        setLoginError('Error occurred while registering. Please try again');
       })
       .finally(() => {
         setIsLoggingIn(false);

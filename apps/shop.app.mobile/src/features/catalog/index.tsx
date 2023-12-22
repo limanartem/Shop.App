@@ -52,9 +52,9 @@ function Catalog() {
     },
   });
 
-  useEffect(() => {
-    console.log('Catalog:fetching products');
+  function fetchProducts() {
     setProductsLoading(true);
+
     catalogServiceClient
       .getProductsAsync({})
       .then((products) => {
@@ -67,14 +67,19 @@ function Catalog() {
       .finally(() => {
         setProductsLoading(false);
       });
+  }
+
+  useEffect(() => {
+    fetchProducts();
   }, []);
 
   return (
     <>
       <View style={styles.container}>
-        {productsLoading && <LoadingIndicator size="large" />}
         {products.length > 0 ? (
           <VirtualizedList
+            refreshing={productsLoading}
+            onRefresh={() => fetchProducts()}
             initialNumToRender={4}
             renderItem={({ item }: { item: ProductItem }) =>
               productsLoading ? <ProductPlaceholder /> : <ProductCard product={item} />

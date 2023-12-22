@@ -1,7 +1,7 @@
 {
   "name": "@shop.app/mobile",
   "version": "1.0.0",
-  "main": "src/index.js",
+  "main": "src/index.tsx",
   "scripts": {
     "tsc": "tsc --noEmit",
     "start": "expo start",
