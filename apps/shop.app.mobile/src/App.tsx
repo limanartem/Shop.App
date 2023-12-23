@@ -12,6 +12,7 @@ import ShoppingCart from './features/shopping-cart';
 import LoginForm from './features/auth/signIn';
 import { AuthWrapper } from './components/AuthWrapper';
 import Orders from './features/orders';
+import Checkout from './features/checkout';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +44,7 @@ export default function App() {
             <Stack.Screen name="SignIn" component={LoginForm} initialParams={{ mode: 'login'}} options={{ title: 'Sign In' }} />
             <Stack.Screen name="SignUp" component={LoginForm} initialParams={{ mode: 'register'}} options={{ title: 'Sign Up' }} />
             <Stack.Screen name="Orders" component={Orders} options={{ title: 'Orders' }} />
+            <Stack.Screen name="Checkout" component={Checkout} options={{ title: 'Checkout' }} />
           </Stack.Navigator>
           <StatusBar style="auto" />
         </NavigationContainer>

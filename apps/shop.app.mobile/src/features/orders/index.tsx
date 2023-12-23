@@ -1,4 +1,4 @@
-import { Text } from 'react-native-paper';
+import { Text } from 'react-native-paper';  
 import { View, VirtualizedList, StyleSheet } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { useEffect, useState } from 'react';
