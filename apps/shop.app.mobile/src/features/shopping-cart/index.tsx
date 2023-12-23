@@ -8,7 +8,6 @@ import { ShoppingCartItem } from '@shop.app/lib.client-data/dist/model';
 
 export default function ShoppingCart() {
   const items = useAppSelector((state) => state.shoppingCart.items);
-  const dispatch = useAppDispatch();
   const navigate = useNavigation();
   const hasItems = useCallback(() => items.length > 0, [items]);
 

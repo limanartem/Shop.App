@@ -10,7 +10,7 @@ import { useAppDispatch } from '../../app/hooks';
 type Mode = 'login' | 'register';
 
 const LoginForm = ({ route }) => {
-  const { mode }: { mode: Mode } = route.params;
+  const { mode, redirectTo = 'Catalog' }: { mode: Mode; redirectTo?: string } = route.params;
   const theme = useTheme();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
@@ -40,7 +40,7 @@ const LoginForm = ({ route }) => {
       .then(unwrapResult)
       .then((result) => {
         if (result.success) {
-          navigation.navigate('Catalog' as never);
+          navigation.navigate(redirectTo as never);
         } else {
           setLoginError('Invalid credentials');
         }
@@ -62,7 +62,7 @@ const LoginForm = ({ route }) => {
       .then(unwrapResult)
       .then((result) => {
         if (result.success) {
-          navigation.navigate('Catalog' as never);
+          navigation.navigate(redirectTo as never);
         } else {
           setLoginError('Cannot register');
         }

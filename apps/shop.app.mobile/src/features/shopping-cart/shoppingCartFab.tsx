@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Badge, FAB, Icon, MD2Colors, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { clearCart } from '../../app/reducers/shoppingCartReducer';
 
 export default function ShoppingCartFAB() {
   const onStateChange = ({ open }: { open: boolean }) => setState({ open });
@@ -13,6 +14,7 @@ export default function ShoppingCartFAB() {
     state.shoppingCart.items.reduce((count, item) => count + item.quantity, 0),
   );
   const theme = useTheme();
+  const dispatch = useAppDispatch();
 
   const styles = StyleSheet.create({
     fab: {
@@ -21,8 +23,6 @@ export default function ShoppingCartFAB() {
       right: 0,
       bottom: 0,
       overflow: 'visible',
-      //backgroundColor: theme.colors.primary,
-      //color: '#0000',
     },
     badge: {
       position: 'absolute',
@@ -62,13 +62,13 @@ export default function ShoppingCartFAB() {
           icon: 'cart-check',
           label: 'Checkout',
           color: MD2Colors.green900,
-          onPress: () => console.log('Pressed remove from cart'),
+          onPress: () => navigation.navigate('Checkout' as never),
         },
         {
           icon: 'cart-remove',
           label: 'Remove All',
           color: MD2Colors.redA700,
-          onPress: () => console.log('Pressed remove from cart'),
+          onPress: () => dispatch(clearCart()),
         },
       ]}
     />
