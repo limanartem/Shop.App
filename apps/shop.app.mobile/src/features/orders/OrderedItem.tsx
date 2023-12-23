@@ -39,6 +39,7 @@ export default function OrderedItem({ order }: { order: Order }) {
     },
     contentStyle: {
       margin: 0,
+      padding: 0,
     },
   });
 
@@ -53,8 +54,8 @@ export default function OrderedItem({ order }: { order: Order }) {
           </>
         }
         left={(props) => <Icon source="cart-variant" size={20} color={theme.colors.primary} />}
-        leftStyle={{ marginRight: 0, marginLeft: 0 }}
-        rightStyle={{ marginRight: 10 }}
+        leftStyle={{ marginRight: 0, marginLeft: 0, marginTop: 50 }}
+        rightStyle={{ marginRight: 10, marginTop: 50 }}
         right={(props) => <Icon source="dots-vertical" size={20} />}
         subtitleNumberOfLines={2}
         subtitleVariant="bodyMedium"
