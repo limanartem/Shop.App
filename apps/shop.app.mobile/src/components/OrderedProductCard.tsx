@@ -36,7 +36,7 @@ const OrderedProductCard = ({ item, flow }: Props) => {
   });
 
   return (
-    <Card style={styles.container}>
+    <Card style={styles.container}  >
       <Card.Title
         title={title}
         subtitle={description}

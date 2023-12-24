@@ -10,6 +10,7 @@ interface CheckOutState extends PersistentState {
   flowStep?: FlowStep;
   payment: CheckoutPaymentInfo;
   shipment: CheckoutShippingInfo;
+  shipmentDirty: CheckoutShippingInfo;
 }
 
 const initialState: CheckOutState = {
@@ -17,6 +18,7 @@ const initialState: CheckOutState = {
   flowStep: 'confirmItems',
   payment: {},
   shipment: {},
+  shipmentDirty: {},
 };
 
 export const checkOutSlice = createSlice({
@@ -39,6 +41,9 @@ export const checkOutSlice = createSlice({
       state.shipment = action.payload;
       state.flowStep = 'payment';
     },
+    setCheckoutShippingDirty: (state, action: PayloadAction<CheckoutShippingInfo>) => {
+      state.shipmentDirty = action.payload;
+    },
     resetCheckout: (state) => {
       state.flowStep = 'confirmItems';
       state.payment = {};
@@ -54,11 +59,13 @@ export const checkOutSlice = createSlice({
 
 export const selectPayment = (state: RootState) => state.checkout.payment;
 export const selectShipping = (state: RootState) => state.checkout.shipment;
+export const selectShippingDirty = (state: RootState) => state.checkout.shipmentDirty;
 export const {
   previousStep,
   confirmCheckoutItems,
   setCheckoutPayment,
   setCheckoutShipping,
+  setCheckoutShippingDirty,
   placeOrder,
   resetCheckout,
 } = checkOutSlice.actions;
