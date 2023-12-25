@@ -1,11 +1,12 @@
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { setCheckoutShipping, setCheckoutShippingDirty } from '../../app/reducers/checkOutReducer';
-import { Card, HelperText, TextInput } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import { View } from 'react-native';
 import NavigationButtons from './NavigationButtons';
 import { StyleSheet } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import ControlledInput from '../../components/ControlledInput';
 
 type FormData = {
   address: string;
@@ -17,16 +18,24 @@ type FormData = {
   phoneNumber: string;
 };
 
-const ERROR_MESSAGES = {
-  REQUIRED: 'This Field Is Required',
-  NAME_INVALID: 'Not a Valid Name',
-  TERMS: 'Terms Must Be Accepted To Continue',
-  EMAIL_INVALID: 'Not a Valid Email',
+type FormRefs = {
+  [key in keyof FormData]: React.MutableRefObject<any>;
 };
+
+const getFormRefs = (): FormRefs => ({
+  address: useRef(),
+  city: useRef(),
+  country: useRef(),
+  state: useRef(),
+  zip: useRef(),
+  name: useRef(),
+  phoneNumber: useRef(),
+});
 
 export function StepShippingDetails() {
   const dispatch = useAppDispatch();
   const { shipmentDirty } = useAppSelector((state) => state.checkout);
+  const formRefs = getFormRefs();
 
   useEffect(() => {
     return () => {
@@ -34,16 +43,17 @@ export function StepShippingDetails() {
     };
   }, []);
 
-  const {
-    control,
-    formState: { errors, isValid, isDirty },
-    handleSubmit,
-    getValues,
-  } = useForm<FormData>({
+  const form = useForm<FormData>({
     mode: 'onChange',
     defaultValues: shipmentDirty,
     reValidateMode: 'onBlur',
   });
+
+  const {
+    formState: { isValid },
+    handleSubmit,
+    getValues,
+  } = form;
 
   const submit = (data: FormData) => dispatch(setCheckoutShipping(data));
 
@@ -56,61 +66,73 @@ export function StepShippingDetails() {
       marginTop: 20,
       alignItems: 'stretch',
     },
-    total: {},
+    row: {
+      flexDirection: 'row',
+      columnGap: 10,
+      justifyContent: 'flex-start',
+    },
   });
-
-  function ControlledInput({
-    name,
-    label,
-    required = true,
-    pattern,
-  }: {
-    name: keyof FormData;
-    label: string;
-    required?: boolean;
-    pattern?: { message: string; value: RegExp };
-  }) {
-    return (
-      <Controller
-        name={name}
-        control={control}
-        rules={{
-          required: required ? { value: true, message: ERROR_MESSAGES.REQUIRED } : undefined,
-          pattern: pattern ? { message: pattern.message, value: pattern.value } : undefined,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <View>
-            <TextInput
-              label={label}
-              value={value}
-              onBlur={onBlur}
-              onChangeText={(text) => onChange(text)}
-              returnKeyType="next"
-              error={errors[name] && true}
-            />
-            <HelperText type="error">{errors[name]?.message}</HelperText>
-          </View>
-        )}
-      />
-    );
-  }
 
   return (
     <>
       <Card style={styles.container}>
         <Card.Title title="" style={{ display: 'none' }} />
         <Card.Content style={styles.formContainer}>
-          <ControlledInput name="name" label="Contact Name" />
-          <ControlledInput name="phoneNumber" label="Contact Phone Number" />
-          <ControlledInput name="address" label="Street" />
           <ControlledInput
-            name="zip"
-            label="Zip"
-            pattern={{ value: /^\d+$/, message: 'Invalid Zip format' }}
+            name="name"
+            label="Contact Name"
+            form={form}
+            ref={formRefs.name}
+            nextRef={formRefs.phoneNumber}
           />
-          <ControlledInput name="city" label="City" />
-          <ControlledInput name="country" label="Country" />
-          <ControlledInput name="state" label="State" />
+          <ControlledInput
+            ref={formRefs.phoneNumber}
+            nextRef={formRefs.address}
+            name="phoneNumber"
+            label="Contact Phone Number"
+            required={false}
+            form={form}
+          />
+          <ControlledInput
+            name="address"
+            label="Street"
+            form={form}
+            ref={formRefs.address}
+            nextRef={formRefs.zip}
+          />
+          <View style={styles.row}>
+            <ControlledInput
+              form={form}
+              name="zip"
+              label="Zip"
+              ref={formRefs.zip}
+              nextRef={formRefs.city}
+              pattern={{ value: /^\d+$/, message: 'Invalid Zip format' }}
+              style={{ width: 80 }}
+            />
+            <ControlledInput
+              name="city"
+              label="City"
+              style={{ flexGrow: 1 }}
+              form={form}
+              ref={formRefs.city}
+              nextRef={formRefs.country}
+            />
+          </View>
+          <ControlledInput
+            name="country"
+            label="Country"
+            form={form}
+            ref={formRefs.country}
+            nextRef={formRefs.state}
+          />
+          <ControlledInput
+            name="state"
+            label="State"
+            required={false}
+            form={form}
+            ref={formRefs.state}
+          />
         </Card.Content>
       </Card>
       <NavigationButtons nextAction={handleSubmit(submit)} canNavigateForward={isValid} />
