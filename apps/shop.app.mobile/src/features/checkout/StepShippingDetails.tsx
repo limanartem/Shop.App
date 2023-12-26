@@ -55,7 +55,7 @@ export function StepShippingDetails() {
     getValues,
   } = form;
 
-  const submit = (data: FormData) => dispatch(setCheckoutShipping(data));
+  const submit = (data: FormData) => isValid && dispatch(setCheckoutShipping(data));
 
   const styles = StyleSheet.create({
     container: {

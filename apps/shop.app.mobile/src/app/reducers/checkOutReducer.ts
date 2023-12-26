@@ -9,6 +9,7 @@ export const CHECKOUT_FLOW_STEPS: FlowStep[] = ['confirmItems', 'shipping', 'pay
 interface CheckOutState extends PersistentState {
   flowStep?: FlowStep;
   payment: CheckoutPaymentInfo;
+  paymentDirty: CheckoutPaymentInfo;
   shipment: CheckoutShippingInfo;
   shipmentDirty: CheckoutShippingInfo;
 }
@@ -17,8 +18,26 @@ const initialState: CheckOutState = {
   persistent: true,
   flowStep: 'confirmItems',
   payment: {},
+  paymentDirty: {
+    creditCard: {
+      number: '4242424242424242',
+      name: 'John Doe',
+      cvc: '123',
+      expire: '01/2022',
+    },
+    bank: {
+      iban: 'DE89370400440532013000',
+    }
+  },
   shipment: {},
-  shipmentDirty: {},
+  shipmentDirty: {
+    address: '123 Main St',
+    country: 'US',
+    city: 'New York',
+    state: 'NY',
+    zip: '10001',
+    name: 'John Doe',
+  },
 };
 
 export const checkOutSlice = createSlice({
@@ -37,6 +56,9 @@ export const checkOutSlice = createSlice({
       state.payment = action.payload;
       state.flowStep = 'review';
     },
+    setCheckoutPaymentDirty: (state, action: PayloadAction<CheckoutPaymentInfo>) => {
+      state.paymentDirty = action.payload;
+    },  
     setCheckoutShipping: (state, action: PayloadAction<CheckoutShippingInfo>) => {
       state.shipment = action.payload;
       state.flowStep = 'payment';
@@ -64,6 +86,7 @@ export const {
   previousStep,
   confirmCheckoutItems,
   setCheckoutPayment,
+  setCheckoutPaymentDirty,
   setCheckoutShipping,
   setCheckoutShippingDirty,
   placeOrder,

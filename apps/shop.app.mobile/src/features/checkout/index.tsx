@@ -10,11 +10,11 @@ import { StepConfirmItems } from './StepConfirmItems';
 import NavigationButtons from './NavigationButtons';
 import { StepShippingDetails } from './StepShippingDetails';
 import { View, ScrollView } from 'react-native';
+import { StepPaymentDetails } from './StepPaymentDetails';
 
 export default function Checkout() {
   const dispatch = useAppDispatch();
   const { flowStep } = useAppSelector((state) => state.checkout);
-  const [paymentType, setPaymentType] = useState('credit-card');
 
   return (
     <ScrollView>
@@ -42,31 +42,7 @@ export default function Checkout() {
           right={() => <></>}
           left={(props) => <List.Icon {...props} icon="credit-card-check-outline" />}
         >
-          <List.AccordionGroup
-            expandedId={paymentType}
-            onAccordionPress={(expandedId) => setPaymentType(expandedId as string)}
-          >
-            <List.Accordion
-              id="credit-card"
-              title="Credit Card"
-              right={() => <></>}
-              left={(props) => <List.Icon {...props} icon="credit-card-outline" />}
-              style={{ marginLeft: 20 }}
-            >
-              <Text>Credit card</Text>
-            </List.Accordion>
-            <List.Accordion
-              id="bank"
-              title="Bank"
-              right={() => <></>}
-              left={(props) => <List.Icon {...props} icon="bank-outline" />}
-              style={{ marginLeft: 20 }}
-            >
-              <Text>Bank</Text>
-            </List.Accordion>
-          </List.AccordionGroup>
-
-          <NavigationButtons nextAction={() => dispatch(setCheckoutPayment({}))} />
+         <StepPaymentDetails />
         </List.Accordion>
         <List.Accordion
           id="review"
