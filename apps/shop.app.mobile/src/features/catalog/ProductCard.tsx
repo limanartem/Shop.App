@@ -67,9 +67,11 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
         }}
       />
       <Card.Actions>
+        {/*
         <View>
           <Rating readonly={true} imageSize={15} startingValue={Math.random() * 5 + 1} />
         </View>
+         */}
         <View>
           <Text variant="titleMedium">
             {price.toFixed(2)} {currency}

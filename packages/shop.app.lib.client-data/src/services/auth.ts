@@ -1,4 +1,5 @@
 import { User } from 'supertokens-web-js/types';
+import { GetAccessTokenFunc } from '.';
 
 type FormField = {
   id: 'email' | 'password' | 'name';
@@ -61,11 +62,13 @@ const buildSignUpPayload = (email: string, password: string, name?: string): Sig
  */
 export class AuthServiceClient {
   private authApiUrl: string;
+  private getAccessToken: GetAccessTokenFunc;
 
-  constructor(env: Record<string, string>) {
+  constructor(env: Record<string, string>, getAccessToken: GetAccessTokenFunc) {
     const { REACT_APP_AUTH_API_URL = 'http://localhost:3003' } = env;
     console.log(`AuthServiceClient: ${REACT_APP_AUTH_API_URL}`);
     this.authApiUrl = REACT_APP_AUTH_API_URL;
+    this.getAccessToken = getAccessToken;
   }
 
   /**
@@ -74,10 +77,18 @@ export class AuthServiceClient {
    * @throws An error if unable to get user details.
    */
   public async getUserAsync(): Promise<User> {
+    const token = await this.getAccessToken();
+    if (token == null) {
+      throw new Error('User is not logged in');
+    }
+    
     console.log(`Fetching user from ${this.authApiUrl}/user`);
 
     const response = await fetch(`${this.authApiUrl}/user`, {
       method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {

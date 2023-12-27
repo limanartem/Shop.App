@@ -7,7 +7,9 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web -c ",
+    "web:prod": "export start --web --no-dev --minify",
+    "_postinstall": "patch-package"
   },
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",
@@ -17,9 +19,11 @@
     "@reduxjs/toolkit": "^2.0.1",
     "@shop.app/lib.client-data": "file:../../packages/shop.app.lib.client-data",
     "@types/react-redux": "^7.1.33",
+    "card-validator": "^9.0.0",
     "expo": "~49.0.15",
     "expo-splash-screen": "~0.20.5",
-    "expo-status-bar": "^1.7.1",
+    "expo-status-bar": "~1.6.0",
+    "ibantools": "^4.3.8",
     "react": "18.2.0",
     "react-hook-form": "^7.49.2",
     "react-native": "^0.73.1",
@@ -28,17 +32,19 @@
     "react-native-mmkv-storage": "^0.9.1",
     "react-native-paper": "^5.11.4",
     "react-native-ratings": "^8.1.0",
-    "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.6",
     "react-redux": "^9.0.4",
-    "supertokens-react-native": "^4.0.8"
+    "supertokens-react-native": "^4.0.8",
+    "supertokens-web-js": "^0.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.6",
+    "@react-native/metro-config": "^0.73.2",
     "@tsconfig/react-native": "^3.0.2",
     "@types/jest": "^29.5.11",
     "@types/react": "~18.2.14",
     "@types/react-test-renderer": "^18.0.7",
+    "patch-package": "^8.0.0",
     "typescript": "^5.3.3"
   },
   "private": true

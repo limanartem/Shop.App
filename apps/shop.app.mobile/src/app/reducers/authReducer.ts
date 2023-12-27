@@ -1,11 +1,14 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { User } from 'supertokens-web-js/types';
-import SuperTokens from 'supertokens-react-native';
 import { authServiceClient } from '../../services';
-import env from '../../config/environment';
+import {
+  doesSessionExist,
+  initSuperTokens,
+  signOutSession,
+  signIn as signInUser,
+} from '../../utils/supertoken-utils';
 
-const { REACT_APP_AUTH_API_URL } = env;
 
 interface AuthState {
   user?: User | null;
@@ -17,19 +20,12 @@ const initialState: AuthState = {
   initialized: false,
 };
 
-const initSuperTokens = () => {
-  SuperTokens.init({
-    apiDomain: REACT_APP_AUTH_API_URL,
-    apiBasePath: '/auth',
-  });
-};
-
 /**
  * Refreshes the authentication session.
  * @returns A promise that resolves to an object containing the user and success status.
  */
 export const refreshAuthSession = createAsyncThunk('/auth/refresh', async () => {
-  const isLogged = await SuperTokens.doesSessionExist();
+  const isLogged = await doesSessionExist();
 
   if (isLogged) {
     const user = await authServiceClient.getUserAsync();
@@ -50,12 +46,7 @@ export const signIn = createAsyncThunk(
   '/auth/signin',
   async (args: { email: string; password: string }) => {
     const { email, password } = args;
-    const loginResponse = await authServiceClient.signInAsync(email, password);
-
-    if (loginResponse.status === 'OK' && loginResponse.user) {
-      return { user: loginResponse.user, success: true };
-    }
-    return { success: false };
+    return await signInUser(email, password);
   },
 );
 
@@ -76,7 +67,7 @@ export const signUp = createAsyncThunk(
  * Signs out the user.
  */
 export const signOut = createAsyncThunk('/auth/signout', async () => {
-  await SuperTokens.signOut();
+  await signOutSession();
 });
 
 export const authSlice = createSlice({
@@ -97,7 +88,7 @@ export const authSlice = createSlice({
         state.user = null;
       })
       .addCase(signIn.fulfilled, (state, action) => {
-        state.user = action.payload.success ? action.payload.user : null;
+        state.user = action.payload?.success === true ? action.payload.user : null;
       })
       .addCase(signIn.rejected, (state) => {
         state.user = null;

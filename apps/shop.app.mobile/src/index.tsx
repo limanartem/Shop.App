@@ -2,10 +2,8 @@ import { registerRootComponent } from 'expo';
 import * as React from 'react';
 import { MD3LightTheme as DefaultTheme, PaperProvider, useTheme } from 'react-native-paper';
 
-
 import App from './App';
 import { theme } from './theme';
-
 
 export default function Main() {
   return (
