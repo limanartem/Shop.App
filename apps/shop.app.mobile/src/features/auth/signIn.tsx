@@ -2,15 +2,26 @@ import React, { useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, useTheme, Icon, Card, HelperText } from 'react-native-paper';
 import { TextInput as RNTextInput } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { signIn, signUp } from '../../app/reducers/authReducer';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useAppDispatch } from '../../app/hooks';
 
 type Mode = 'login' | 'register';
 
-const LoginForm = ({ route }) => {
-  const { mode, redirectTo = 'Catalog' }: { mode: Mode; redirectTo?: string } = route.params;
+type RouteTypeParams = RouteProp<
+  {
+    params: {
+      mode: Mode;
+      redirectTo?: string;
+    };
+  },
+  'params'
+>;
+
+const LoginForm = () => {
+  const { params } = useRoute<RouteTypeParams>();
+  const { mode = 'login', redirectTo = 'Catalog' } = params || {};
   const theme = useTheme();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
@@ -40,7 +51,7 @@ const LoginForm = ({ route }) => {
       .then(unwrapResult)
       .then((result) => {
         if (result?.success === true) {
-          navigation.navigate(redirectTo as never);
+          //navigation.navigate(redirectTo as never);
         } else {
           setLoginError('Invalid credentials');
         }
@@ -62,7 +73,7 @@ const LoginForm = ({ route }) => {
       .then(unwrapResult)
       .then((result) => {
         if (result.success) {
-          navigation.navigate(redirectTo as never);
+          //navigation.navigate(redirectTo as never);
         } else {
           setLoginError('Cannot register');
         }

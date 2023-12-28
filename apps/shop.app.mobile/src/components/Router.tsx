@@ -10,13 +10,13 @@ import Orders from '../features/orders';
 import ShoppingCart from '../features/shopping-cart';
 import AppBar from './AppBar';
 
-const Stack = createNativeStackNavigator();
-
 function AppBarHeader({ route, options }: { route: any; options: any }) {
   const title = getHeaderTitle(options, route.name);
 
   return <AppBar title={title} />;
 }
+
+const Stack = createNativeStackNavigator();
 
 export default function Router() {
   const user = useAppSelector((state) => state.auth.user);
