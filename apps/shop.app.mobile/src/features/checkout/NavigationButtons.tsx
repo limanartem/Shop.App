@@ -32,7 +32,7 @@ export default function NavigationButtons({
         mode="contained"
         onPress={async () => await nextAction()}
         icon="check"
-        disabled={!canNavigateForward}
+        disabled={!canNavigateForward || loading}
         loading={loading}
       >
         OK

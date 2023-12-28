@@ -66,7 +66,7 @@ export default function OrderedItem({ order }: { order: Order }) {
               <Text style={styles.price}>
                 <Text style={styles.label}>Total: </Text>
                 {calculateTotal(order)}
-                <Text>&nbsp;{order.items[0].product.currency}</Text>
+                <Text>&nbsp;{order.items[0]?.product?.currency}</Text>
               </Text>
             </View>
             <View style={styles.row}>

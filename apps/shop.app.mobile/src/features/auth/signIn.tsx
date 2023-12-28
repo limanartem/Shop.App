@@ -112,13 +112,13 @@ const LoginForm = () => {
       case 'login':
         if (isEmailValid && password !== '') {
           handleLogin();
-          break;
         }
+        break;
       case 'register':
         if (isEmailValid && password !== '' && name !== '') {
           handleRegister();
-          break;
         }
+        break;
     }
   };
 
