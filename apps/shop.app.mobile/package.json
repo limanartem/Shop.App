@@ -20,7 +20,7 @@
     "@shop.app/lib.client-data": "file:../../packages/shop.app.lib.client-data",
     "@types/react-redux": "^7.1.33",
     "card-validator": "^9.0.0",
-    "expo": "~49.0.15",
+    "expo": "^49.0.21",
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
     "ibantools": "^4.3.8",
