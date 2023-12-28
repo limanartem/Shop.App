@@ -1,15 +1,10 @@
-import React, { ChangeEventHandler, FormEventHandler, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import valid from 'card-validator';
 import { isValidIBAN } from 'ibantools';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import {
-  previousStep,
-  setCheckoutPayment,
-  setCheckoutShipping,
-} from '../../app/reducers/checkOutReducer';
-import { CreditCardDetails, BankDetails } from '@shop.app/lib.client-data/dist/model';
+import { setCheckoutPayment } from '../../app/reducers/checkOutReducer';
 import { useForm } from 'react-hook-form';
-import { Card, List, Text } from 'react-native-paper';
+import { Card, List } from 'react-native-paper';
 import ControlledInput from '../../components/ControlledInput';
 import NavigationButtons from './NavigationButtons';
 import { StyleSheet, View } from 'react-native';
@@ -42,30 +37,11 @@ const getFormRefs = () => ({
 
 export function StepPaymentDetails() {
   const { paymentDirty } = useAppSelector((state) => state.checkout);
-  const initialPaymentMethod =
-    paymentDirty.creditCard != null || paymentDirty.bank == null ? 'creditCard' : 'bank';
 
-  const [paymentMethod, setPaymentMethod] = useState<'creditCard' | 'bank'>(initialPaymentMethod);
-  const [creditCardDetails, setCreditCardDetails] = useState<CreditCardDetails | undefined>(
-    paymentDirty.creditCard,
-  );
-  const [bankDetails, setBankDetails] = useState<BankDetails | undefined>({
-    ...paymentDirty.bank,
-    iban: 'DE89370400440532013000', // For ease of testing
-  });
-  const [paymentType, setPaymentType] = useState('credit-card');
+  const [paymentType, setPaymentType] = useState('creditCard');
   const formRefs = getFormRefs();
 
   const dispatch = useAppDispatch();
-
-
-  const handleFormSubmit = () => {
-    dispatch(
-      setCheckoutPayment(
-        paymentMethod === 'creditCard' ? { creditCard: creditCardDetails } : { bank: bankDetails },
-      ),
-    );
-  };
 
   const isValidCreditCard = (cardNumber: string) => valid.number(cardNumber).isValid;
   const isValidExpiryDate = (expiryDate: string) => new Date(expiryDate) > new Date();
@@ -77,13 +53,21 @@ export function StepPaymentDetails() {
     reValidateMode: 'onBlur',
   });
 
+  console.log(paymentDirty);
+
   const {
     formState: { isValid },
     handleSubmit,
     getValues,
   } = form;
 
-  const submit = (data: FormData) => isValid && dispatch(setCheckoutPayment(data));
+  const submit = (data: FormData) =>
+    isValid &&
+    dispatch(
+      setCheckoutPayment(
+        paymentType === 'creditCard' ? { creditCard: data.creditCard } : { bank: data.bank },
+      ),
+    );
 
   return (
     <>
@@ -92,7 +76,7 @@ export function StepPaymentDetails() {
         onAccordionPress={(expandedId) => setPaymentType(expandedId as string)}
       >
         <List.Accordion
-          id="credit-card"
+          id="creditCard"
           title="Credit Card"
           right={() => <></>}
           left={(props) => <List.Icon {...props} icon="credit-card-outline" />}
@@ -102,7 +86,7 @@ export function StepPaymentDetails() {
             <Card.Title title="" style={{ display: 'none' }} />
             <Card.Content style={styles.formContainer}>
               <ControlledInput
-                name="number"
+                name="creditCard.number"
                 label="Card Number"
                 form={form}
                 ref={formRefs.creditCard.number}
@@ -115,7 +99,7 @@ export function StepPaymentDetails() {
               <View style={styles.row}>
                 <ControlledInput
                   form={form}
-                  name="cvc"
+                  name="creditCard.cvc"
                   label="CVC"
                   placeholder="123"
                   ref={formRefs.creditCard.cvc}
@@ -126,7 +110,7 @@ export function StepPaymentDetails() {
                   }}
                 />
                 <ControlledInput
-                  name="expire"
+                  name="creditCard.expire"
                   label="Expire"
                   style={{ flexGrow: 1 }}
                   form={form}
@@ -139,7 +123,7 @@ export function StepPaymentDetails() {
                 />
               </View>
               <ControlledInput
-                name="name"
+                name="creditCard.name"
                 label="Card Holder"
                 form={form}
                 ref={formRefs.creditCard.name}
@@ -158,7 +142,7 @@ export function StepPaymentDetails() {
             <Card.Title title="" style={{ display: 'none' }} />
             <Card.Content style={styles.formContainer}>
               <ControlledInput
-                name="iban"
+                name="bank.iban"
                 label="IBAN"
                 form={form}
                 ref={formRefs.bank.iban}
@@ -172,96 +156,6 @@ export function StepPaymentDetails() {
       </List.AccordionGroup>
 
       <NavigationButtons nextAction={handleSubmit(submit)} canNavigateForward={isValid} />
-      {/*
-      <form onSubmit={handleFormSubmit}>
-        <Tabs value={paymentMethod} onChange={handleTabChange} style={{ marginBottom: 10 }}>
-          <Tab label="Credit Card" value="creditCard" />
-          <Tab label="Bank" value="bank" />
-        </Tabs>
-        {paymentMethod === 'creditCard' ? (
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Card Number"
-                fullWidth
-                required
-                name="number"
-                value={creditCardDetails?.number || ''}
-                onChange={handleCreditCardChange}
-                error={errors.number}
-                helperText={errors.number && 'Please enter a valid card number'}
-              />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <TextField
-                label="CVC"
-                fullWidth
-                required
-                name="cvc"
-                value={creditCardDetails?.cvc || ''}
-                onChange={handleCreditCardChange}
-                error={errors.cvc}
-                helperText={errors.cvc && 'Please enter a valid CVC (3 digits)'}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Expiry Date (MM/YYYY)"
-                fullWidth
-                required
-                name="expire"
-                value={creditCardDetails?.expire || ''}
-                onChange={handleCreditCardChange}
-                error={errors.expire}
-                helperText={errors.expire && 'Please enter a valid expiry date'}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Card Holder"
-                fullWidth
-                required
-                name="name"
-                value={creditCardDetails?.name || ''}
-                onChange={handleCreditCardChange}
-                error={errors.name}
-                helperText={errors.name && 'Please enter a valid card holder'}
-              />
-            </Grid>
-          </Grid>
-        ) : (
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                label="IBAN"
-                fullWidth
-                required
-                name="iban"
-                value={bankDetails?.iban || ''}
-                onChange={handleIbanChange}
-                error={errors.iban}
-                helperText={errors.iban && 'Please enter a valid IBAN'}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField label="Bank Name" fullWidth helperText={'Please enter the bank name'} />
-            </Grid>
-          </Grid>
-        )}
-        <Grid item xs={12}>
-          <Box textAlign="right" padding={2}>
-            <ButtonGroup size="large">
-              <Button type="submit" variant="contained" color="primary" style={{ minWidth: 80 }}>
-                Continue
-              </Button>
-              <Button disabled={false} onClick={handleBack} style={{ minWidth: '80px' }}>
-                Back
-              </Button>
-            </ButtonGroup>
-          </Box>
-        </Grid>
-      </form>
-       */}
     </>
   );
 }
@@ -269,6 +163,7 @@ export function StepPaymentDetails() {
 const styles = StyleSheet.create({
   container: {
     margin: 10,
+    paddingLeft: 0,
   },
   formContainer: {
     flexDirection: 'column',

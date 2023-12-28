@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { PersistentState } from '../persistance/local-storage';
 import { ShoppingCartItem, ProductItem } from '@shop.app/lib.client-data/dist/model';
+import { placeOrder } from './checkOutReducer';
 
 interface ShoppingCartState extends PersistentState {
   items: ShoppingCartItem[];
@@ -30,7 +31,12 @@ export const shoppingCartSlice = createSlice({
     },
     clearCart: (state) => {
       state.items = [];
-    }
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(placeOrder.fulfilled, (state) => {
+      state.items = [];
+    });
   },
 });
 

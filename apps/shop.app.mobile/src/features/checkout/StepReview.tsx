@@ -1,109 +1,46 @@
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { Alert, Box, Button, ButtonGroup, Grid } from '@mui/material';
-import { previousStep, placeOrder } from '../../app/reducers/checkOutReducer';
-import CircularProgress from '@mui/material/CircularProgress';
-import { FormEventHandler, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import config from '../../config';
-import { orderServiceClient } from '../../services';
+import { useAppDispatch } from '../../app/hooks';
+import { placeOrder } from '../../app/reducers/checkOutReducer';
+import { useState } from 'react';
+import { View } from 'react-native';
+import { Text } from 'react-native-paper';
+import NavigationButtons from './NavigationButtons';
 
 export function StepReview() {
   const dispatch = useAppDispatch();
-  const { shipment, payment } = useAppSelector((state) => state.checkout);
-  const { items } = useAppSelector((state) => state.shoppingCart);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>();
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    dispatch(previousStep());
-  };
-
-  const handleComplete: FormEventHandler = (e) => {
-    e.preventDefault();
-
-    setSuccess(false);
+  const submit = () => {
     setLoading(true);
-    setError(null);
-
-    const createOrder = async () => {
-      try {
-        const result = await orderServiceClient.createOrdersAsync({
-          items: items.map((item) => ({
-            productId: item.product.id,
-            quantity: item.quantity,
-          })),
-          shipping: shipment,
-          payment,
-        });
-
+    dispatch(placeOrder())
+      .unwrap()
+      .then((result) => {
         if (result?.id != null) {
           setSuccess(true);
-          setLoading(false);
-          setTimeout(() => {
-            dispatch(placeOrder());
-            navigate(`/orders/${result.id}`);
-          }, config.checkout.DelayAfterCompletion);
-        } else {
-          setError('Something went wrong');
         }
-      } catch (error) {
+      })
+      .catch((error) => {
         setError(`Something went wrong: ${error}`);
-      } finally {
+        setSuccess(false);
+      })
+      .finally(() => {
         setLoading(false);
-      }
-    };
-
-    createOrder();
+      });
   };
 
   return (
-    <Box textAlign="right" padding={2}>
+    <View>
       {!success && (
-        <form onSubmit={handleComplete}>
-          <ButtonGroup size="large" sx={{ m: 1, position: 'relative' }}>
-            <Button
-              variant="contained"
-              color="primary"
-              type={success ? undefined : 'submit'}
-              style={{ minWidth: '120px' }}
-              disabled={loading}
-            >
-              Submit
-            </Button>
-            {loading && (
-              <CircularProgress
-                size={24}
-                sx={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  marginTop: '-12px',
-                  marginLeft: '-12px',
-                }}
-              />
-            )}
-            <Button
-              disabled={loading || success}
-              onClick={handleBack}
-              style={{ minWidth: '120px' }}
-            >
-              Back
-            </Button>
-          </ButtonGroup>
-        </form>
+        <NavigationButtons nextAction={submit} loading={loading} canNavigateForward={true} />
       )}
-      <Grid container spacing={2} alignContent="center" textAlign="center">
-        <Grid item xs={12}>
-          {error != null && <Alert severity="error">{error}</Alert>}
+      <View>
+        <View>
+          {error != null && <Text>{error}</Text>}
           {success && (
-            <Alert severity="success">
-              Order has been successfully placed and is being processed! Thank You!
-            </Alert>
+            <Text>Order has been successfully placed and is being processed! Thank You!</Text>
           )}
-        </Grid>
-      </Grid>
-    </Box>
+        </View>
+      </View>
+    </View>
   );
 }

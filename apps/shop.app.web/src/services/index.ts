@@ -15,4 +15,4 @@ import {
 export const catalogServiceClient = new CatalogServiceClient(env);
 export const graphQlWsClient = new GraphQlWsClient(env, Session.getAccessToken);
 export const orderServiceClient = new OrderServiceClient(env, Session.getAccessToken);
-export const authServiceClient = new AuthServiceClient(env);
+export const authServiceClient = new AuthServiceClient(env, Session.getAccessToken);

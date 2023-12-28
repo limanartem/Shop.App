@@ -1,9 +1,17 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {
+  createAsyncThunk,
+  createSlice,
+  PayloadAction,
+} from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { PersistentState } from '../persistance/local-storage';
-import { CheckoutPaymentInfo, CheckoutShippingInfo } from '@shop.app/lib.client-data/dist/model';
+import {
+  CheckoutPaymentInfo,
+  CheckoutShippingInfo,
+} from '@shop.app/lib.client-data/dist/model';
+import { createOrderAsync } from './ordersReducer';
 
-export type FlowStep = 'confirmItems' | 'shipping' | 'payment' | 'review';
+export type FlowStep = 'confirmItems' | 'shipping' | 'payment' | 'review' | 'complete';
 export const CHECKOUT_FLOW_STEPS: FlowStep[] = ['confirmItems', 'shipping', 'payment', 'review'];
 
 interface CheckOutState extends PersistentState {
@@ -27,7 +35,7 @@ const initialState: CheckOutState = {
     },
     bank: {
       iban: 'DE89370400440532013000',
-    }
+    },
   },
   shipment: {},
   shipmentDirty: {
@@ -39,6 +47,21 @@ const initialState: CheckOutState = {
     name: 'John Doe',
   },
 };
+
+export const placeOrder = createAsyncThunk('checkOut/placeOrder', async (_, options) => {
+  const { checkout, shoppingCart } = options.getState() as RootState;
+  const result = options.dispatch(
+    createOrderAsync({
+      items: shoppingCart.items.map((item) => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+      })),
+      payment: checkout.payment,
+      shipping: checkout.shipment,
+    }),
+  );
+  return result.unwrap();
+});
 
 export const checkOutSlice = createSlice({
   name: 'checkOut',
@@ -58,7 +81,7 @@ export const checkOutSlice = createSlice({
     },
     setCheckoutPaymentDirty: (state, action: PayloadAction<CheckoutPaymentInfo>) => {
       state.paymentDirty = action.payload;
-    },  
+    },
     setCheckoutShipping: (state, action: PayloadAction<CheckoutShippingInfo>) => {
       state.shipment = action.payload;
       state.flowStep = 'payment';
@@ -71,11 +94,13 @@ export const checkOutSlice = createSlice({
       state.payment = {};
       state.shipment = {};
     },
-    placeOrder: (state) => {
-      state.flowStep = 'confirmItems';
+  },
+  extraReducers: (builder) => {
+    builder.addCase(placeOrder.fulfilled, (state) => {
+      state.flowStep = 'complete';
       state.payment = {};
       state.shipment = {};
-    },
+    });
   },
 });
 
@@ -89,7 +114,6 @@ export const {
   setCheckoutPaymentDirty,
   setCheckoutShipping,
   setCheckoutShippingDirty,
-  placeOrder,
   resetCheckout,
 } = checkOutSlice.actions;
 export default checkOutSlice.reducer;

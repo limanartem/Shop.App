@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { FormEventHandler, useCallback } from 'react';
+import { useCallback } from 'react';
 import { confirmCheckoutItems } from '../../app/reducers/checkOutReducer';
 import { View, VirtualizedList } from 'react-native';
 import OrderedProductCard from '../../components/OrderedProductCard';
@@ -11,7 +11,7 @@ import NavigationButtons from './NavigationButtons';
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
   },
   list: {
     //maxHeight: '80%',
@@ -38,11 +38,6 @@ export function StepConfirmItems() {
       .toFixed(2);
   }, [items]);
 
-  const handleFormSubmit: FormEventHandler = (e) => {
-    e.preventDefault();
-    dispatch(confirmCheckoutItems());
-  };
-
   return (
     <View style={styles.container}>
       <VirtualizedList
@@ -59,7 +54,9 @@ export function StepConfirmItems() {
       />
       <View style={styles.footer}>
         <NavigationButtons
-          nextAction={() => dispatch(confirmCheckoutItems())}
+          nextAction={() => {
+            dispatch(confirmCheckoutItems());
+          }}
           canNavigateBack={false}
         />
         <Text style={styles.total}>

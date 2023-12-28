@@ -17,10 +17,12 @@ export default function NavigationButtons({
   nextAction,
   canNavigateBack = true,
   canNavigateForward = true,
+  loading = false,
 }: {
   nextAction: () => void | Promise<void>;
   canNavigateBack?: boolean;
   canNavigateForward?: boolean;
+  loading?: boolean;
 }) {
   const dispatch = useAppDispatch();
 
@@ -31,6 +33,7 @@ export default function NavigationButtons({
         onPress={async () => await nextAction()}
         icon="check"
         disabled={!canNavigateForward}
+        loading={loading}
       >
         OK
       </Button>

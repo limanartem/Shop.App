@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Order } from '@shop.app/lib.client-data/dist/model';
+import { CreateOrder, Order } from '@shop.app/lib.client-data/dist/model';
 import { orderServiceClient } from '../../services';
 import { RootState } from '../store';
 import { DataLoadingState } from './categoriesReducer';
@@ -18,7 +18,7 @@ export const fetchOrdersAsync = createAsyncThunk('orders/fetchOrders', async () 
   return await orderServiceClient.getOrdersAsync();
 });
 
-export const createOrderAsync = createAsyncThunk('orders/createOrder', async (order: Order) => {
+export const createOrderAsync = createAsyncThunk('orders/createOrder', async (order: CreateOrder) => {
   return await orderServiceClient.createOrdersAsync(order);
 });
 
@@ -45,9 +45,9 @@ export const ordersSlice = createSlice({
     builder.addCase(fetchOrdersAsync.rejected, (state, action) => {
       state.ordersState = DataLoadingState.failed;
     });
-    builder.addCase(createOrderAsync.fulfilled, (state, action) => {
+    /* builder.addCase(createOrderAsync.fulfilled, (state, action) => {
       fetchOrdersAsync();
-    });
+    }); */
   },
 });
 

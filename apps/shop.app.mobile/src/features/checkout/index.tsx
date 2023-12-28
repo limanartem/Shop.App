@@ -1,22 +1,19 @@
-import React, { useState } from 'react';
-import { List, Text } from 'react-native-paper';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import {
-  placeOrder,
-  setCheckoutPayment,
-  setCheckoutShipping,
-} from '../../app/reducers/checkOutReducer';
+import React, { useEffect } from 'react';
+import { List } from 'react-native-paper';
+import { useAppSelector } from '../../app/hooks';
 import { StepConfirmItems } from './StepConfirmItems';
-import NavigationButtons from './NavigationButtons';
 import { StepShippingDetails } from './StepShippingDetails';
-import { View, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 import { StepPaymentDetails } from './StepPaymentDetails';
+import { StepReview } from './StepReview';
+import StepCompleted from './StepCompleted';
 
 export default function Checkout() {
-  const dispatch = useAppDispatch();
   const { flowStep } = useAppSelector((state) => state.checkout);
 
-  return (
+  return flowStep === 'complete' ? (
+    <StepCompleted />
+  ) : (
     <ScrollView>
       <List.AccordionGroup expandedId={flowStep}>
         <List.Accordion
@@ -42,7 +39,7 @@ export default function Checkout() {
           right={() => <></>}
           left={(props) => <List.Icon {...props} icon="credit-card-check-outline" />}
         >
-         <StepPaymentDetails />
+          <StepPaymentDetails />
         </List.Accordion>
         <List.Accordion
           id="review"
@@ -50,8 +47,7 @@ export default function Checkout() {
           right={() => <></>}
           left={(props) => <List.Icon {...props} icon="cart-check" />}
         >
-          <Text>Confirm</Text>
-          <NavigationButtons nextAction={() => dispatch(placeOrder())} />
+          <StepReview />
         </List.Accordion>
       </List.AccordionGroup>
     </ScrollView>
