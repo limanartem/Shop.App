@@ -7,7 +7,7 @@ import { verifySession } from 'supertokens-node/recipe/session/framework/express
 import { initApiUser, initAuth } from './init-auth';
 import { useLogging, useTracing } from '@shop.app/lib.express';
 
-const { WEB_API_PORT, PUBLIC_WEB_UI_DOMAIN } = process.env;
+const { WEB_API_PORT, PUBLIC_WEB_UI_DOMAINS } = process.env;
 
 initAuth();
 
@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: `http://${PUBLIC_WEB_UI_DOMAIN}`,
+    origin: PUBLIC_WEB_UI_DOMAINS.split(','),
     allowedHeaders: ['content-type', ...supertokens.getAllCORSHeaders()],
     methods: ['GET', 'PUT', 'POST', 'DELETE'],
     credentials: true,

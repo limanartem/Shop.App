@@ -39,7 +39,7 @@ const LoginForm = ({ route }) => {
     dispatch(signIn({ email, password }))
       .then(unwrapResult)
       .then((result) => {
-        if (result.success) {
+        if (result?.success === true) {
           navigation.navigate(redirectTo as never);
         } else {
           setLoginError('Invalid credentials');
