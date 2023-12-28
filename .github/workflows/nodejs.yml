@@ -34,6 +34,12 @@ jobs:
           npm install
           npm run build
             
+      - name: Shop.App.Packages lib.client-data
+        working-directory: ./packages/shop.app.lib.client-data
+        run: |
+          npm install
+          npm run build
+  
 
       - name: Shop.App.Orders.Api Tests
         working-directory: ./apps/shop.app.orders.api
