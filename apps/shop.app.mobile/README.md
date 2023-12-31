@@ -39,3 +39,7 @@ React Native project for Shop.App
 # Packages used
 * [React Native Paper](https://callstack.github.io/react-native-paper/docs/guides/getting-started) - for Material UI components for ReactNative
 * [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv) - for fast key/value based storage
+* `supertokens-react-native` and `supertokens-web-js` are both used depending on the build target platform.
+  * `supertokens-react-native` for all mobile targets
+  * `supertokens-web-js` only for web targets
+  * Both packages are included as dependencies, but only one is used at a runtime to init authentication flow, verify tokens etc
