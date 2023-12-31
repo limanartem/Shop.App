@@ -33,6 +33,9 @@ React Native project for Shop.App
 * Some profiles configured to produce `apk` files, which can be manually installed on android devices, wheres others produce `aab` files that can only be used for store deployment 
 * Read more docs - [Build your project for app stores](https://docs.expo.dev/deploy/build-project/)
 
+## Builds troubleshooting
+* It seems that currently expo.dev has issues building latest `expo@49.0.21` and `react-native@0.73.1` packages. Running `npx expo install --check` would suggest to downgrade to `react-native@0.72.6`, which does not work well for shop.app.mobile as it gets stuck on start. But to test build on expo.dev, run check tool and apply suggested downgrades, this would allow to pass build on expo.dev, but app would not be runnable. Currently it is unclear what is causing this
+
 # Packages used
 * [React Native Paper](https://callstack.github.io/react-native-paper/docs/guides/getting-started) - for Material UI components for ReactNative
 * [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv) - for fast key/value based storage
