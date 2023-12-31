@@ -50,17 +50,20 @@ To share common logic across different apps add new package under `/packages` fo
 1. Update github workflow config - `.github/workflows/nodejs.yml` and add build step for new package
 
 ## Architecture Overview
-![Architecture Overview](media/Shop.App.Architecture_1.png)
+![Architecture Overview](media/Shop.App.Architecture_2.png)
 
 ## Application Details
-- [shop.app.web](https://github.com/limanartem/Shop.App/tree/master/apps/shop.app.web): Main front-end application built using React, Redux, CRA, etc.
+- [shop.app.web](https://github.com/limanartem/Shop.App/tree/master/apps/shop.app.web): Main web front-end application built using React, Redux, CRA, etc.
+- [shop.app.mobile](https://github.com/limanartem/Shop.App/tree/master/apps/shop.app.mobile): Mobile front-end application built using ReactNative with Expo Go.
 - [shop.app.auth.api](https://github.com/limanartem/Shop.App/tree/master/apps/shop.app.auth.api): Authentication provider API built on top of the open-source authentication framework [Supertokens.io](https://supertokens.io).
 - [shop.app.catalog.api](https://github.com/limanartem/Shop.App/tree/master/apps/shop.app.catalog.api): REST API services providing access to the shop catalog (product categories, products, etc.), built using [.NET minimal API](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-8.0). This API does not require authentication.
 - [shop.app.orders.api](https://github.com/limanartem/Shop.App/tree/master/apps/shop.app.orders.api): REST API & GraphQL services for order submission and retrieval. Built based on node.js using [Express](https://expressjs.com) app.
 
-  Endpoints consumed by `shop.app.web` frontend necessitate user authentication via bearer tokens issued by `shop.app.auth.api` during the login process.
+  * Endpoints consumed by `shop.app.web` and `shop.app.mobile` frontend necessitate user authentication via bearer tokens issued by `shop.app.auth.api` during the login process.
 
-  Some endpoints are exclusively available for backend-to-backend communication, such as changing order status from order processing workloads. A special technical API user is configured with the required `role` to access these APIs.
+  * Some endpoints are exclusively available for backend-to-backend communication, such as changing order status from order processing workloads. A special technical API user is configured with the required `role` to access these APIs.
+
+  * Provides WS communication for receiving real-time updates, e.g. when order status is changed, so that it can be immediately reflected on UI
 
 - [shop.app.orders.processing](https://github.com/limanartem/Shop.App/tree/master/apps/shop.app.orders.processing): Node.js-based app simulating the order processing flow by updating its status over time (new order processing, payment processing, dispatching).
 
