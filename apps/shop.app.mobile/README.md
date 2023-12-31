@@ -17,7 +17,21 @@ React Native project for Shop.App
    * `npm start web` - will allow to run app from the browser
      * by default app will be available on `http://localhost:19006/`
    * `npm run android` or `npm run ios` - to run app using bare flow on a connected device or emulator
-     * app would need to be pre-build using `npx expo prebuild`
+     * if needed app will be pre-built using `npx expo prebuild`, e.g. if android/ios folders are missing
+     * You may need to set java home env
+       * `export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home`
+     * To package for release add command param: `--variant release`
+
+# Deploying to EAS
+* `eas.json` contains configs for different build flavors and environments
+* Before running build you should authenticate using `eas login`
+* In order for eas build to successfully complete on expo.dev local `packages/` dependencies have to be pre-built, therefore `apps/shop.app.mobile/package.json` has a `postinstall` task which triggers root npm package task `build:packages`, which builds all packages
+
+## Android builds
+* To trigger build on expo.dev build environment use `eas build -p android`
+* To select specific profile add e.g. ` --profile preview`
+* Some profiles configured to produce `apk` files, which can be manually installed on android devices, wheres others produce `aab` files that can only be used for store deployment 
+* Read more docs - [Build your project for app stores](https://docs.expo.dev/deploy/build-project/)
 
 # Packages used
 * [React Native Paper](https://callstack.github.io/react-native-paper/docs/guides/getting-started) - for Material UI components for ReactNative
