@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import { getProductsAsync } from '../../services/catalog-service';
-import { ProductItem } from '../../model';
 import {
   Backdrop,
   Box,
@@ -17,6 +15,8 @@ import { useAppSelector } from '../../app/hooks';
 import { selectCategory } from '../../app/reducers/searchReducer';
 import { selectCategories } from '../../app/reducers/categoriesReducer';
 import { ProductPlaceholder } from './ProductPlaceholder';
+import { catalogServiceClient } from '../../services';
+import { ProductItem } from '@shop.app/lib.client-data/dist/model';
 
 function Catalog() {
   const [productsLoading, setProductsLoading] = useState(false);
@@ -28,9 +28,10 @@ function Catalog() {
   useEffect(() => {
     console.log('Catalog:fetching products for globalSelectedCategory', globalSelectedCategory);
     setProductsLoading(true);
-    getProductsAsync({
-      category: globalSelectedCategory === '-1' ? null : globalSelectedCategory,
-    })
+    catalogServiceClient
+      .getProductsAsync({
+        category: globalSelectedCategory === '-1' ? null : globalSelectedCategory,
+      })
       .then((products) => {
         setProducts(products);
       })

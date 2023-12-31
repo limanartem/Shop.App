@@ -78,7 +78,7 @@ services:
       AUTH_CORE_DOMAIN: $AUTH_CORE_DOMAIN
       WEB_API_PORT: 3003
       WEB_API_DOMAIN: shop.app.auth.api
-      PUBLIC_WEB_UI_DOMAIN: $PUBLIC_WEB_UI_DOMAIN # need external domain for cors
+      PUBLIC_WEB_UI_DOMAINS: $PUBLIC_WEB_UI_DOMAINS # need external domain for cors
       API_USER_EMAIL: $API_USER_EMAIL
       API_USER_PASSWORD: $API_USER_PASSWORD
 
@@ -301,10 +301,20 @@ services:
       REACT_APP_ORDERS_API_HOST: $ORDERS_API_HOST
       REACT_APP_CATALOG_API_URL: $CATALOG_API_URL
       REACT_APP_AUTH_API_URL: $AUTH_API_URL
+      REACT_APP_CDN_URL: $CDN_URL
     depends_on:
       - shop.app.orders.api
       - shop.app.catalog.api
       - shop.app.auth.api
+
+  shop.app.cdn:
+    build:
+      context: ./apps/shop.app.cdn
+    ports:
+      - '3005:80'
+    networks:
+        - app-public-network
+    
 
 volumes:
   cache:

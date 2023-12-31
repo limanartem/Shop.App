@@ -1,11 +1,10 @@
-import { ShoppingCartItem } from '../model';
 import { Button, Card, CardContent, CardMedia, Tooltip, Typography } from '@mui/material';
 import { useAppDispatch } from '../app/hooks';
 import { getProductImage, ProductFallbackImage } from '../utils/product-utils';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import { removeFromCart } from '../app/reducers/shoppingCartReducer';
-import { ProductItem } from '../model';
-import { StatusIndicator } from '../features/shopping-cart/StatusIndicator';
+import { OrderStatusIndicator } from './OrderStatusIndicator';
+import { ShoppingCartItem, ProductItem } from '@shop.app/lib.client-data/dist/model';
 
 type Props = {
   item: ShoppingCartItem;
@@ -21,7 +20,11 @@ function ItemImage({ item, flow }: Props) {
       style={{ width: width, minWidth: width }}
       image={getProductImage(item.product)}
       alt={item.product.title}
-      onError={(e: any) => (e.target.src = ProductFallbackImage)}
+      onError={(e: any) => {
+        if (e.target.src != ProductFallbackImage) {
+          e.target.src = ProductFallbackImage;
+        }
+      }}
     />
   );
 }
@@ -52,7 +55,7 @@ function ItemAction({ item, flow }: Props) {
           </Button>
         </Tooltip>
       )}
-      {flow === 'orderDetails' && <StatusIndicator status={item.status || 'pending'} />}
+      {flow === 'orderDetails' && <OrderStatusIndicator status={item.status || 'pending'} />}
     </>
   );
 }

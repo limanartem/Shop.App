@@ -2,7 +2,8 @@ import { createListenerMiddleware } from '@reduxjs/toolkit';
 import { placeOrder, resetCheckout } from '../reducers/checkOutReducer';
 import { clearCart, addToCart, removeFromCart } from '../reducers/shoppingCartReducer';
 import { setUser } from '../reducers/authReducer';
-import { startListening, stopListening } from '../../services/ws-service';
+import { graphQlWsClient } from '../../services';
+import { setChangedOrders } from '../reducers/notificationsReducer';
 
 /**
  * Creates a middleware that listens for the completion of the checkout process.
@@ -46,9 +47,11 @@ const authMiddleware = () => {
     actionCreator: setUser,
     effect: async (action, listenerApi) => {
       if (action.payload == null) {
-        await stopListening();
+        await graphQlWsClient.stopListening();
       } else {
-        await startListening(listenerApi.dispatch);
+        await graphQlWsClient.startListening((ids) => {
+          listenerApi.dispatch(setChangedOrders(ids));
+        });
       }
     },
   });

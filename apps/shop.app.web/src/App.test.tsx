@@ -8,25 +8,21 @@ jest.mock('supertokens-auth-react/recipe/session', () => ({
   SessionAuth: jest.fn(),
 }));
 jest.mock('./components/AuthWrapper', () => ({
-  AuthWrapper: ({
-    children,
-  }: {
-    children: React.ReactNode;
-    onAuthInitialized: () => void;
-  }) => {
+  AuthWrapper: ({ children }: { children: React.ReactNode; onAuthInitialized: () => void }) => {
     return <>{children}</>;
   },
 }));
 
-jest.mock('./services/catalog-service', () => ({
-  getProductsAsync: jest.fn().mockResolvedValue([]),
-  getCategoriesAsync: jest.fn().mockResolvedValue([]),
-}));
-
-jest.mock('./services/order-service', () => ({
-  getOrdersAsync: jest.fn().mockResolvedValue({ orders: [] }),
-  getOrderAsync: jest.fn().mockResolvedValue({}),
-  createOrdersAsync: jest.fn().mockResolvedValue(null),
+jest.mock('./services', () => ({
+  catalogServiceClient: {
+    getProductsAsync: jest.fn().mockResolvedValue([]),
+    getCategoriesAsync: jest.fn().mockResolvedValue([]),
+  },
+  orderServiceClient: {
+    getOrdersAsync: jest.fn().mockResolvedValue({ orders: [] }),
+    getOrderAsync: jest.fn().mockResolvedValue({}),
+    createOrdersAsync: jest.fn().mockResolvedValue(null),
+  },
 }));
 
 describe('App', () => {
@@ -50,9 +46,7 @@ describe('App', () => {
   describe('unauthenticated user', () => {
     beforeEach(() => {
       // Mock user is not authenticated
-      (SessionAuth as jest.Mock).mockImplementation(
-        () => <></>,
-      );
+      (SessionAuth as jest.Mock).mockImplementation(() => <></>);
     });
 
     it('should not navigate to checkout feature if user is not authenticated', async () => {

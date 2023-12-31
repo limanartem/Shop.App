@@ -28,6 +28,7 @@ import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { drawerWidth } from './ShopDrawer';
 import { DrawerOpenState } from '.';
+import { assetUrl } from '../../utils/product-utils';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -148,7 +149,7 @@ export function ShopAppBar({ open, toggleDrawer }: ShopBarPropsType) {
             <Link href="/">
               <CardMedia
                 component="img"
-                image="/shop-assets/logo/shop.app.logo.png"
+                image={assetUrl('/shop-assets/logo/shop.app.logo.png')}
                 sx={{ width: { md: '48px', xs: '32px' } }}
               />
             </Link>

@@ -7,7 +7,7 @@ const {
   AUTH_CORE_DOMAIN,
   WEB_API_PORT,
   WEB_API_DOMAIN,
-  PUBLIC_WEB_UI_DOMAIN,
+  PUBLIC_WEB_UI_DOMAINS,
   API_USER_EMAIL,
   API_USER_PASSWORD,
 } = process.env;
@@ -33,7 +33,7 @@ export const initAuth = () => {
       // learn more about this on https://supertokens.com/docs/thirdpartyemailpassword/appinfo
       appName: 'Shop.App',
       apiDomain: `${WEB_API_DOMAIN}:${WEB_API_PORT}`,
-      websiteDomain: PUBLIC_WEB_UI_DOMAIN,
+      websiteDomain: PUBLIC_WEB_UI_DOMAINS.split(',')[0],
       apiBasePath: '/auth',
       websiteBasePath: '/auth',
     },

@@ -15,7 +15,6 @@ import {
   Rating,
   Box,
 } from '@mui/material';
-import { ProductItem } from '../../model';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { addToCart, removeFromCart, selectItems } from '../../app/reducers/shoppingCartReducer';
 import AddShoppingCart from '@mui/icons-material/AddShoppingCart';
@@ -23,6 +22,7 @@ import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
 import { ProductFallbackImage, getProductImage } from '../../utils/product-utils';
 import Carousel from 'react-material-ui-carousel';
 import { CarouselProps } from 'react-material-ui-carousel/dist/components/types';
+import { ProductItem } from '@shop.app/lib.client-data/dist/model';
 
 const ProductCard = ({ product }: { product: ProductItem }) => {
   const { title, description, price, currency } = product;
@@ -67,7 +67,6 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
       minHeight: 160,
       maxHeight: 160,
     },
-
   }));
 
   return (
@@ -78,7 +77,11 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
             key={i}
             component="img"
             image={getProductImage(product, i)}
-            onError={(e: any) => (e.target.src = ProductFallbackImage)}
+            onError={(e: any) => {
+              if (e.target.src != ProductFallbackImage) {
+                e.target.src = ProductFallbackImage;
+              }
+            }}
           />
         ))}
       </CarouselExt>

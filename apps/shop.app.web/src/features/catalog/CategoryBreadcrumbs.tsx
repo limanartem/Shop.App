@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Breadcrumbs, Button, Link } from '@mui/material';
-import { ProductCategory } from '../../model';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { selectCategory, setCategory } from '../../app/reducers/searchReducer';
+import { ProductCategory } from '@shop.app/lib.client-data/dist/model';
 
 const findCategoryById = (categories: ProductCategory[], categoryId?: number) => {
   return categories.find((category) => category.id === categoryId);

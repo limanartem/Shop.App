@@ -18,10 +18,7 @@
       {
         "name": "typescript-strict-plugin"
       }
-    ],
-    "paths": {
-      "*": ["node_modules/*"]
-    }
+    ]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

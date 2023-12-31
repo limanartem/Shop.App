@@ -2,13 +2,14 @@ import '@testing-library/jest-dom';
 import { render, screen, cleanup, within, fireEvent, waitFor } from '@testing-library/react';
 import Catalog from '.';
 import { Provider } from 'react-redux';
-import { getProductsAsync } from '../../services/catalog-service';
+import { catalogServiceClient } from '../../services/';
 import { randomUUID } from 'crypto';
 import { buildStore } from '../../app/store';
 
-jest.mock('../../services/catalog-service', () => ({
-  getProductsAsync: jest.fn().mockResolvedValue([]),
-  getCategoriesAsync: jest.fn().mockResolvedValue([]),
+jest.mock('../../services/', () => ({
+  catalogServiceClient: {
+    getProductsAsync: jest.fn(() => Promise.resolve([])),
+  },
 }));
 
 // Avoid loading store from the local storage
@@ -57,9 +58,9 @@ describe('Feature Catalog', () => {
 
     beforeEach(() => {
       expectedProductId = randomUUID();
-      (getProductsAsync as jest.Mock).mockResolvedValue([
-        { id: expectedProductId, title: 'Some nice product' },
-      ]);
+      jest
+        .spyOn(catalogServiceClient, 'getProductsAsync')
+        .mockResolvedValue([{ id: expectedProductId, title: 'Some nice product' } as any]);
     });
 
     async function ensureProductAddedToCart(expectedProductId: string, quantity: number) {

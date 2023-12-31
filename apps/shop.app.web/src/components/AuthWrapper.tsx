@@ -12,8 +12,8 @@ import { OnHandleEventContext } from 'supertokens-auth-react/lib/build/recipe/em
 import { useAppDispatch } from '../app/hooks';
 import { setUser } from '../app/reducers/authReducer';
 import { useEffect, useState } from 'react';
-import { getUserAsync } from '../services/auth';
 import { env } from '../config/environment';
+import { authServiceClient } from '../services';
 
 const { REACT_APP_AUTH_API_URL } = env;
 
@@ -60,7 +60,7 @@ export function AuthWrapper({ children, onAuthInitialized }: AuthWrapperProps) {
       const isLogged = await Session.doesSessionExist();
 
       if (isLogged) {
-        const user = await getUserAsync();
+        const user = await authServiceClient.getUserAsync();
         dispatch(setUser(user));
       }
     };

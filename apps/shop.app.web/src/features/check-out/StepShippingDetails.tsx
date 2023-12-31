@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Box, Button, ButtonGroup, Grid, TextField } from '@mui/material';
 import { ChangeEventHandler, FormEventHandler, useState } from 'react';
 import { previousStep, setCheckoutShipping } from '../../app/reducers/checkOutReducer';
-import { CheckoutShippingInfo } from '../../model';
+import { CheckoutShippingInfo } from '@shop.app/lib.client-data/dist/model';
 
 export function StepShippingDetails() {
   const dispatch = useAppDispatch();

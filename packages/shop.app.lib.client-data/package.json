@@ -1,0 +1,26 @@
+{
+  "name": "@shop.app/lib.client-data",
+  "version": "1.0.1",
+  "type": "commonjs",
+  "description": "Package for client data handling - redux store, data services, data models etc",
+  "scripts": {
+    "clean": "npx rimraf dist",
+    "_prebuild": "npm run clean",
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint . --ext .js,.ts ./src --quiet",
+    "pre-commit": "npm run lint",
+    "pre-push": "npm run test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "graphql-ws": "^5.14.2",
+    "supertokens-web-js": "^0.8.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.45",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  }
+}

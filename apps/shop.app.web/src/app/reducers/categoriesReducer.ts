@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ProductCategory } from '../../model';
 import { RootState } from '../store';
-import { getCategoriesAsync } from '../../services/catalog-service';
+import { catalogServiceClient } from '../../services';
+import { ProductCategory } from '@shop.app/lib.client-data/dist/model';
 
 export enum DataLoadingState {
   idle,
@@ -21,7 +21,7 @@ const initialState: CategoriesState = {
 };
 
 export const fetchCategories = createAsyncThunk('/categories', async () => {
-  return await getCategoriesAsync();
+  return await catalogServiceClient.getCategoriesAsync();
 });
 
 export const categoriesSlice = createSlice({
@@ -47,7 +47,6 @@ export const categoriesSlice = createSlice({
   },
 });
 
-export const { setCategories } = categoriesSlice.actions;
 export const selectCategories = (state: RootState) => state.categories.categories;
 export const selectCategoriesStatus = (state: RootState) => state.categories.status;
 
