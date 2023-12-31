@@ -50,7 +50,7 @@ To share common logic across different apps add new package under `/packages` fo
 1. Update github workflow config - `.github/workflows/nodejs.yml` and add build step for new package
 
 ## Architecture Overview
-![Architecture Overview](media/Shop.App.Architecture_2.png)
+![Architecture Overview](media/Shop.App.Architecture_3.png)
 
 ## Application Details
 - [shop.app.web](https://github.com/limanartem/Shop.App/tree/master/apps/shop.app.web): Main web front-end application built using React, Redux, CRA, etc.
