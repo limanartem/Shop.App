@@ -6,6 +6,14 @@ import {
   updateDocument,
 } from '@shop.app/lib.server-utils/dist/mongodb';
 
+/**
+ * Adds an item to the shopping cart.
+ * 
+ * @param _ - Unused parameter.
+ * @param item - The item to be added to the shopping cart.
+ * @param context - The request context.
+ * @returns The updated shopping cart.
+ */
 export const addToCart: MutationResolvers['addToCart'] = async (
   _: any,
   { item },
@@ -40,6 +48,14 @@ export const addToCart: MutationResolvers['addToCart'] = async (
   return updatedDocument as unknown as ShoppingCart;
 };
 
+/**
+ * Removes a product from the shopping cart.
+ * @param _ The parent resolver's result.
+ * @param productId The ID of the product to be removed.
+ * @param context The context object containing user information.
+ * @returns The updated shopping cart after removing the product.
+ * @throws Error if failed to update the shopping cart.
+ */
 export const removeFromCart: MutationResolvers['removeFromCart'] = async (
   _: any,
   { productId },
@@ -70,6 +86,15 @@ export const removeFromCart: MutationResolvers['removeFromCart'] = async (
   return document;
 };
 
+/**
+ * Updates the quantity of a product in the shopping cart.
+ * 
+ * @param _ The parent resolver's result.
+ * @param productId The ID of the product to update.
+ * @param quantity The new quantity of the product.
+ * @param context The context object containing user information.
+ * @returns The updated shopping cart document.
+ */
 export const updateQuantity: MutationResolvers['updateQuantity'] = async (
   _: any,
   { productId, quantity },
