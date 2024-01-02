@@ -22,9 +22,9 @@
   "license": "ISC",
   "dependencies": {
     "@graphql-tools/schema": "^10.0.2",
-    "@shop.app/lib.db": "file:../../packages/shop.app.lib.db",
     "@shop.app/lib.express": "file:../../packages/shop.app.lib.express",
     "@shop.app/lib.messaging": "file:../../packages/shop.app.lib.messaging",
+    "@shop.app/lib.server-utils": "file:../../packages/shop.app.lib.server-utils",
     "@types/uuid": "^9.0.6",
     "amqplib": "^0.10.3",
     "cls-rtracer": "^2.6.3",

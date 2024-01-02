@@ -4,7 +4,7 @@
  * functions for caching and retrieving data from the database.
  */
 import { ObjectId } from 'mongodb';
-import { getObject as getCachedObject, updateObject as updateCacheObject } from '@shop.app/lib.db/dist/cache';
+import { getObject as getCachedObject, updateObject as updateCacheObject } from '@shop.app/lib.server-utils/dist/cache';
 import { ProductItem, Order, OrderItemEnhanced, UpdateOrder, OrderItem } from '../model';
 import {
   WithClearId,
@@ -12,7 +12,8 @@ import {
   fetchDocuments,
   insertDocument,
   updateDocument,
-} from '@shop.app/lib.db/dist/mongodb';
+} from '@shop.app/lib.server-utils/dist/mongodb';
+
 const { CATALOG_API_URL } = process.env;
 const ORDERS_CACHE_GROUP = 'orders';
 
