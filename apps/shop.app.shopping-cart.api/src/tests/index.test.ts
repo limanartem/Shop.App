@@ -1,5 +1,5 @@
 import request from 'supertest';
-import createApolloServer, { RequestContext } from '../apollo-server';
+import createApolloServer from '../apollo-server';
 import { ApolloServer } from '@apollo/server';
 import { StatusCodes } from 'http-status-codes';
 import { decodeToken } from '@shop.app/lib.server-utils/dist/auth';
@@ -11,6 +11,7 @@ import {
   insertDocument,
   updateDocument,
 } from '@shop.app/lib.server-utils/dist/mongodb';
+import { RequestContext } from '../types';
 
 jest.mock('@shop.app/lib.server-utils/dist/auth', () => ({
   decodeToken: jest.fn(),

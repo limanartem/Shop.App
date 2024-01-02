@@ -3,7 +3,7 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 const config: CodegenConfig = {
   overwrite: true,
   config: {
-    contextType: '../apollo-server#RequestContext',
+    contextType: '../types#RequestContext',
   },
   schema: './src/schema.graphql',
   generates: {
