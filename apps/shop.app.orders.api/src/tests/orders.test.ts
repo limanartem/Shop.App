@@ -1,12 +1,12 @@
 import { ObjectId } from 'mongodb';
 import { getOrders, getOrder, updateOrder } from '../domain/orders';
-import { fetchDocuments, fetchDocument, updateDocument } from '../utils/mongodb';
+import { fetchDocuments, fetchDocument, updateDocument } from '@shop.app/lib.db/dist/mongodb';
 import { v4 as uuidv4 } from 'uuid';
-import { getObject, updateObject } from '../utils/cache';
+import { getObject, updateObject } from '@shop.app/lib.db/dist/cache';
 import { Status } from '../model/orders-model';
 import { mockImpl } from './utils';
 
-jest.mock('../utils/mongodb', () => {
+jest.mock('@shop.app/lib.db/dist/mongodb', () => {
   return {
     fetchDocument: jest.fn(),
     fetchDocuments: jest.fn(),
@@ -15,7 +15,7 @@ jest.mock('../utils/mongodb', () => {
   };
 });
 
-jest.mock('../utils/cache', () => ({
+jest.mock('@shop.app/lib.db/dist/cache', () => ({
   getObject: jest.fn(),
   updateObject: jest.fn(),
 }));
