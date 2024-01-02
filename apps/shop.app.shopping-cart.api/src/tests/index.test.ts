@@ -5,9 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import { decodeToken } from '@shop.app/lib.server-utils/dist/auth';
 import { randomUUID } from 'crypto';
 import {
-  WithClearId,
   fetchDocument,
-  fetchDocuments,
   insertDocument,
   updateDocument,
 } from '@shop.app/lib.server-utils/dist/mongodb';
@@ -141,7 +139,9 @@ describe('shopping-cart api', () => {
       it('should add product to new shopping cart', async () => {
         const productId = randomUUID();
         const quantity = 2;
+        const cartId = randomUUID();
         const expectedShoppingCart = {
+          id: cartId,
           userId,
           items: [
             {
@@ -152,7 +152,8 @@ describe('shopping-cart api', () => {
         };
 
         (fetchDocument as jest.Mock).mockResolvedValue(null);
-        (insertDocument as jest.Mock).mockResolvedValue(expectedShoppingCart);
+        (insertDocument as jest.Mock).mockResolvedValue({ id: cartId, userId, items: [] });
+        (updateDocument as jest.Mock).mockResolvedValue(expectedShoppingCart);
 
         const response = await req()
           .send({
@@ -162,7 +163,8 @@ describe('shopping-cart api', () => {
 
         expect(response.body.data?.addToCart).toBeDefined();
         expect(response.body.data.addToCart.userId).toEqual(userId);
-        expect(insertDocument).toHaveBeenCalledWith(expectedShoppingCart, 'shopping-cart');
+        expect(insertDocument).toHaveBeenCalledWith({ userId, items: [] }, 'shopping-cart');
+        expect(updateDocument).toHaveBeenCalledWith(cartId, expectedShoppingCart, 'shopping-cart');
       });
 
       it('should add product to existing shopping cart with no items', async () => {

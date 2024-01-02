@@ -6,11 +6,49 @@ import {
   updateDocument,
 } from '@shop.app/lib.server-utils/dist/mongodb';
 
+
+/**
+ * Updates the shopping cart for a given user.
+ * If the shopping cart document does not exist, it will be created.
+ * 
+ * @param userId - The ID of the user.
+ * @param updateFn - A function that takes the current shopping cart and returns a boolean indicating whether the cart should be updated.
+ * @returns The updated shopping cart.
+ * @throws Error if the update fails.
+ */
+const updateShoppingCart = async (
+  userId: string,
+  updateFn: (cart: ShoppingCart) => boolean,
+): Promise<ShoppingCart> => {
+  let document = (await fetchDocument<ShoppingCart>({ userId }, 'shopping-cart')) as ShoppingCart;
+
+  if (document == null) {
+    document = (await insertDocument<ShoppingCart>(
+      { userId, items: [] },
+      'shopping-cart',
+    )) as ShoppingCart;
+  }
+
+  if (document.items == null) {
+    document.items = [];
+  }
+
+  if (updateFn(document)) {
+    const updatedDocument = await updateDocument(document.id!, document, 'shopping-cart');
+    if (updatedDocument == null) {
+      throw new Error('Failed to update shopping cart');
+    }
+
+    return updatedDocument as unknown as ShoppingCart;
+  }
+  return document;
+};
+
 /**
  * Adds an item to the shopping cart.
- * 
- * @param _ - Unused parameter.
- * @param item - The item to be added to the shopping cart.
+ * If the item already exists in the cart, its quantity will be incremented.
+ * @param _ - The parent object (not used).
+ * @param item - The item to add to the cart.
  * @param context - The request context.
  * @returns The updated shopping cart.
  */
@@ -19,109 +57,58 @@ export const addToCart: MutationResolvers['addToCart'] = async (
   { item },
   context: RequestContext,
 ) => {
-  let document = (await fetchDocument<ShoppingCart>(
-    { userId: context.userId },
-    'shopping-cart',
-  )) as ShoppingCart;
-
-  if (document == null) {
-    return (await insertDocument<ShoppingCart>(
-      { userId: context.userId, items: [item] },
-      'shopping-cart',
-    )) as ShoppingCart;
-  }
-  if (document.items == null) {
-    document.items = [];
-  }
-  //Check if item with product id already exists and then merge
-  const existingItem = document.items?.find((i) => i.productId === item.productId);
-  if (existingItem != null) {
-    existingItem.quantity += item.quantity;
-  } else {
-    document.items.push(item);
-  }
-
-  const updatedDocument = await updateDocument(document.id!, document, 'shopping-cart');
-  if (updatedDocument == null) {
-    throw new Error('Failed to update shopping cart');
-  }
-  return updatedDocument as unknown as ShoppingCart;
+  return updateShoppingCart(context.userId, (cart) => {
+    const existingItem = cart.items?.find((i) => i.productId === item.productId);
+    if (existingItem != null) {
+      existingItem.quantity += item.quantity;
+    } else {
+      cart.items?.push(item);
+    }
+    return true;
+  });
 };
 
 /**
- * Removes a product from the shopping cart.
- * @param _ The parent resolver's result.
- * @param productId The ID of the product to be removed.
- * @param context The context object containing user information.
- * @returns The updated shopping cart after removing the product.
- * @throws Error if failed to update the shopping cart.
+ * Removes an item from the shopping cart.
+ * @param _ - The parent object (not used).
+ * @param productId - The ID of the product to remove.
+ * @param context - The request context.
+ * @returns The updated shopping cart.
  */
 export const removeFromCart: MutationResolvers['removeFromCart'] = async (
   _: any,
   { productId },
   context: RequestContext,
 ) => {
-  let document = (await fetchDocument<ShoppingCart>(
-    { userId: context.userId },
-    'shopping-cart',
-  )) as ShoppingCart;
-
-  if (document == null) {
-    return null;
-  }
-  if (document.items == null) {
-    document.items = [];
-  }
-  //Check if item with product id already exists and then merge
-  const existingItemIndex = document.items.findIndex((i) => i.productId === productId);
-  if (existingItemIndex > -1) {
-    document.items.splice(existingItemIndex, 1);
-
-    const updatedDocument = await updateDocument(document.id!, document, 'shopping-cart');
-    if (updatedDocument == null) {
-      throw new Error('Failed to update shopping cart');
+  return updateShoppingCart(context.userId, (cart) => {
+    const existingItemIndex = cart.items?.findIndex((i) => i.productId === productId) ?? -1;
+    if (existingItemIndex > -1) {
+      cart.items?.splice(existingItemIndex, 1);
+      return true;
     }
-    return updatedDocument as unknown as ShoppingCart;
-  }
-  return document;
+    return false;
+  });
 };
 
 /**
- * Updates the quantity of a product in the shopping cart.
- * 
- * @param _ The parent resolver's result.
- * @param productId The ID of the product to update.
- * @param quantity The new quantity of the product.
- * @param context The context object containing user information.
- * @returns The updated shopping cart document.
+ * Updates the quantity of an item in the shopping cart.
+ * @param _ - The parent object (not used).
+ * @param productId - The ID of the product to update.
+ * @param quantity - The new quantity.
+ * @param context - The request context.
+ * @returns The updated shopping cart.
  */
 export const updateQuantity: MutationResolvers['updateQuantity'] = async (
   _: any,
   { productId, quantity },
   context: RequestContext,
 ) => {
-  let document = (await fetchDocument<ShoppingCart>(
-    { userId: context.userId },
-    'shopping-cart',
-  )) as ShoppingCart;
-
-  if (document == null) {
-    return null;
-  }
-  if (document.items == null) {
-    document.items = [];
-  }
-  //Check if item with product id already exists and then merge
-  const existingItem = document.items.find((i) => i.productId === productId);
-  if (existingItem != null) {
-    existingItem.quantity = quantity;
-
-    const updatedDocument = await updateDocument(document.id!, document, 'shopping-cart');
-    if (updatedDocument == null) {
-      throw new Error('Failed to update shopping cart');
+  return updateShoppingCart(context.userId, (cart) => {
+    const existingItem = cart.items?.find((i) => i.productId === productId);
+    if (existingItem != null) {
+      existingItem.quantity = quantity;
+      return true;
     }
-
-    return updatedDocument as unknown as ShoppingCart;
-  }
-  return document;
+    return false;
+  });
 };
