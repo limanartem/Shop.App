@@ -1,6 +1,7 @@
 import { RequestContext } from '../types';
 import { MutationResolvers, ShoppingCart } from '../generated/graphql';
 import {
+  deleteDocument,
   fetchDocument,
   insertDocument,
   updateDocument,
@@ -111,4 +112,15 @@ export const updateQuantity: MutationResolvers['updateQuantity'] = async (
     }
     return false;
   });
+};
+
+export const deleteCart: MutationResolvers['deleteCart'] = async (
+  _: any,
+  __: any,
+  context: RequestContext,
+) => {
+  const result = await deleteDocument({ userId: context.userId }, 'shopping-cart');
+  return {
+    deleted: result,
+  };
 };

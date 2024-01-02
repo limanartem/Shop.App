@@ -8,6 +8,7 @@ import {
   fetchDocument,
   insertDocument,
   updateDocument,
+  deleteDocument,
 } from '@shop.app/lib.server-utils/dist/mongodb';
 import { RequestContext } from '../types';
 
@@ -20,6 +21,7 @@ jest.mock('@shop.app/lib.server-utils/dist/mongodb', () => ({
   fetchDocuments: jest.fn(),
   insertDocument: jest.fn(),
   updateDocument: jest.fn(),
+  deleteDocument: jest.fn(),
 }));
 
 describe('shopping-cart api', () => {
@@ -377,6 +379,22 @@ describe('shopping-cart api', () => {
         expect(response.body.data?.updateQuantity).toBeDefined();
         expect(response.body.data.updateQuantity.userId).toEqual(userId);
         expect(updateDocument).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('delete shopping cart', () => {
+      it('should delete shopping cart', async () => {
+        (deleteDocument as jest.Mock).mockResolvedValue(true);
+
+        const response = await req()
+          .send({
+            query: `mutation {deleteCart { deleted} }`,
+          })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.deleteCart).toBeDefined();
+        expect(response.body.data.deleteCart.deleted).toEqual(true);
+        expect(deleteDocument).toHaveBeenCalledWith({ userId }, 'shopping-cart');
       });
     });
   });

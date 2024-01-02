@@ -141,3 +141,14 @@ export const insertDocument = async <T extends Document>(
       ...data,
     };
   });
+
+export const deleteDocument = async (
+  criteria: Filter<WithId<Document>>,
+  collection: DB_COLLECTION = 'orders',
+): Promise<boolean> =>
+  usingClient(async (client) => {
+    console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
+    console.log('Deleting item in db...', criteria, collection);
+    const result = await client.db().collection(collection).deleteOne(criteria);
+    return result.deletedCount > 0;
+  });

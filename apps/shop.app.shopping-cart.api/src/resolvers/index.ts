@@ -1,6 +1,6 @@
 import { Resolvers } from '../generated/graphql';
 import { shoppingCart } from './queries';
-import { addToCart, removeFromCart, updateQuantity } from './mutations';
+import { addToCart, removeFromCart, updateQuantity, deleteCart } from './mutations';
 
 const resolvers: Resolvers = {
   Query: {
@@ -10,6 +10,7 @@ const resolvers: Resolvers = {
     addToCart,
     removeFromCart,
     updateQuantity,
+    deleteCart,
   },
 };
 

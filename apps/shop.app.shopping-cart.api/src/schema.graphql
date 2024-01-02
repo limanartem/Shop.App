@@ -23,6 +23,10 @@ type ProductItemSnapshot {
   currency: String
 }
 
+type DeleteResult {
+  deleted: Boolean!
+}
+
 type Query {
   shoppingCart: ShoppingCart
 }
@@ -31,4 +35,5 @@ type Mutation {
   addToCart(item: ShoppingCartItemInput!): ShoppingCart
   removeFromCart(productId: String!): ShoppingCart
   updateQuantity(productId: String!, quantity: Int!): ShoppingCart
+  deleteCart: DeleteResult
 }
