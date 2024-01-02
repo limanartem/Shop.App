@@ -6,11 +6,10 @@ import {
   updateDocument,
 } from '@shop.app/lib.server-utils/dist/mongodb';
 
-
 /**
  * Updates the shopping cart for a given user.
  * If the shopping cart document does not exist, it will be created.
- * 
+ *
  * @param userId - The ID of the user.
  * @param updateFn - A function that takes the current shopping cart and returns a boolean indicating whether the cart should be updated.
  * @returns The updated shopping cart.
@@ -34,7 +33,8 @@ const updateShoppingCart = async (
   }
 
   if (updateFn(document)) {
-    const updatedDocument = await updateDocument(document.id!, document, 'shopping-cart');
+    const updatedDocument = await updateDocument(document.id, document, 'shopping-cart');
+
     if (updatedDocument == null) {
       throw new Error('Failed to update shopping cart');
     }

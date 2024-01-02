@@ -10,13 +10,13 @@ import { RequestContext } from './types';
 
 const { WEB_SERVER_PORT } = process.env;
 
-
 const typeDefs = readFileSync(path.join(__dirname, 'schema.graphql'), { encoding: 'utf-8' });
 
 export default async function createApolloServer() {
   const server = new ApolloServer<RequestContext>({
     typeDefs,
     resolvers,
+    includeStacktraceInErrorResponses: true,
   });
 
   const { url } = await startStandaloneServer(server, {

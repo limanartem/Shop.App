@@ -85,9 +85,12 @@ export const fetchDocument = async <DocumentType extends Document = Document>(
     // const _id = ObjectId.createFromHexString(id);
     console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
     console.log('Fetching item from db...', criteria, collection);
-    const order = await client.db().collection(collection).findOne<WithId<DocumentType>>(criteria);
-    if (order != null) {
-      return mapToClearIdDocument<DocumentType>(order);
+    const document = await client
+      .db()
+      .collection(collection)
+      .findOne<WithId<DocumentType>>(criteria);
+    if (document != null) {
+      return mapToClearIdDocument<DocumentType>(document);
     }
     return null;
   });
@@ -101,18 +104,18 @@ export const fetchDocument = async <DocumentType extends Document = Document>(
  * @returns A promise that resolves to the updated document with the ID, or null if the document was not found.
  */
 export const updateDocument = async (
-  id: string,
+  id: string | ObjectId,
   data: any,
   collection: DB_COLLECTION = 'orders',
 ): Promise<WithId<Document> | null> =>
   usingClient(async (client) => {
-    const _id = ObjectId.createFromHexString(id);
+    const _id = id instanceof ObjectId ? id : ObjectId.createFromHexString(id);
     console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
     console.log('Updating item in db...', id, data, collection);
     const updateResult = await client
       .db()
       .collection(collection)
-      .findOneAndUpdate({ _id }, { $set: data }, {});
+      .findOneAndUpdate({ _id }, { $set: data }, { returnDocument: 'after' });
     return updateResult;
   });
 

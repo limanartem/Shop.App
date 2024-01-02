@@ -19,7 +19,6 @@ const jwtClient = jwksClient({
 export const decodeToken = (token: string): Promise<JwtPayload | null> =>
   new Promise<JwtPayload | null>((resolve) => {
     JsonWebToken.verify(token, getSigningKey, {}, (err, decoded) => {
-      console.log({ err, decoded });
       if (err || decoded == null) {
         console.error('Invalid token: ' + err?.message);
         resolve(null);
