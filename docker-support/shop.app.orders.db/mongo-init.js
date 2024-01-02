@@ -56,13 +56,24 @@ ensureUserCreated(process.env.MONGO_DB_READ_USERNAME, process.env.MONGO_DB_READ_
   },
 ]);
 
-// Check if collection was created and if not create it
+// Check if collections were created and if not create them
+
+// orders collection
 if (!db.getCollectionNames().includes('orders')) {
   db.createCollection('orders');
   db.orders.createIndex({ userId: 1 });
   console.log('Collection orders created');
 } else {
   console.log('Collection orders already exists');
+}
+
+// shopping-cart collection
+if (!db.getCollectionNames().includes('shopping-cart')) {
+  db.createCollection('shopping-cart');
+  db.orders.createIndex({ userId: 1 });
+  console.log('Collection shopping-cart created');
+} else {
+  console.log('Collection shopping-cart already exists');
 }
 
 quit(0);
