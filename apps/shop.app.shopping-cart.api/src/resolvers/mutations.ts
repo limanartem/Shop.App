@@ -1,5 +1,9 @@
 import { RequestContext } from '../types';
-import { MutationResolvers, ShoppingCart } from '../generated/graphql';
+import {
+  MutationMergeArgs,
+  MutationResolvers,
+  ShoppingCart,
+} from '../generated/graphql';
 import {
   deleteDocument,
   fetchDocument,
@@ -114,6 +118,13 @@ export const updateQuantity: MutationResolvers['updateQuantity'] = async (
   });
 };
 
+/**
+ * Deletes the shopping cart for the current user.
+ * @param _ - The parent resolver's result.
+ * @param __ - The arguments passed to the resolver.
+ * @param context - The context object containing user information.
+ * @returns An object indicating whether the shopping cart was successfully deleted.
+ */
 export const deleteCart: MutationResolvers['deleteCart'] = async (
   _: any,
   __: any,
@@ -123,4 +134,33 @@ export const deleteCart: MutationResolvers['deleteCart'] = async (
   return {
     deleted: result,
   };
+};
+
+export const mergeCart: MutationResolvers['merge'] = async (
+  _: any,
+  args: MutationMergeArgs,
+  context: RequestContext,
+) => {
+  const cart = await fetchDocument<ShoppingCart>({ userId: context.userId }, 'shopping-cart');
+
+  if (cart == null) {
+    throw new Error('Cart not found');
+  }
+
+  return updateShoppingCart(context.userId, (userCart) => {
+    if (userCart.items == null) {
+      userCart.items = [];
+    }
+
+    args.input?.items?.forEach((item) => {
+      const existingItem = userCart.items?.find((i) => i.productId === item.productId);
+      if (existingItem != null) {
+        existingItem.quantity += item.quantity;
+      } else {
+        userCart.items?.push(item);
+      }
+    });
+
+    return true;
+  });
 };

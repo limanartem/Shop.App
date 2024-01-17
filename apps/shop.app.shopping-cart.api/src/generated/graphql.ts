@@ -26,6 +26,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addToCart?: Maybe<ShoppingCart>;
   deleteCart?: Maybe<DeleteResult>;
+  merge?: Maybe<ShoppingCart>;
   removeFromCart?: Maybe<ShoppingCart>;
   updateQuantity?: Maybe<ShoppingCart>;
 };
@@ -33,6 +34,11 @@ export type Mutation = {
 
 export type MutationAddToCartArgs = {
   item: ShoppingCartItemInput;
+};
+
+
+export type MutationMergeArgs = {
+  input?: InputMaybe<ShoppingCartMergeInput>;
 };
 
 
@@ -77,6 +83,10 @@ export type ShoppingCartItem = {
 export type ShoppingCartItemInput = {
   productId: Scalars['String']['input'];
   quantity: Scalars['Int']['input'];
+};
+
+export type ShoppingCartMergeInput = {
+  items?: InputMaybe<Array<ShoppingCartItemInput>>;
 };
 
 
@@ -161,6 +171,7 @@ export type ResolversTypes = {
   ShoppingCart: ResolverTypeWrapper<ShoppingCart>;
   ShoppingCartItem: ResolverTypeWrapper<ShoppingCartItem>;
   ShoppingCartItemInput: ShoppingCartItemInput;
+  ShoppingCartMergeInput: ShoppingCartMergeInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
 };
 
@@ -177,6 +188,7 @@ export type ResolversParentTypes = {
   ShoppingCart: ShoppingCart;
   ShoppingCartItem: ShoppingCartItem;
   ShoppingCartItemInput: ShoppingCartItemInput;
+  ShoppingCartMergeInput: ShoppingCartMergeInput;
   String: Scalars['String']['output'];
 };
 
@@ -188,6 +200,7 @@ export type DeleteResultResolvers<ContextType = RequestContext, ParentType exten
 export type MutationResolvers<ContextType = RequestContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addToCart?: Resolver<Maybe<ResolversTypes['ShoppingCart']>, ParentType, ContextType, RequireFields<MutationAddToCartArgs, 'item'>>;
   deleteCart?: Resolver<Maybe<ResolversTypes['DeleteResult']>, ParentType, ContextType>;
+  merge?: Resolver<Maybe<ResolversTypes['ShoppingCart']>, ParentType, ContextType, Partial<MutationMergeArgs>>;
   removeFromCart?: Resolver<Maybe<ResolversTypes['ShoppingCart']>, ParentType, ContextType, RequireFields<MutationRemoveFromCartArgs, 'productId'>>;
   updateQuantity?: Resolver<Maybe<ResolversTypes['ShoppingCart']>, ParentType, ContextType, RequireFields<MutationUpdateQuantityArgs, 'productId' | 'quantity'>>;
 };

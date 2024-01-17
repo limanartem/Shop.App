@@ -15,6 +15,10 @@ input ShoppingCartItemInput {
   quantity: Int!
 }
 
+input ShoppingCartMergeInput {
+  items: [ShoppingCartItemInput!]
+}
+
 type ProductItemSnapshot {
   id: ID
   title: String
@@ -33,6 +37,7 @@ type Query {
 
 type Mutation {
   addToCart(item: ShoppingCartItemInput!): ShoppingCart
+  merge(input: ShoppingCartMergeInput): ShoppingCart
   removeFromCart(productId: String!): ShoppingCart
   updateQuantity(productId: String!, quantity: Int!): ShoppingCart
   deleteCart: DeleteResult
