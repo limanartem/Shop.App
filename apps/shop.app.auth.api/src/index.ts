@@ -6,13 +6,14 @@ import { errorHandler } from 'supertokens-node/framework/express';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { initApiUser, initAuth } from './init-auth';
 import { useLogging, useTracing } from '@shop.app/lib.express';
+import { userInfo } from 'os';
 
 const { WEB_API_PORT, PUBLIC_WEB_UI_DOMAINS } = process.env;
 
 initAuth();
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '500kb'}));
 app.use(
   cors({
     origin: PUBLIC_WEB_UI_DOMAINS.split(','),
@@ -43,8 +44,21 @@ app.use((err: any, req: any, res: any, next: any) => {
   res.setHeader('Content-Type', 'application/json').status(500).send({ error: err });
 });
 
-app.listen(WEB_API_PORT, async () => {
-  console.log(`Server is running on port ${WEB_API_PORT}`);
+const server = app.listen(WEB_API_PORT, async () => {
+  console.log(
+    `🚀  Server is running on port ${WEB_API_PORT} under "${userInfo().username}" user context`,
+  );
 
   await initApiUser();
 });
+
+const closeGracefully = async (signal: string) => {
+  console.log(`🚪 Received signal to terminate: ${signal}.`);
+  console.log('Closing server...');
+
+  server.close();
+  process.exit();
+};
+
+process.on('SIGINT', closeGracefully);
+process.on('SIGTERM', closeGracefully);

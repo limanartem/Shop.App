@@ -8,18 +8,19 @@ RUN npm run build
 
 # Stage 2: Build for prod env
 FROM node:21.1.0-slim 
+RUN apt-get update -y
+RUN apt-get install -y dumb-init
+USER node
 WORKDIR /app/apps/shop.app.auth.api
-COPY --from=builder /app/apps/shop.app.auth.api/dist /app/apps/shop.app.auth.api/dist
+COPY --chown=node:node --from=builder /app/apps/shop.app.auth.api/dist /app/apps/shop.app.auth.api/dist
 # Adding shared packages
-COPY --from=builder /app/packages ../../packages
+COPY --chown=node:node --from=builder /app/packages ../../packages
 
 ENV NODE_ENV=production
 
-COPY package*.json ./
+COPY --chown=node:node package*.json ./
 RUN npm install --omit=dev
-#COPY . .
 
 EXPOSE 3003
 
-#CMD ["npm", "run", "tsc"]
-CMD ["npm", "start"]
+CMD ["dumb-init", "npm", "start"]

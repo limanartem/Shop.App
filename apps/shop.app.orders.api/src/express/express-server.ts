@@ -11,6 +11,7 @@ import { useGraphql } from './graphql';
 import { useTracing, useLogging } from '@shop.app/lib.express/dist';
 import { routerFactory as csrfRouterFactory } from './csrf';
 import cookeParser from 'cookie-parser';
+import toobusy from 'toobusy-js';
 /**
  * Starts the server.
  * @returns {express.Express} The Express app instance.
@@ -19,6 +20,13 @@ export const start = () => {
   initAuth();
 
   const app = express();
+  app.use(function (req, res, next) {
+    if (toobusy()) {
+      res.status(503).send('Server Too Busy');
+    } else {
+      next();
+    }
+  });
   app.use(express.json());
   app.use(
     cors({

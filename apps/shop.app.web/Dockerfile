@@ -1,7 +1,7 @@
 # Stage 1: Build the React app
 
 FROM shop.app.packages as builder
-
+ENV NODE_ENV=
 WORKDIR /app/apps/shop.app.web
 COPY package*.json ./
 RUN npm install
