@@ -16,11 +16,12 @@
   "license": "ISC",
   "dependencies": {
     "graphql-ws": "^5.14.2",
-    "supertokens-web-js": "^0.8.0"
+    "supertokens-web-js": "^0.8.0",
+    "rimraf": "^5.0.5",
+    "@types/node": "^20.8.10"
   },
   "devDependencies": {
     "@types/react": "^18.2.45",
-    "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
   }
 }

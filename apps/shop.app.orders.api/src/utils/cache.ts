@@ -18,7 +18,7 @@ process.on('unhandledRejection', function (reason, promise) {
 });
 
 process.on('exit', async () => {
-  console.log('Exiting app.');
+  console.log('App is existing. Closing Redis connection');
 
   if (redisClient) {
     await redisClient.disconnect();

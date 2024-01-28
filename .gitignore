@@ -25,3 +25,4 @@ yarn-debug.log*
 yarn-error.log*
 *.cer
 temp
+update-env.sh

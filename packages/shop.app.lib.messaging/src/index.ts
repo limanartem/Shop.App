@@ -44,7 +44,7 @@ export async function initChannel(
 
     process.on('exit', () => {
       exiting = true;
-      console.log('app terminating, closing connection to message broker');
+      console.log('App terminating, closing connection to message broker');
       channel?.close();
       connection.close();
     });
