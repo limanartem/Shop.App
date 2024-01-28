@@ -15,7 +15,7 @@ RUN apt-get install -y dumb-init
 
 USER node 
 WORKDIR /app/apps/shop.app.orders.api
-COPY  --chown=node:node --from=builder /app/apps/shop.app.orders.api/dist /app/apps/shop.app.orders.api/dist
+COPY --chown=node:node --from=builder /app/apps/shop.app.orders.api/dist /app/apps/shop.app.orders.api/dist
 # Adding shared packages
 COPY --chown=node:node --from=builder /app/packages ../../packages
 ENV NODE_ENV=production
