@@ -10,7 +10,9 @@
     "test": "jest",
     "lint": "eslint . --ext .js,.ts ./src --quiet",
     "pre-commit": "npm run lint",
-    "pre-push": "npm run test"
+    "pre-push": "npm run test",
+    "shopping-cart-codegen": "graphql-codegen --config shoppping-cart.codegen.yaml",
+    "codegen": "graphql-codegen --config codegen.ts"
   },
   "author": "",
   "license": "ISC",
@@ -19,8 +21,12 @@
     "supertokens-web-js": "^0.8.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.0",
+    "@graphql-codegen/client-preset": "^4.1.0",
     "@types/react": "^18.2.45",
     "rimraf": "^5.0.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "@graphql-codegen/typescript": "4.0.1",
+    "@graphql-codegen/introspection": "4.0.0"
   }
 }
