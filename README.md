@@ -96,3 +96,4 @@ To share common logic across different apps add new package under `/packages` fo
       apt-get install ca-certificates
 
       ```
+* On Windows, if you are using WSL2 and after starting docker `vmmem` process takes too much memory, follow [Limiting Memory Usage in WSL2](https://www.aleksandrhovhannisyan.com/blog/limiting-memory-usage-in-wsl-2/) to set memory limits
