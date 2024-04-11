@@ -388,7 +388,7 @@ describe('shopping-cart api', () => {
 
         const response = await req()
           .send({
-            query: `mutation {deleteCart { deleted} }`,
+            query: 'mutation {deleteCart { deleted} }',
           })
           .expect(StatusCodes.OK);
 
