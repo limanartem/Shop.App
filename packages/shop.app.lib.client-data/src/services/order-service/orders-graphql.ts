@@ -28,6 +28,7 @@ function init(env: Record<string, string>, getAccessToken: GetAccessTokenFunc) {
       productId,
       quantity, 
       product { 
+        id,
         title,
         description,
         price,
