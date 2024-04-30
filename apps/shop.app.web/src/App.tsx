@@ -1,13 +1,11 @@
 import './App.css';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Home from './features/home';
 import Catalog from './features/catalog';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, CssBaseline } from '@mui/material';
 import { amber } from '@mui/material/colors';
 import AppWrapper from './components/app-wrapper';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
 import { SessionAuth } from 'supertokens-auth-react/recipe/session';
 import CheckOut from './features/check-out';
 import { useAppDispatch, useAppSelector } from './app/hooks';
@@ -47,56 +45,52 @@ function App() {
   });
 
   return (
-    <Provider store={store}>
-      <InitializeDataWrapper>
-        <AuthWrapper
-          onAuthInitialized={() => {
-            setAuthInitialized(true);
-          }}
-        >
-          <ThemeProvider theme={defaultTheme}>
-            <CssBaseline />
-            <BrowserRouter>
-              <CategoryContextProvider>
-                <AppWrapper>
-                  <Box padding={1}>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/catalog" element={<Catalog />} />
-                      <Route
-                        path="/checkout"
-                        element={
-                          <SessionAuth>
-                            <CheckOut />
-                          </SessionAuth>
-                        }
-                      />
-                      <Route
-                        path="/orders"
-                        element={
-                          <SessionAuth>
-                            <Orders />
-                          </SessionAuth>
-                        }
-                      />
-                      <Route
-                        path="/orders/:id"
-                        element={
-                          <SessionAuth>
-                            <OrderPage />
-                          </SessionAuth>
-                        }
-                      />
-                      {authInitialized && AuthRoutes()}
-                    </Routes>
-                  </Box>
-                </AppWrapper>
-              </CategoryContextProvider>
-            </BrowserRouter>
-          </ThemeProvider>
-        </AuthWrapper>
-      </InitializeDataWrapper>
-    </Provider>
+    <InitializeDataWrapper>
+      <AuthWrapper
+        onAuthInitialized={() => {
+          setAuthInitialized(true);
+        }}
+      >
+        <ThemeProvider theme={defaultTheme}>
+          <CssBaseline />
+          <CategoryContextProvider>
+            <AppWrapper>
+              <Box padding={1}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/catalog" element={<Catalog />} />
+                  <Route
+                    path="/checkout"
+                    element={
+                      <SessionAuth>
+                        <CheckOut />
+                      </SessionAuth>
+                    }
+                  />
+                  <Route
+                    path="/orders"
+                    element={
+                      <SessionAuth>
+                        <Orders />
+                      </SessionAuth>
+                    }
+                  />
+                  <Route
+                    path="/orders/:id"
+                    element={
+                      <SessionAuth>
+                        <OrderPage />
+                      </SessionAuth>
+                    }
+                  />
+                  {authInitialized && AuthRoutes()}
+                </Routes>
+              </Box>
+            </AppWrapper>
+          </CategoryContextProvider>
+        </ThemeProvider>
+      </AuthWrapper>
+    </InitializeDataWrapper>
   );
 }
 

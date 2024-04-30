@@ -22,6 +22,7 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
 
   return (
     <Popover
+      data-testid="shoppingCart-popup"
       open={open}
       anchorEl={anchorEl}
       onClose={onClose}
@@ -39,7 +40,11 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
           <List sx={{ width: '100%' }}>
             {items &&
               items?.map((item) => (
-                <ListItem alignItems="flex-start" key={item.product.id}>
+                <ListItem
+                  alignItems="flex-start"
+                  key={item.product.id}
+                  data-testid={`shoppingCart-popup-orderedProduct-${item.product.id}`}
+                >
                   <OrderedProductCard item={item} flow="shoppingCart" />
                 </ListItem>
               ))}
@@ -53,7 +58,7 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
         {hasItems() && (
           <Grid container direction="column" padding={1}>
             <Grid item justifyContent="flex-end" textAlign="right">
-              <Typography>
+              <Typography data-testid="shoppingCart-popup-total">
                 <strong>Total:&nbsp;</strong>
                 {items
                   ?.reduce((acc, item) => acc + item.product.price * item.quantity, 0)
