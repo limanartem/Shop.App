@@ -2,8 +2,12 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { User } from 'supertokens-web-js/types';
 
+type UserExt = User & {
+  hasSignedIn: boolean;
+};
+
 interface AuthState {
-  user?: User | null;
+  user?: UserExt | null;
 }
 
 const initialState: AuthState = {
@@ -14,7 +18,7 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<User | null>) => {
+    setUser: (state, action: PayloadAction<UserExt | null>) => {
       state.user = action.payload;
     },
   },

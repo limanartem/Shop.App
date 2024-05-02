@@ -35,7 +35,7 @@ const initAuth = (onHandleEvent: (context: OnHandleEventContext) => void) =>
         },
       }),
       Session.init({
-        tokenTransferMethod: 'header'
+        tokenTransferMethod: 'header',
       }),
     ],
   });
@@ -52,7 +52,7 @@ export function AuthWrapper({ children, onAuthInitialized }: AuthWrapperProps) {
   useEffect(() => {
     initAuth((context) => {
       if (context.action === 'SUCCESS') {
-        dispatch(setUser(context.user));
+        dispatch(setUser({ ...context.user, hasSignedIn: true }));
       }
     });
 
@@ -61,7 +61,7 @@ export function AuthWrapper({ children, onAuthInitialized }: AuthWrapperProps) {
 
       if (isLogged) {
         const user = await authServiceClient.getUserAsync();
-        dispatch(setUser(user));
+        dispatch(setUser({ ...user, hasSignedIn: false }));
       }
     };
 

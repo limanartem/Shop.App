@@ -2,6 +2,7 @@ import { Mutation, ShoppingCart, ShoppingCartMergeInput } from '../../generated/
 import { ApolloClient, InMemoryCache, gql, createHttpLink } from '@apollo/client';
 import { GetAccessTokenFunc } from '..';
 import { setContext } from '@apollo/client/link/context';
+import fetch from 'cross-fetch';
 
 const MERGE = gql(`mutation mergeShoppingCart($input: ShoppingCartMergeInput!) {
   merge(input: $input) {
@@ -36,7 +37,7 @@ export class ShoppingCartService {
     });
 
     this.client = new ApolloClient({
-      link: authLink.concat(createHttpLink({ uri: REACT_APP_SHOPPING_CART_API_URL })),
+      link: authLink.concat(createHttpLink({ uri: REACT_APP_SHOPPING_CART_API_URL, fetch })),
       cache: new InMemoryCache(),
     });
   }

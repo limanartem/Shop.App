@@ -2,6 +2,7 @@ import { createListenerMiddleware } from '@reduxjs/toolkit';
 import { setUser } from '../reducers/authReducer';
 import { graphQlWsClient } from '../../services';
 import { buildStore } from '../store';
+import { merge, clearCart } from '../reducers/shoppingCartReducer';
 
 jest.mock('../../services', () => ({
   ...jest.requireActual('../../services'),
@@ -17,14 +18,24 @@ jest.mock('../reducers/notificationsReducer', () => ({
   setChangedOrders: jest.fn(),
 }));
 
+jest.mock('../reducers/shoppingCartReducer', () => ({
+  ...jest.requireActual('../reducers/shoppingCartReducer'),
+  merge: jest.fn(),
+  clearCart: jest.fn(),
+}));
+
 describe('authMiddleware', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should stop WS listening when action payload is null', async () => {
     const store = buildStore();
 
     const startListeningMock = jest.spyOn(createListenerMiddleware(), 'startListening');
     const stopListeningMock = jest.spyOn(graphQlWsClient, 'stopListening');
 
-    store.dispatch(setUser(null));
+    await store.dispatch(setUser(null));
 
     expect(stopListeningMock).toHaveBeenCalled();
     expect(startListeningMock).not.toHaveBeenCalled();
@@ -36,17 +47,34 @@ describe('authMiddleware', () => {
     const startListeningClientMock = jest.spyOn(graphQlWsClient, 'startListening');
     const stopListeningMock = jest.spyOn(graphQlWsClient, 'stopListening');
 
-    store.dispatch(setUser({} as any));
+    await store.dispatch(setUser({} as any));
 
     expect(startListeningClientMock).toHaveBeenCalled();
     expect(stopListeningMock).not.toHaveBeenCalled();
   });
 
-  
-  it('should merge shopping cart when action payload is not null', async () => {
+  it('should merge shopping cart when user has signed in', async () => {
     const store = buildStore();
 
-    store.dispatch(setUser({} as any));
+    await store.dispatch(setUser({ hasSignedIn: true } as any));
 
+    expect(merge).toHaveBeenCalled();
+  });
+
+  it('should clear shopping cart when user has signed out', async () => {
+    const store = buildStore();
+
+    await store.dispatch(setUser(null));
+
+    expect(merge).not.toHaveBeenCalled();
+    expect(clearCart).toHaveBeenCalled();
+  });
+
+  it('should not merge shopping cart when user was signed in before', async () => {
+    const store = buildStore();
+
+    await store.dispatch(setUser({ hasSignedIn: false } as any));
+
+    expect(merge).not.toHaveBeenCalled();
   });
 });

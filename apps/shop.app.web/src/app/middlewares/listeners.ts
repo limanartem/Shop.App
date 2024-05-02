@@ -49,11 +49,15 @@ const authMiddleware = () => {
     effect: async (action, listenerApi) => {
       if (action.payload == null) {
         await graphQlWsClient.stopListening();
+        listenerApi.dispatch(clearCart());
       } else {
         await graphQlWsClient.startListening((ids) => {
           listenerApi.dispatch(setChangedOrders(ids));
         });
-        listenerApi.dispatch(merge({ getState: listenerApi.getState as () => RootState }));
+
+        if (action.payload.hasSignedIn === true) {
+          listenerApi.dispatch(merge({ getState: listenerApi.getState as () => RootState }));
+        }
       }
     },
   });

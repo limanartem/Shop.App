@@ -19,6 +19,7 @@
   "dependencies": {
     "@apollo/client": "^3.10.1",
     "@shop.app/lib.client-data.catalog-service": "file:../shop.app.lib.client-data.catalog-service",
+    "cross-fetch": "^4.0.0",
     "graphql-ws": "^5.14.2",
     "supertokens-web-js": "^0.8.0"
   },
