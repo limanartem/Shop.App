@@ -1,15 +1,14 @@
 import { RequestContext } from '../types';
-import {
-  MutationMergeArgs,
-  MutationResolvers,
-  ShoppingCart,
-} from '../generated/graphql';
+import { MutationMergeArgs, MutationResolvers, ShoppingCart } from '../generated/graphql';
 import {
   deleteDocument,
   fetchDocument,
   insertDocument,
   updateDocument,
 } from '@shop.app/lib.server-utils/dist/mongodb';
+import { CatalogServiceClient } from '@shop.app/lib.client-data.catalog-service/dist/catalog-service';
+
+const catalogClient = new CatalogServiceClient(process.env);
 
 /**
  * Updates the shopping cart for a given user.
@@ -38,14 +37,21 @@ const updateShoppingCart = async (
   }
 
   if (updateFn(document)) {
-    const updatedDocument = await updateDocument(document.id, document, 'shopping-cart');
+    const updatedDocument = await updateDocument<ShoppingCart>(
+      document.id,
+      document,
+      'shopping-cart',
+    );
 
     if (updatedDocument == null) {
       throw new Error('Failed to update shopping cart');
     }
 
+    await enrichWithProductDetails(updatedDocument);
+
     return updatedDocument as unknown as ShoppingCart;
   }
+
   return document;
 };
 
@@ -141,12 +147,6 @@ export const mergeCart: MutationResolvers['merge'] = async (
   args: MutationMergeArgs,
   context: RequestContext,
 ) => {
-  const cart = await fetchDocument<ShoppingCart>({ userId: context.userId }, 'shopping-cart');
-
-  if (cart == null) {
-    throw new Error('Cart not found');
-  }
-
   return updateShoppingCart(context.userId, (userCart) => {
     if (userCart.items == null) {
       userCart.items = [];
@@ -162,5 +162,18 @@ export const mergeCart: MutationResolvers['merge'] = async (
     });
 
     return true;
+  });
+};
+
+const enrichWithProductDetails = async (updatedDocument: ShoppingCart) => {
+  const productDetails = await catalogClient.getProductsAsync({
+    ids: updatedDocument.items?.map((i) => i.productId),
+  });
+
+  productDetails.forEach((product) => {
+    const cartItem = updatedDocument.items?.find((i) => i.productId === product.id);
+    if (cartItem != null) {
+      cartItem.product = product;
+    }
   });
 };

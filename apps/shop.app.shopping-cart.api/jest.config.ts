@@ -21,6 +21,7 @@ const config: Config.InitialOptions = {
   roots: ['src/'],
   forceExit: true,
   setupFiles: fs.readdirSync(rootDir).map((file) => path.join(rootDir, file)),
+  testEnvironment: './src/test-utils/undici-mockagent-fetch-jest.ts',
   // runner: 'groups',
 };
 

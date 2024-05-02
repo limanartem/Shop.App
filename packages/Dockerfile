@@ -9,6 +9,11 @@ COPY ./shop.app.lib.messaging .
 RUN npm install
 RUN npm run build
 
+WORKDIR /app/packages/shop.app.lib.client-data.catalog-service
+COPY ./shop.app.lib.client-data.catalog-service .
+RUN npm install
+RUN npm run build
+
 WORKDIR /app/packages/shop.app.lib.client-data
 COPY ./shop.app.lib.client-data .
 RUN npm install

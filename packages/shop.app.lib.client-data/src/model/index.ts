@@ -1,19 +1,4 @@
-export type ProductItem = {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  currency: string;
-  images?: string[];
-  capacity?: number;
-  category?: string;
-};
-
-export type ProductCategory = {
-  id: number;
-  parentCategoryId?: number;
-  title: string;
-};
+import { ProductItem } from '@shop.app/lib.client-data.catalog-service/dist/model';
 
 export type ShoppingCartItem = {
   product: ProductItem;
@@ -93,3 +78,5 @@ export type Order = {
 export type OrdersResponse = {
   orders: Order[];
 };
+
+export * from '@shop.app/lib.client-data.catalog-service/dist/model'

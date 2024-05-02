@@ -1,4 +1,4 @@
-import { ProductCategory, ProductItem } from '../model';
+import { ProductCategory, ProductItem } from './model';
 
 /**
  * Represents a client for interacting with the catalog service.
@@ -6,9 +6,9 @@ import { ProductCategory, ProductItem } from '../model';
 export class CatalogServiceClient {
   private catalogApiUrl: string;
 
-  constructor(env: Record<string, string>) {
-    const { REACT_APP_CATALOG_API_URL } = env;
-    this.catalogApiUrl = REACT_APP_CATALOG_API_URL;
+  constructor(env: Record<string, string> | { [key: string]: string | undefined }) {
+    const { REACT_APP_CATALOG_API_URL, CATALOG_API_URL } = env;
+    this.catalogApiUrl = (REACT_APP_CATALOG_API_URL || CATALOG_API_URL)!;
   }
 
   /**
@@ -28,19 +28,23 @@ export class CatalogServiceClient {
     ids?: string[];
   }): Promise<ProductItem[]> {
     console.log(
-      `Fetching products from ${`${this.catalogApiUrl}/products?categoryId=${category}`}`,
+      !ids?.length
+        ? `Fetching products from ${`${this.catalogApiUrl}/products?categoryId=${
+            category ? category : ''
+          }`}`
+        : `Fetching products from ${this.catalogApiUrl}/products/search`,
     );
 
     const response = !ids?.length
-      ? await fetch(
-          `${this.catalogApiUrl}/products?categoryId=${category ? category : ''}`,
-          {
-            method: 'GET',
-          },
-        )
-      : await fetch(`${this.catalogApiUrl}/products/search}`, {
+      ? await fetch(`${this.catalogApiUrl}/products?categoryId=${category ? category : ''}`, {
+          method: 'GET',
+        })
+      : await fetch(`${this.catalogApiUrl}/products/search`, {
           method: 'POST',
-          body: JSON.stringify({ ids }),
+          body: JSON.stringify(ids),
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
 
     if (!response.ok) {

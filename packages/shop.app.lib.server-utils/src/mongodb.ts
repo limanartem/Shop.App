@@ -103,18 +103,18 @@ export const fetchDocument = async <DocumentType extends Document = Document>(
  * @param collection - The MongoDB collection to update the document in. Defaults to DB_COLLECTION.ORDERS.
  * @returns A promise that resolves to the updated document with the ID, or null if the document was not found.
  */
-export const updateDocument = async (
+export const updateDocument = async <DocumentType extends Document = Document>(
   id: string | ObjectId,
   data: any,
   collection: DB_COLLECTION = 'orders',
-): Promise<WithId<Document> | null> =>
-  usingClient(async (client) => {
+): Promise<WithId<DocumentType> | null> =>
+  usingClient<WithId<DocumentType> | null>(async (client) => {
     const _id = id instanceof ObjectId ? id : ObjectId.createFromHexString(id);
     console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
     console.log('Updating item in db...', id, data, collection);
     const updateResult = await client
       .db()
-      .collection(collection)
+      .collection<any>(collection)
       .findOneAndUpdate({ _id }, { $set: data }, { returnDocument: 'after' });
     return updateResult;
   });

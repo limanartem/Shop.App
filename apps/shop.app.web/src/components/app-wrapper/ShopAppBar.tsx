@@ -186,7 +186,7 @@ export function ShopAppBar({ open, toggleDrawer }: ShopBarPropsType) {
             >
               <Badge
                 data-testid="appBar-shoppingCart-badge"
-                badgeContent={items.reduce((count, item) => count + item.quantity, 0)}
+                badgeContent={items?.reduce((count, item) => count + item.quantity, 0)}
                 color="success"
               >
                 <ShoppingCartIcon />

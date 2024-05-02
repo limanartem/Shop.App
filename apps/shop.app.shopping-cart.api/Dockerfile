@@ -18,7 +18,5 @@ COPY package*.json ./
 RUN npm install --omit=dev --legacy-peer-deps
 #COPY . .
 
-EXPOSE 3001
-
 #CMD ["npm", "run", "tsc"]
 CMD ["npm", "start"]

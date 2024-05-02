@@ -1,7 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { PersistentState } from '../persistance/local-storage';
 import { ShoppingCartItem, ProductItem } from '@shop.app/lib.client-data/dist/model';
+import { shoppingCartServiceClient } from '../../services';
 
 interface ShoppingCartState extends PersistentState {
   items: ShoppingCartItem[];
@@ -12,11 +13,25 @@ const initialState: ShoppingCartState = {
   items: [],
 };
 
+export const merge = createAsyncThunk(
+  '/shoppingCart/merge',
+  async ({ getState }: { getState: () => RootState }) => {
+    const state = getState() as RootState;
+    const inputItems = state.shoppingCart.items.map((item) => ({
+      productId: item.product.id,
+      quantity: item.quantity,
+    }));
+
+    return await shoppingCartServiceClient.merge({ items: inputItems });
+  },
+);
+
 export const shoppingCartSlice = createSlice({
   name: 'shoppingCart',
   initialState,
   reducers: {
     addToCart: (state, action: PayloadAction<{ product: ProductItem; quantity: number }>) => {
+      if (!state.items) state.items = [];
       const { product, quantity } = action.payload;
       const existingItem = state.items.find((item) => item.product.id === product.id);
       if (existingItem) {
@@ -30,7 +45,14 @@ export const shoppingCartSlice = createSlice({
     },
     clearCart: (state) => {
       state.items = [];
-    }
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(merge.fulfilled, (state, action) => {
+      console.log(action);
+      if (action.payload?.items != null)
+        state.items = action.payload.items?.map((item) => item as ShoppingCartItem);
+    });
   },
 });
 

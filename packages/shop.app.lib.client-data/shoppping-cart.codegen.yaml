@@ -2,6 +2,6 @@ overwrite: true
 schema: "../../apps/shop.app.shopping-cart.api/src/schema.graphql"
 documents: "src/**/*.tsx"
 generates:
-  src/gql/:
+  src/generated/shopping-cart/:
     preset: "client"
     plugins: []

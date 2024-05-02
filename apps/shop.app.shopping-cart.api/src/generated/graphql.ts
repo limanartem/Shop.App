@@ -54,6 +54,7 @@ export type MutationUpdateQuantityArgs = {
 
 export type ProductItemSnapshot = {
   __typename?: 'ProductItemSnapshot';
+  categoryId?: Maybe<Scalars['String']['output']>;
   currency?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
@@ -206,6 +207,7 @@ export type MutationResolvers<ContextType = RequestContext, ParentType extends R
 };
 
 export type ProductItemSnapshotResolvers<ContextType = RequestContext, ParentType extends ResolversParentTypes['ProductItemSnapshot'] = ResolversParentTypes['ProductItemSnapshot']> = {
+  categoryId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   currency?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;

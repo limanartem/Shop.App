@@ -18,7 +18,7 @@ export function ShoppingCartPopup({ open, anchorEl, onClose }: ShoppingCartPopup
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const hasItems = useCallback(() => items.length > 0, [items]);
+  const hasItems = useCallback(() => items?.length > 0, [items]);
 
   return (
     <Popover

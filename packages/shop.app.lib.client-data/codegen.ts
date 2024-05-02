@@ -4,13 +4,12 @@ const config: CodegenConfig = {
   overwrite: true,
   schema: '../../apps/shop.app.shopping-cart.api/src/schema.graphql',
   generates: {
-    'src/generated/': {
+    'src/generated/shopping-cart/': {
       preset: 'client',
-      presetConfig: {
-        gqlTagName: 'gql',
-      },
     },
   },
+  ignoreNoDocuments: true,
+  documents: ['src/**/*.{ts}'],
 };
 
 export default config;

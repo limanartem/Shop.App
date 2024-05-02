@@ -15,5 +15,5 @@
     "lib": ["dom", "dom.iterable", "esnext"]
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "src/generated"]
+  "exclude": ["node_modules", "dist", "src/generated/shopping-cart"]
 }

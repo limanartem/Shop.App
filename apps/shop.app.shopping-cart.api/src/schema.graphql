@@ -25,6 +25,7 @@ type ProductItemSnapshot {
   description: String
   price: Float!
   currency: String
+  categoryId: String
 }
 
 type DeleteResult {
