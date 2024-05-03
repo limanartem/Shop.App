@@ -1,0 +1,21 @@
+{
+  "name": "@shop.app/lib.client-data.catalog-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "clean": "npx rimraf dist",
+    "_prebuild": "npm run clean",
+    "build": "tsc --project tsconfig.json",
+    "test": "jest",
+    "lint": "eslint . --ext .js,.ts ./src --quiet",
+    "pre-commit": "npm run lint",
+    "pre-push": "npm run test"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  }
+}

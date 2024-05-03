@@ -3,6 +3,9 @@ import '@testing-library/jest-dom';
 import { render, screen, cleanup, within } from '@testing-library/react';
 import App from './App';
 import { SessionAuth } from 'supertokens-auth-react/recipe/session';
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+import { store } from './app/store';
 
 jest.mock('supertokens-auth-react/recipe/session', () => ({
   SessionAuth: jest.fn(),
@@ -32,14 +35,14 @@ describe('App', () => {
   });
 
   it('should contain main elements', async () => {
-    render(<App />);
+    renderApp();
     await expect(await screen.findByTestId('appBar')).toBeInTheDocument();
     await expect(await screen.findByTestId('categoriesTree')).toBeInTheDocument();
   });
 
   it('should navigate to catalog feature', async () => {
     window.history.pushState({}, '', '/catalog');
-    render(<App />);
+    renderApp();
     await expect(await screen.findByTestId('feature-catalog')).toBeInTheDocument();
   });
 
@@ -51,19 +54,19 @@ describe('App', () => {
 
     it('should not navigate to checkout feature if user is not authenticated', async () => {
       window.history.pushState({}, '', '/checkout');
-      render(<App />);
+      renderApp();
       await expect(screen.findByTestId('feature-checkout')).rejects.toThrow();
     });
 
     it('should not navigate to orders feature if user is not authenticated', async () => {
       window.history.pushState({}, '', '/orders');
-      render(<App />);
+      renderApp();
       await expect(screen.findByTestId('feature-orders')).rejects.toThrow();
     });
 
     it('should not navigate to order page feature if user is not authenticated', async () => {
       window.history.pushState({}, '', '/orders/123445');
-      render(<App />);
+      renderApp();
       await expect(screen.findByTestId('feature-orderPage')).rejects.toThrow();
     });
   });
@@ -78,27 +81,36 @@ describe('App', () => {
 
     it('able to navigate to checkout feature', async () => {
       window.history.pushState({}, '', '/checkout');
-      render(<App />);
+      renderApp();
       await expect(await screen.findByTestId('feature-checkout')).toBeInTheDocument();
     });
 
     it('able to navigate to orders feature', async () => {
       window.history.pushState({}, '', '/orders');
-      render(<App />);
+      renderApp();
       await expect(await screen.findByTestId('feature-orders')).toBeInTheDocument();
     });
 
     it('able to navigate to order page feature', async () => {
       window.history.pushState({}, '', '/orders/1234');
-      render(<App />);
+      renderApp();
       await expect(await screen.findByTestId('feature-orderPage')).toBeInTheDocument();
     });
   });
 
   it('should contain search within appBar', async () => {
-    render(<App />);
+    renderApp();
     const appBarElement = await screen.findByTestId('appBar');
     const search = await within(appBarElement).findByTestId('appBar-search');
     expect(search).toBeInTheDocument();
   });
 });
+function renderApp() {
+  render(
+    <BrowserRouter>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </BrowserRouter>,
+  );
+}

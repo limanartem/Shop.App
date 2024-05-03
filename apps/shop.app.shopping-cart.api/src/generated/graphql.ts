@@ -1,4 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql';
+import { RequestContext } from '../types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -6,6 +7,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -15,12 +17,48 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
-export type ProductItem = {
-  __typename?: 'ProductItem';
+export type DeleteResult = {
+  __typename?: 'DeleteResult';
+  deleted: Scalars['Boolean']['output'];
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  addToCart?: Maybe<ShoppingCart>;
+  deleteCart?: Maybe<DeleteResult>;
+  merge?: Maybe<ShoppingCart>;
+  removeFromCart?: Maybe<ShoppingCart>;
+  updateQuantity?: Maybe<ShoppingCart>;
+};
+
+
+export type MutationAddToCartArgs = {
+  item: ShoppingCartItemInput;
+};
+
+
+export type MutationMergeArgs = {
+  input?: InputMaybe<ShoppingCartMergeInput>;
+};
+
+
+export type MutationRemoveFromCartArgs = {
+  productId: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateQuantityArgs = {
+  productId: Scalars['String']['input'];
+  quantity: Scalars['Int']['input'];
+};
+
+export type ProductItemSnapshot = {
+  __typename?: 'ProductItemSnapshot';
+  categoryId?: Maybe<Scalars['String']['output']>;
   currency?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
-  price?: Maybe<Scalars['Float']['output']>;
+  price: Scalars['Float']['output'];
   title?: Maybe<Scalars['String']['output']>;
 };
 
@@ -31,16 +69,25 @@ export type Query = {
 
 export type ShoppingCart = {
   __typename?: 'ShoppingCart';
-  id?: Maybe<Scalars['ID']['output']>;
-  items?: Maybe<Array<Maybe<ShoppingCartItem>>>;
-  userId?: Maybe<Scalars['ID']['output']>;
+  id: Scalars['ID']['output'];
+  items?: Maybe<Array<ShoppingCartItem>>;
+  userId: Scalars['ID']['output'];
 };
 
 export type ShoppingCartItem = {
   __typename?: 'ShoppingCartItem';
-  product?: Maybe<ProductItem>;
-  productId?: Maybe<Scalars['String']['output']>;
-  quantity?: Maybe<Scalars['Int']['output']>;
+  product?: Maybe<ProductItemSnapshot>;
+  productId: Scalars['String']['output'];
+  quantity: Scalars['Int']['output'];
+};
+
+export type ShoppingCartItemInput = {
+  productId: Scalars['String']['input'];
+  quantity: Scalars['Int']['input'];
+};
+
+export type ShoppingCartMergeInput = {
+  items?: InputMaybe<Array<ShoppingCartItemInput>>;
 };
 
 
@@ -115,58 +162,82 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  DeleteResult: ResolverTypeWrapper<DeleteResult>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  ProductItem: ResolverTypeWrapper<ProductItem>;
+  Mutation: ResolverTypeWrapper<{}>;
+  ProductItemSnapshot: ResolverTypeWrapper<ProductItemSnapshot>;
   Query: ResolverTypeWrapper<{}>;
   ShoppingCart: ResolverTypeWrapper<ShoppingCart>;
   ShoppingCartItem: ResolverTypeWrapper<ShoppingCartItem>;
+  ShoppingCartItemInput: ShoppingCartItemInput;
+  ShoppingCartMergeInput: ShoppingCartMergeInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
+  DeleteResult: DeleteResult;
   Float: Scalars['Float']['output'];
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
-  ProductItem: ProductItem;
+  Mutation: {};
+  ProductItemSnapshot: ProductItemSnapshot;
   Query: {};
   ShoppingCart: ShoppingCart;
   ShoppingCartItem: ShoppingCartItem;
+  ShoppingCartItemInput: ShoppingCartItemInput;
+  ShoppingCartMergeInput: ShoppingCartMergeInput;
   String: Scalars['String']['output'];
 };
 
-export type ProductItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProductItem'] = ResolversParentTypes['ProductItem']> = {
+export type DeleteResultResolvers<ContextType = RequestContext, ParentType extends ResolversParentTypes['DeleteResult'] = ResolversParentTypes['DeleteResult']> = {
+  deleted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MutationResolvers<ContextType = RequestContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addToCart?: Resolver<Maybe<ResolversTypes['ShoppingCart']>, ParentType, ContextType, RequireFields<MutationAddToCartArgs, 'item'>>;
+  deleteCart?: Resolver<Maybe<ResolversTypes['DeleteResult']>, ParentType, ContextType>;
+  merge?: Resolver<Maybe<ResolversTypes['ShoppingCart']>, ParentType, ContextType, Partial<MutationMergeArgs>>;
+  removeFromCart?: Resolver<Maybe<ResolversTypes['ShoppingCart']>, ParentType, ContextType, RequireFields<MutationRemoveFromCartArgs, 'productId'>>;
+  updateQuantity?: Resolver<Maybe<ResolversTypes['ShoppingCart']>, ParentType, ContextType, RequireFields<MutationUpdateQuantityArgs, 'productId' | 'quantity'>>;
+};
+
+export type ProductItemSnapshotResolvers<ContextType = RequestContext, ParentType extends ResolversParentTypes['ProductItemSnapshot'] = ResolversParentTypes['ProductItemSnapshot']> = {
+  categoryId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   currency?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  price?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+export type QueryResolvers<ContextType = RequestContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   shoppingCart?: Resolver<Maybe<ResolversTypes['ShoppingCart']>, ParentType, ContextType>;
 };
 
-export type ShoppingCartResolvers<ContextType = any, ParentType extends ResolversParentTypes['ShoppingCart'] = ResolversParentTypes['ShoppingCart']> = {
-  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  items?: Resolver<Maybe<Array<Maybe<ResolversTypes['ShoppingCartItem']>>>, ParentType, ContextType>;
-  userId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+export type ShoppingCartResolvers<ContextType = RequestContext, ParentType extends ResolversParentTypes['ShoppingCart'] = ResolversParentTypes['ShoppingCart']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  items?: Resolver<Maybe<Array<ResolversTypes['ShoppingCartItem']>>, ParentType, ContextType>;
+  userId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type ShoppingCartItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['ShoppingCartItem'] = ResolversParentTypes['ShoppingCartItem']> = {
-  product?: Resolver<Maybe<ResolversTypes['ProductItem']>, ParentType, ContextType>;
-  productId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  quantity?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+export type ShoppingCartItemResolvers<ContextType = RequestContext, ParentType extends ResolversParentTypes['ShoppingCartItem'] = ResolversParentTypes['ShoppingCartItem']> = {
+  product?: Resolver<Maybe<ResolversTypes['ProductItemSnapshot']>, ParentType, ContextType>;
+  productId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type Resolvers<ContextType = any> = {
-  ProductItem?: ProductItemResolvers<ContextType>;
+export type Resolvers<ContextType = RequestContext> = {
+  DeleteResult?: DeleteResultResolvers<ContextType>;
+  Mutation?: MutationResolvers<ContextType>;
+  ProductItemSnapshot?: ProductItemSnapshotResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   ShoppingCart?: ShoppingCartResolvers<ContextType>;
   ShoppingCartItem?: ShoppingCartItemResolvers<ContextType>;

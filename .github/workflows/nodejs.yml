@@ -5,6 +5,7 @@ on:
     branches: ['master']
   pull_request:
     branches: ['master']
+  workflow_dispatch:
 
 jobs:
   build:
@@ -33,8 +34,14 @@ jobs:
           npm run lint
           npm run test
 
+      - name: Shop.App.Shopping-Cart.Api Tests
+        working-directory: ./apps/shop.app.shopping-cart.api
+        run: |
+          npm install
+          npm run test
+
       - name: Shop.App.Web Tests
-        working-directory: ./apps/shop.app.web       
+        working-directory: ./apps/shop.app.web
         run: |
           npm install
           npm run lint

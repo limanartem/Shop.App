@@ -1,0 +1,602 @@
+import request from 'supertest';
+import createApolloServer from '../apollo-server';
+import { ApolloServer } from '@apollo/server';
+import { StatusCodes } from 'http-status-codes';
+import { decodeToken } from '@shop.app/lib.server-utils/dist/auth';
+import { randomUUID } from 'crypto';
+import {
+  fetchDocument,
+  insertDocument,
+  updateDocument,
+  deleteDocument,
+} from '@shop.app/lib.server-utils/dist/mongodb';
+import { RequestContext } from '../types';
+import { Agent, Interceptable, MockAgent, setGlobalDispatcher } from 'undici';
+import cloneDeep from 'lodash.clonedeep';
+
+jest.mock('@shop.app/lib.server-utils/dist/auth', () => ({
+  decodeToken: jest.fn(),
+}));
+
+jest.mock('@shop.app/lib.server-utils/dist/mongodb', () => ({
+  fetchDocument: jest.fn(),
+  fetchDocuments: jest.fn(),
+  insertDocument: jest.fn(),
+  updateDocument: jest.fn(),
+  deleteDocument: jest.fn(),
+}));
+
+describe('shopping-cart api', () => {
+  const { CATALOG_API_URL } = process.env;
+  let server: ApolloServer<RequestContext>, url: string;
+  let mockAgent: MockAgent;
+  let mockPool: Interceptable;
+  let productSearchResult: any[];
+
+  beforeEach(() => {
+    mockAgent = new MockAgent();
+    mockPool = mockAgent.get(CATALOG_API_URL!);
+
+    (global as any).setMockedFetchGlobalDispatcher(mockAgent);
+    mockAgent.disableNetConnect();
+
+    productSearchResult = [];
+    mockPool
+      .intercept({ path: '/products/search', method: 'POST' })
+      .reply(200, () => productSearchResult)
+      .persist();
+
+    jest.resetAllMocks();
+  });
+
+  afterEach(async () => {
+    await mockAgent.close();
+    setGlobalDispatcher(new Agent());
+  });
+
+  beforeAll(async () => {
+    ({ server, url } = await createApolloServer());
+  });
+
+  afterAll(async () => {
+    await server?.stop();
+  });
+
+  describe('should authenticate request', () => {
+    it(`should return ${StatusCodes.UNAUTHORIZED} if auth header is missing`, async () => {
+      await request(url)
+        .post('.')
+        .send({ query: 'query {shoppingCart { userId} }' })
+        .expect(StatusCodes.UNAUTHORIZED);
+    });
+
+    it(`should return ${StatusCodes.UNAUTHORIZED} if token failed to decode`, async () => {
+      (decodeToken as jest.Mock).mockResolvedValue(null);
+      const token = btoa(randomUUID());
+      await request(url)
+        .post('.')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query: 'query {shoppingCart { userId} }' })
+        .expect(StatusCodes.UNAUTHORIZED);
+
+      expect(decodeToken).toHaveBeenCalledWith(token);
+    });
+
+    it(`should return ${StatusCodes.OK} if token successfully decoded`, async () => {
+      const token = btoa(randomUUID());
+      const userId = randomUUID();
+
+      (decodeToken as jest.Mock).mockResolvedValue({
+        sub: userId,
+      });
+
+      await request(url)
+        .post('.')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query: 'query {shoppingCart { userId} }' })
+        .expect(StatusCodes.OK);
+
+      expect(decodeToken).toHaveBeenCalledWith(token);
+    });
+  });
+
+  describe('for authenticated requests', () => {
+    const token = btoa(randomUUID());
+    const userId = randomUUID();
+    const req = () => request(url).post('.').set('Authorization', `Bearer ${token}`);
+
+    beforeEach(() => {
+      (decodeToken as jest.Mock).mockResolvedValue({
+        sub: userId,
+      });
+    });
+
+    afterEach(() => {
+      expect(decodeToken).toHaveBeenCalledWith(token);
+    });
+
+    describe('should return shopping cart', () => {
+      it('should return shopping cart', async () => {
+        (fetchDocument as jest.Mock).mockResolvedValue({
+          userId,
+          items: [
+            {
+              productId: '123',
+              quantity: 1,
+              product: {
+                id: '123',
+                title: 'Test',
+                description: 'Test',
+                price: 1,
+                currency: 'USD',
+              },
+            },
+          ],
+        });
+
+        const response = await req()
+          .send({ query: 'query {shoppingCart { userId} }' })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.shoppingCart).toBeDefined();
+        expect(response.body.data.shoppingCart.userId).toEqual(userId);
+        expect(fetchDocument).toHaveBeenCalledWith(
+          {
+            userId,
+          },
+          'shopping-cart',
+        );
+      });
+
+      it('if shopping cart does not exist should return null', async () => {
+        (fetchDocument as jest.Mock).mockResolvedValue(null);
+
+        const response = await req()
+          .send({ query: 'query {shoppingCart { userId} }' })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.shoppingCart).toBeNull();
+        expect(fetchDocument).toHaveBeenCalledWith({ userId }, 'shopping-cart');
+      });
+    });
+
+    describe('add product to shopping cart', () => {
+      it('should add product to new shopping cart', async () => {
+        const productId = randomUUID();
+        const quantity = 2;
+        const cartId = randomUUID();
+        const expectedShoppingCart = {
+          id: cartId,
+          userId,
+          items: [
+            {
+              productId,
+              quantity,
+            },
+          ],
+        };
+
+        (fetchDocument as jest.Mock).mockResolvedValue(null);
+        (insertDocument as jest.Mock).mockResolvedValue({ id: cartId, userId, items: [] });
+        (updateDocument as jest.Mock).mockResolvedValue(expectedShoppingCart);
+
+        const response = await req()
+          .send({
+            query: `mutation {addToCart(item: {productId: "${productId}", quantity: ${quantity}}) { userId} }`,
+          })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.addToCart).toBeDefined();
+        expect(response.body.data.addToCart.userId).toEqual(userId);
+        expect(insertDocument).toHaveBeenCalledWith({ userId, items: [] }, 'shopping-cart');
+        expect(updateDocument).toHaveBeenCalledWith(cartId, expectedShoppingCart, 'shopping-cart');
+      });
+
+      it('should add product to existing shopping cart with no items', async () => {
+        const productId = randomUUID();
+        const quantity = 2;
+        const cartId = randomUUID();
+
+        const existingShoppingCart = {
+          id: cartId,
+          userId,
+          items: null,
+        };
+
+        const expectedShoppingCart = {
+          id: cartId,
+          userId,
+          items: [
+            {
+              productId,
+              quantity,
+            },
+          ],
+        };
+
+        (fetchDocument as jest.Mock).mockResolvedValue(existingShoppingCart);
+        (updateDocument as jest.Mock).mockResolvedValue(expectedShoppingCart);
+
+        const response = await req()
+          .send({
+            query: `mutation {addToCart(item: {productId: "${productId}", quantity: ${quantity}}) { userId} }`,
+          })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.addToCart).toBeDefined();
+        expect(response.body.data.addToCart.userId).toEqual(userId);
+        expect(updateDocument).toHaveBeenCalledWith(cartId, expectedShoppingCart, 'shopping-cart');
+      });
+
+      it('should add product to existing shopping cart', async () => {
+        const productId = randomUUID();
+        const quantity = 2;
+        const cartId = randomUUID();
+
+        const existingShoppingCart = {
+          id: cartId,
+          userId,
+          items: [
+            {
+              productId,
+              quantity,
+            },
+          ],
+        };
+
+        const expectedShoppingCart = {
+          id: cartId,
+          userId,
+          items: [
+            {
+              productId,
+              quantity: quantity * 2,
+            },
+          ],
+        };
+
+        (fetchDocument as jest.Mock).mockResolvedValue(existingShoppingCart);
+        (updateDocument as jest.Mock).mockResolvedValue(expectedShoppingCart);
+
+        const response = await req()
+          .send({
+            query: `mutation {addToCart(item: {productId: "${productId}", quantity: ${quantity}}) { userId} }`,
+          })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.addToCart).toBeDefined();
+        expect(response.body.data.addToCart.userId).toEqual(userId);
+        expect(updateDocument).toHaveBeenCalledWith(cartId, expectedShoppingCart, 'shopping-cart');
+      });
+    });
+
+    describe('remove product from shopping cart', () => {
+      it('should remove product from shopping cart', async () => {
+        const productIds = [randomUUID(), randomUUID()];
+        const cartId = randomUUID();
+
+        const existingShoppingCart = {
+          id: cartId,
+          userId,
+          items: productIds.map((productId, index) => ({
+            productId,
+            quantity: index + 1,
+          })),
+        };
+
+        const expectedShoppingCart = {
+          id: cartId,
+          userId,
+          items: [
+            {
+              productId: productIds[1],
+              quantity: 2,
+            },
+          ],
+        };
+
+        (fetchDocument as jest.Mock).mockResolvedValue(existingShoppingCart);
+        (updateDocument as jest.Mock).mockResolvedValue(expectedShoppingCart);
+
+        const response = await req()
+          .send({
+            query: `mutation {removeFromCart(productId: "${productIds[0]}") { userId} }`,
+          })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.removeFromCart).toBeDefined();
+        expect(response.body.data.removeFromCart.userId).toEqual(userId);
+        expect(updateDocument).toHaveBeenCalledWith(cartId, expectedShoppingCart, 'shopping-cart');
+      });
+
+      it('should not update shopping cart if item does not exist', async () => {
+        const productIds = [randomUUID(), randomUUID()];
+        const cartId = randomUUID();
+
+        const existingShoppingCart = {
+          id: cartId,
+          userId,
+          items: productIds.map((productId, index) => ({
+            productId,
+            quantity: index + 1,
+          })),
+        };
+
+        (fetchDocument as jest.Mock).mockResolvedValue(existingShoppingCart);
+
+        const response = await req()
+          .send({
+            query: `mutation {removeFromCart(productId: "${randomUUID()}") { userId} }`,
+          })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.removeFromCart).toBeDefined();
+        expect(response.body.data.removeFromCart.userId).toEqual(userId);
+        expect(updateDocument).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('update product in shopping cart', () => {
+      it('should update product in shopping cart', async () => {
+        const productId = randomUUID();
+        const newQuantity = 2;
+        const cartId = randomUUID();
+
+        const existingShoppingCart = {
+          id: cartId,
+          userId,
+          items: [
+            {
+              productId,
+              quantity: 1,
+            },
+          ],
+        };
+
+        const expectedShoppingCart = {
+          id: cartId,
+          userId,
+          items: [
+            {
+              productId,
+              quantity: newQuantity,
+            },
+          ],
+        };
+
+        (fetchDocument as jest.Mock).mockResolvedValue(existingShoppingCart);
+        (updateDocument as jest.Mock).mockResolvedValue(expectedShoppingCart);
+
+        const response = await req()
+          .send({
+            query: `mutation {updateQuantity(productId: "${productId}", quantity: ${newQuantity}) { userId} }`,
+          })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.updateQuantity).toBeDefined();
+        expect(response.body.data.updateQuantity.userId).toEqual(userId);
+        expect(updateDocument).toHaveBeenCalledWith(cartId, expectedShoppingCart, 'shopping-cart');
+      });
+
+      it('should not update shopping cart if item does not exist', async () => {
+        const productIds = [randomUUID(), randomUUID()];
+        const cartId = randomUUID();
+
+        const existingShoppingCart = {
+          id: cartId,
+          userId,
+          items: productIds.map((productId, index) => ({
+            productId,
+            quantity: index + 1,
+          })),
+        };
+
+        (fetchDocument as jest.Mock).mockResolvedValue(existingShoppingCart);
+
+        const response = await req()
+          .send({
+            query: `mutation {updateQuantity(productId: "${randomUUID()}", quantity: 2) { userId} }`,
+          })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.updateQuantity).toBeDefined();
+        expect(response.body.data.updateQuantity.userId).toEqual(userId);
+        expect(updateDocument).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('delete shopping cart', () => {
+      it('should delete shopping cart', async () => {
+        (deleteDocument as jest.Mock).mockResolvedValue(true);
+
+        const response = await req()
+          .send({
+            query: 'mutation {deleteCart { deleted} }',
+          })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.deleteCart).toBeDefined();
+        expect(response.body.data.deleteCart.deleted).toEqual(true);
+        expect(deleteDocument).toHaveBeenCalledWith({ userId }, 'shopping-cart');
+      });
+    });
+
+    describe('merge shopping carts', () => {
+      it('should merge shopping cart with existing unique product items and get their details', async () => {
+        const productIds = [randomUUID(), randomUUID()];
+        const quantity = 2;
+        const cartId = randomUUID();
+        const expectedExistingShoppingCart = {
+          id: cartId,
+          userId,
+          items: [
+            {
+              productId: productIds[0],
+              quantity,
+            },
+          ],
+        };
+
+        const expectedResultingShoppingCart = {
+          id: cartId,
+          userId,
+          items: [
+            {
+              productId: productIds[0],
+              quantity,
+            },
+            {
+              productId: productIds[1],
+              quantity,
+            },
+          ],
+        };
+
+        (fetchDocument as jest.Mock).mockResolvedValue(cloneDeep(expectedExistingShoppingCart));
+        (updateDocument as jest.Mock).mockResolvedValue(cloneDeep(expectedResultingShoppingCart));
+
+        productSearchResult.push(
+          ...productIds.map((id) => ({
+            id,
+            title: `Title ${id}`,
+            description: `Description ${id}`,
+            price: 449.99,
+            currency: 'USD',
+            categoryId: '22',
+          })),
+        );
+
+        const response = await req()
+          .send({
+            query: `mutation {
+              merge(input: {
+                items: [
+                  {
+                    productId: "${productIds[1]}",
+                    quantity: ${quantity}
+                  }
+                ]
+              }) {
+                userId,
+                items {
+                  productId,
+                  product {
+                    id,
+                    title,
+                    description,
+                    price,
+                    currency,
+                    categoryId
+                  }
+                }
+              }
+            }`,
+          })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.errors).toBeUndefined();
+        expect(response.body.data?.merge).toBeDefined();
+        expect(response.body.data.merge.userId).toEqual(userId);
+        expect(response.body.data.merge.items).toEqual(
+          expect.arrayContaining(
+            productIds.map((id) =>
+              expect.objectContaining({
+                productId: id,
+                product: productSearchResult.find((p) => p.id === id),
+              }),
+            ),
+          ),
+        );
+        expect(fetchDocument).toHaveBeenCalledWith({ userId }, 'shopping-cart');
+        expect(updateDocument).toHaveBeenCalledWith(
+          cartId,
+          expectedResultingShoppingCart,
+          'shopping-cart',
+        );
+      });
+
+      it('should merge shopping cart with existing same product items', async () => {
+        const productId = randomUUID();
+        const quantity = 2;
+        const cartId = randomUUID();
+        const expectedExistingShoppingCart = {
+          id: cartId,
+          userId,
+          items: [
+            {
+              productId,
+              quantity,
+            },
+          ],
+        };
+
+        const expectedResultingShoppingCart = {
+          id: cartId,
+          userId,
+          items: [
+            {
+              productId,
+              quantity: quantity * 2,
+            },
+          ],
+        };
+
+        (fetchDocument as jest.Mock).mockResolvedValue(cloneDeep(expectedExistingShoppingCart));
+        (updateDocument as jest.Mock).mockResolvedValue(cloneDeep(expectedResultingShoppingCart));
+
+        productSearchResult.push({
+          id: productId,
+          title: `Title ${productId}`,
+          description: `Description ${productId}`,
+          price: 449.99,
+          currency: 'USD',
+          categoryId: '22',
+        });
+
+        const response = await req()
+          .send({
+            query: `mutation {
+              merge(input: {
+                items: [
+                  {
+                    productId: "${productId}",
+                    quantity: ${quantity}
+                  }
+                ]
+              }) {
+                userId,
+                items {
+                  productId,
+                  quantity,
+                  product {
+                    id,
+                    title,
+                    description,
+                    price,
+                    currency,
+                    categoryId
+                  }
+                }
+              }
+            }`,
+          })
+          .expect(StatusCodes.OK);
+
+        expect(response.body.data?.merge).toBeDefined();
+        expect(response.body.data.merge.userId).toEqual(userId);
+        expect(response.body.data.merge.items).toEqual(
+          expect.arrayContaining([
+            { productId, quantity: quantity * 2, product: productSearchResult[0] },
+          ]),
+        );
+
+        expect(fetchDocument).toHaveBeenCalledWith({ userId }, 'shopping-cart');
+        expect(updateDocument).toHaveBeenCalledWith(
+          cartId,
+          expectedResultingShoppingCart,
+          'shopping-cart',
+        );
+      });
+    });
+  });
+});

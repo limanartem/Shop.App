@@ -7,7 +7,7 @@ export enum DataLoadingState {
   idle,
   loading,
   loaded,
-  failed 
+  failed,
 }
 
 interface CategoriesState {

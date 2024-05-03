@@ -1,7 +1,8 @@
 import { AuthServiceClient } from './auth';
-import { CatalogServiceClient } from './catalog-service';
+import { CatalogServiceClient } from '@shop.app/lib.client-data.catalog-service/dist/catalog-service';
 import { OrderServiceClient } from './order-service';
 import { GraphQlWsClient } from './ws-service';
+import { ShoppingCartService } from './shopping-cart-service';
 
 export type GetAccessTokenFunc = () => Promise<string | undefined>;
 
@@ -15,4 +16,4 @@ export abstract class ServiceClient {
   }
 }
 
-export { AuthServiceClient, CatalogServiceClient, OrderServiceClient, GraphQlWsClient };
+export { AuthServiceClient, CatalogServiceClient, OrderServiceClient, GraphQlWsClient, ShoppingCartService };

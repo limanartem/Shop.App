@@ -6,19 +6,29 @@
   "scripts": {
     "clean": "npx rimraf dist",
     "_prebuild": "npm run clean",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json",
     "test": "jest",
     "lint": "eslint . --ext .js,.ts ./src --quiet",
     "pre-commit": "npm run lint",
-    "pre-push": "npm run test"
+    "pre-push": "npm run test",
+    "shopping-cart-codegen": "graphql-codegen --config shoppping-cart.codegen.yaml",
+    "codegen": "graphql-codegen --config codegen.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@apollo/client": "^3.10.1",
+    "@shop.app/lib.client-data.catalog-service": "file:../shop.app.lib.client-data.catalog-service",
+    "cross-fetch": "^4.0.0",
     "graphql-ws": "^5.14.2",
     "supertokens-web-js": "^0.8.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.0",
+    "@graphql-codegen/client-preset": "^4.1.0",
+    "@graphql-codegen/introspection": "4.0.0",
+    "@graphql-codegen/typescript": "4.0.1",
+    "@types/node": "^20.12.7",
     "@types/react": "^18.2.45",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3"

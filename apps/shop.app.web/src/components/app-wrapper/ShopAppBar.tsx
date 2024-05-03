@@ -78,7 +78,7 @@ interface AppBarProps extends MuiAppBarProps {
 
 type ShopBarPropsType = {
   open: DrawerOpenState;
-  toggleDrawer: () => void;
+  toggleDrawer?: () => void;
 };
 
 const AppBar = styled(MuiAppBar, {
@@ -182,9 +182,11 @@ export function ShopAppBar({ open, toggleDrawer }: ShopBarPropsType) {
               onClick={(e) => {
                 setAnchorElShoppingCart(e.currentTarget);
               }}
+              data-testid="appBar-shoppingCart"
             >
               <Badge
-                badgeContent={items.reduce((count, item) => count + item.quantity, 0)}
+                data-testid="appBar-shoppingCart-badge"
+                badgeContent={items?.reduce((count, item) => count + item.quantity, 0)}
                 color="success"
               >
                 <ShoppingCartIcon />

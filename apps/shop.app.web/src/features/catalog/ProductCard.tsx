@@ -41,7 +41,7 @@ const ProductCard = ({ product }: { product: ProductItem }) => {
   };
 
   const isProductInCart = useCallback(
-    () => items.some((item) => item.product.id === product.id),
+    () => items?.some((item) => item.product.id === product.id),
     [items, product],
   );
 
