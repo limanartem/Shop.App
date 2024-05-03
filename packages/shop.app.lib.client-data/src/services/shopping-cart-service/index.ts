@@ -1,4 +1,9 @@
-import { Mutation, ShoppingCart, ShoppingCartMergeInput } from '../../generated/shopping-cart/graphql';
+import {
+  Mutation,
+  ShoppingCart,
+  ShoppingCartItemInput,
+  ShoppingCartMergeInput,
+} from '../../generated/shopping-cart/graphql';
 import { ApolloClient, InMemoryCache, gql, createHttpLink } from '@apollo/client';
 import { GetAccessTokenFunc } from '..';
 import { setContext } from '@apollo/client/link/context';
@@ -17,6 +22,44 @@ const MERGE = gql(`mutation mergeShoppingCart($input: ShoppingCartMergeInput!) {
         currency
       }
     }
+  }
+}`);
+
+const ADD_TO_CART = gql(`mutation addToShoppingCart($item: ShoppingCartItemInput!) {
+  addToCart(item: $item) {
+    items {
+      productId
+      quantity
+      product {
+        id
+        title
+        description
+        price
+        currency
+      }
+    }
+  }
+}`);
+
+const REMOTE_FROM_CART = gql(`mutation removeFromShoppingCart($productId: String!) {
+  removeFromCart(productId: $productId) {
+    items {
+      productId
+      quantity
+      product {
+        id
+        title
+        description
+        price
+        currency
+      }
+    }
+  }
+}`);
+
+const DELETE_CART = gql(`mutation deleteShoppingCart {
+  deleteCart {
+    deleted
   }
 }`);
 
@@ -49,5 +92,29 @@ export class ShoppingCartService {
     });
 
     return result.data?.merge;
+  }
+
+  public async addToCart(input: ShoppingCartItemInput): Promise<ShoppingCart | undefined | null> {
+    const result = await this.client.mutate<Mutation>({
+      mutation: ADD_TO_CART,
+      variables: { item: input },
+    });
+
+    return result.data?.addToCart;
+  }
+
+  public async removeFromCart(productId: string): Promise<ShoppingCart | undefined | null> {
+    const result = await this.client.mutate<Mutation>({
+      mutation: REMOTE_FROM_CART,
+      variables: { productId },
+    });
+
+    return result.data?.removeFromCart;
+  }
+
+  public async deleteCart(): Promise<void> {
+    await this.client.mutate<Mutation>({
+      mutation: DELETE_CART,
+    });
   }
 }

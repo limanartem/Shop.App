@@ -26,6 +26,24 @@ export const merge = createAsyncThunk(
   },
 );
 
+export const addToRemoteCart = createAsyncThunk(
+  '/shoppingCart/addToRemoteCart',
+  async ({ product, quantity }: ShoppingCartItem) => {
+    return shoppingCartServiceClient.addToCart({ productId: product.id, quantity });
+  },
+);
+
+export const removeFromRemoteCart = createAsyncThunk(
+  '/shoppingCart/removeFromRemoteCart',
+  async (product: ProductItem) => {
+    return shoppingCartServiceClient.removeFromCart(product.id);
+  },
+);
+
+export const deleteRemoteCart = createAsyncThunk('/shoppingCart/deleteRemoteCart', async () => {
+  return shoppingCartServiceClient.deleteCart();
+});
+
 export const shoppingCartSlice = createSlice({
   name: 'shoppingCart',
   initialState,
@@ -49,9 +67,9 @@ export const shoppingCartSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(merge.fulfilled, (state, action) => {
-      console.log(action);
-      if (action.payload?.items != null)
+      if (action.payload?.items != null) {
         state.items = action.payload.items?.map((item) => item as ShoppingCartItem);
+      }
     });
   },
 });
