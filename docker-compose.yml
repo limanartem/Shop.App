@@ -81,6 +81,8 @@ services:
       PUBLIC_WEB_UI_DOMAINS: $PUBLIC_WEB_UI_DOMAINS # need external domain for cors
       API_USER_EMAIL: $API_USER_EMAIL
       API_USER_PASSWORD: $API_USER_PASSWORD
+      ADMIN_USER_EMAIL: $ADMIN_USER_EMAIL
+      ADMIN_USER_PASSWORD: $ADMIN_USER_PASSWORD
 
   # Shop cache service
   shop.app.cache:

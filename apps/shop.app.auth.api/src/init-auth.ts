@@ -10,6 +10,8 @@ const {
   PUBLIC_WEB_UI_DOMAINS,
   API_USER_EMAIL,
   API_USER_PASSWORD,
+  ADMIN_USER_EMAIL,
+  ADMIN_USER_PASSWORD,
 } = process.env;
 
 type SignUpInResponseType = {
@@ -45,6 +47,98 @@ export const initAuth = () => {
       UserRoles.init()
     ],
   });
+};
+
+export const initSuperAdminUser = async () => {
+  const AUTH_TENANT = 'public';
+
+  console.log('Creating admin role..');
+
+  const ADMIN_ROLE = 'admin';
+  await UserRoles.createNewRoleOrAddPermissions(ADMIN_ROLE, [
+    'read',
+    'write',
+    'manage-users',
+    'manage-products',
+    'manage-orders',
+    'admin-access'
+  ]);
+
+  console.log('Signing up super admin user..');
+
+  const adminUserPayload = {
+    formFields: [
+      { id: 'email', value: ADMIN_USER_EMAIL },
+      { id: 'password', value: ADMIN_USER_PASSWORD },
+    ],
+  };
+
+  let adminUser: SignUpInResponseType;
+
+  const signUpResult = await fetch(`http://localhost:${WEB_API_PORT}/auth/signup`, {
+    method: 'POST',
+    body: JSON.stringify(adminUserPayload),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (signUpResult.ok) {
+    const signUpResponse = (await signUpResult.json()) as SignUpInResponseType;
+
+    console.log('Admin user sign up response', signUpResponse);
+
+    if (signUpResponse.status === 'FIELD_ERROR') {
+      console.log('Admin user already existed', signUpResponse);
+
+      const signInResult = await fetch(`http://localhost:${WEB_API_PORT}/auth/signin`, {
+        method: 'POST',
+        body: JSON.stringify(adminUserPayload),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (signInResult.ok) {
+        const signInResponse = (await signInResult.json()) as SignUpInResponseType;
+        console.log('Admin user sign in response', signInResponse);
+        if (signInResponse.status === 'OK') {
+          adminUser = signInResponse;
+        }
+      }
+    } else if (signUpResponse.status === 'OK') {
+      adminUser = signUpResponse;
+    }
+
+    if (adminUser == null || adminUser.status !== 'OK') {
+      throw new Error(`Not able to sign in/up admin with "${ADMIN_USER_EMAIL}" email`);
+    }
+
+    console.log(`Adding admin user ${adminUser.user.id} to ${ADMIN_ROLE} role..`);
+    const addRoleResult = await UserRoles.addRoleToUser(
+      adminUser.user.tenantIds[0],
+      adminUser.user.id,
+      ADMIN_ROLE,
+    );
+
+    if (addRoleResult.status !== 'OK') {
+      throw new Error(
+        `Not able to add role "${ADMIN_ROLE}" to admin user with "${ADMIN_USER_EMAIL}" email`,
+      );
+    }
+
+    console.log(`Admin user added to the admin role. Validating`);
+    const roles = await UserRoles.getRolesForUser(AUTH_TENANT, adminUser.user.id);
+    console.log('Admin Roles', roles);
+
+    if ((roles).roles.indexOf(ADMIN_ROLE) === -1) {
+      throw new Error(`Not able to add role "${ADMIN_ROLE}" to admin user with "${ADMIN_USER_EMAIL}" email`);
+    }
+    
+    console.log('Successfully created super admin user:', ADMIN_USER_EMAIL);
+  } else {
+    throw new Error(`Not able to create admin user with "${ADMIN_USER_EMAIL}" email`);
+  }
 };
 
 export const initApiUser = async () => {
