@@ -7,7 +7,7 @@ interface RequireAuthProps {
   children: React.ReactElement;
 }
 
-const RequireAuth = ({ children }: RequireAuthProps) => {
+function RequireAuth({ children }: RequireAuthProps) {
   const { isAuthenticated, isAdmin } = useSelector((state: RootState) => state.auth);
   const location = useLocation();
 

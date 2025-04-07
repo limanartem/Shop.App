@@ -24,7 +24,7 @@ import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
 
-const AdminLayout: React.FC = () => {
+function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -39,7 +39,7 @@ const AdminLayout: React.FC = () => {
   ];
 
   const drawer = (
-    <div>
+    <Box>
       <Toolbar>
         <Typography variant="h6" noWrap component="div">
           Shop Admin
@@ -58,7 +58,7 @@ const AdminLayout: React.FC = () => {
           </ListItem>
         ))}
       </List>
-    </div>
+    </Box>
   );
 
   return (
