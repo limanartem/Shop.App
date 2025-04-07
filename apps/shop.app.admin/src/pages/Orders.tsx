@@ -14,7 +14,7 @@ import {
   MenuItem,
   SelectChangeEvent,
 } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams, GridTreeNodeWithRender } from '@mui/x-data-grid';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../store';
 import { RootState } from '../store';
@@ -43,8 +43,8 @@ const Orders = () => {
       field: 'status',
       headerName: 'Status',
       width: 150,
-      renderCell: (params) => (
-        <Chip
+      renderCell: (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
+        return <Chip
           label={params.value}
           color={
             params.value === 'SHIPPED'
@@ -53,8 +53,8 @@ const Orders = () => {
               ? 'warning'
               : 'default'
           }
-        />
-      ),
+        /> as React.ReactNode;
+      }
     },
     {
       field: 'totalAmount',
@@ -67,8 +67,8 @@ const Orders = () => {
       field: 'actions',
       headerName: 'Actions',
       width: 130,
-      renderCell: (params) => (
-        <Button
+      renderCell: (params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>) => {
+        return <Button
           variant="outlined"
           size="small"
           onClick={() => {
@@ -77,8 +77,8 @@ const Orders = () => {
           }}
         >
           Update Status
-        </Button>
-      ),
+        </Button> as React.ReactNode;
+      }
     },
   ];
 
