@@ -10,10 +10,17 @@ import {
   Typography,
   Checkbox,
   FormControlLabel,
+  IconButton,
+  Stack,
+  Tooltip,
+  Alert,
+  Snackbar,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector, RootState } from '../store';
-import { fetchProducts, updateProduct, createProduct, fetchProductById } from '../store/slices/productsSlice';
+import { fetchProducts, updateProduct, createProduct, fetchProductById, deleteProduct } from '../store/slices/productsSlice';
 
 interface Product {
   id?: string;
@@ -25,9 +32,12 @@ interface Product {
 
 const Products = () => {
   const [open, setOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const dispatch = useAppDispatch();
-  const { products, currentProduct, loading } = useAppSelector((state: RootState) => state.products);
+  const { products, currentProduct, loading, error } = useAppSelector((state: RootState) => state.products);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -49,15 +59,28 @@ const Products = () => {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 130,
+      width: 150,
       renderCell: (params: GridRenderCellParams<any, any, any>) => (
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => handleEdit(params.row)}
-        >
-          Edit
-        </Button>
+        <Stack direction="row" spacing={1}>
+          <Tooltip title="Edit product">
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={() => handleEdit(params.row)}
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete product">
+            <IconButton
+              size="small"
+              color="error"
+              onClick={() => handleDeleteConfirm(params.row.id)}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
       ),
     },
   ];
@@ -99,6 +122,41 @@ const Products = () => {
     setOpen(true);
   };
 
+  const handleDeleteConfirm = (id: string) => {
+    setProductToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteCancel = () => {
+    setProductToDelete(null);
+    setDeleteConfirmOpen(false);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (productToDelete) {
+      try {
+        await dispatch(deleteProduct(productToDelete)).unwrap();
+        setSnackbar({
+          open: true,
+          message: 'Product deleted successfully',
+          severity: 'success'
+        });
+      } catch (error) {
+        setSnackbar({
+          open: true,
+          message: 'Failed to delete product',
+          severity: 'error'
+        });
+      }
+      setDeleteConfirmOpen(false);
+      setProductToDelete(null);
+    }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
   return (
     <Box sx={{ height: 600, width: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
@@ -115,6 +173,27 @@ const Products = () => {
         checkboxSelection
         disableRowSelectionOnClick
       />
+      
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onClose={handleDeleteCancel}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this product? This action cannot be undone.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel}>Cancel</Button>
+          <Button onClick={handleDeleteConfirmed} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
+      {/* Success/Error Notification */}
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>
           {editProduct?.id ? 'Edit Product' : 'New Product'}

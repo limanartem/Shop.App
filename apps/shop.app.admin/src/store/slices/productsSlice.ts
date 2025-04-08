@@ -24,8 +24,17 @@ const initialState: ProductsState = {
 };
 
 export const fetchProducts = createAsyncThunk('products/fetchAll', async () => {
-  const response = await productService.getAllProducts();
-  return response;
+  const apiProducts = await productService.getAllProducts();
+  
+  // Map API field names to UI field names for each product
+  return apiProducts.map((apiProduct: any) => ({
+    id: apiProduct.id || apiProduct.Id,
+    name: apiProduct.Title || apiProduct.title, // Handle PascalCase from .NET
+    description: apiProduct.Description || apiProduct.description,
+    price: apiProduct.Price || apiProduct.price,
+    available: true, // Default value since API doesn't have this field
+    // Include any other fields that might be needed
+  }));
 });
 
 export const fetchProductById = createAsyncThunk(
@@ -49,6 +58,14 @@ export const updateProduct = createAsyncThunk(
   async (product: Product) => {
     const response = await productService.updateProduct(product);
     return response;
+  }
+);
+
+export const deleteProduct = createAsyncThunk(
+  'products/delete',
+  async (id: string) => {
+    await productService.deleteProduct(id);
+    return id; // Return the ID so we can remove it from the state
   }
 );
 
@@ -92,6 +109,19 @@ export const productsSlice = createSlice({
       .addCase(fetchProductById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch product';
+      })
+      .addCase(deleteProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        // Remove the deleted product from the products array
+        state.products = state.products.filter(product => product.id !== action.payload);
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to delete product';
       });
   },
 });
