@@ -38,19 +38,59 @@ namespace Shop.App.Catalog.Api.Services
     /// <returns>The created product.</returns>
     public async Task<Product> CreateProductAsync(Product product)
     {
-      // Ensure new GUID if none provided
-      if (product.Id == Guid.Empty)
-      {
-        product.Id = Guid.NewGuid();
+      try {
+        // Set context to use writer credentials
+        context.IsReadOnly = false;
+        // Ensure new GUID if none provided
+        if (product.Id == Guid.Empty)
+        {
+          product.Id = Guid.NewGuid();
+        }
+        
+        // Validate category exists
+        if (product.CategoryId > 0) {
+          var categoryExists = await context.Categories.AnyAsync(c => c.Id == product.CategoryId);
+          if (!categoryExists) {
+            // Default to first available category if specified one doesn't exist
+            var firstCategory = await context.Categories.FirstOrDefaultAsync();
+            if (firstCategory != null) {
+              product.CategoryId = firstCategory.Id;
+            } else {
+              // Create a default category if none exists
+              var defaultCategory = new Category { Name = "Default Category" };
+              context.Categories.Add(defaultCategory);
+              await context.SaveChangesAsync();
+              product.CategoryId = defaultCategory.Id;
+            }
+          }
+        } else {
+          // Handle case where CategoryId is not provided
+          var firstCategory = await context.Categories.FirstOrDefaultAsync();
+          if (firstCategory != null) {
+            product.CategoryId = firstCategory.Id;
+          } else {
+            // Create a default category if none exists
+            var defaultCategory = new Category { Name = "Default Category" };
+            context.Categories.Add(defaultCategory);
+            await context.SaveChangesAsync();
+            product.CategoryId = defaultCategory.Id;
+          }
+        }
+        
+        await context.Products.AddAsync(product);
+        await context.SaveChangesAsync();
+        
+        // Clear cache to ensure fresh data
+        await cacheService.ClearProductCache();
+        
+        return product;
+      } catch (Exception ex) {
+        Console.WriteLine($"Error creating product: {ex.Message}");
+        if (ex.InnerException != null) {
+          Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+        }
+        throw; // Re-throw to be handled by the calling method
       }
-      
-      await context.Products.AddAsync(product);
-      await context.SaveChangesAsync();
-      
-      // Clear cache to ensure fresh data
-      await cacheService.ClearProductCache();
-      
-      return product;
     }
     
     /// <summary>
@@ -61,6 +101,9 @@ namespace Shop.App.Catalog.Api.Services
     /// <returns>The updated product, or null if not found.</returns>
     public async Task<Product?> UpdateProductAsync(Guid id, Product product)
     {
+      // Set context to use writer credentials
+      context.IsReadOnly = false;
+      
       var existingProduct = await context.Products.FindAsync(id);
       
       if (existingProduct == null)
@@ -92,6 +135,9 @@ namespace Shop.App.Catalog.Api.Services
     /// <returns>True if the product was deleted, false if not found.</returns>
     public async Task<bool> DeleteProductAsync(Guid id)
     {
+      // Set context to use writer credentials
+      context.IsReadOnly = false;
+      
       var product = await context.Products.FindAsync(id);
       
       if (product == null)

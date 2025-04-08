@@ -1,6 +1,33 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authService } from '../../services/authService';
 
+// Helper functions to load/save auth state from localStorage
+const loadAuthState = (): Partial<AuthState> => {
+  try {
+    const serializedState = localStorage.getItem('authState');
+    if (serializedState === null) {
+      return {};
+    }
+    return JSON.parse(serializedState);
+  } catch (err) {
+    console.error('Error loading auth state:', err);
+    return {};
+  }
+};
+
+const saveAuthState = (state: AuthState) => {
+  try {
+    const serializedState = JSON.stringify({
+      isAuthenticated: state.isAuthenticated,
+      isAdmin: state.isAdmin,
+      user: state.user
+    });
+    localStorage.setItem('authState', serializedState);
+  } catch (err) {
+    console.error('Error saving auth state:', err);
+  }
+};
+
 interface AuthState {
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -9,10 +36,13 @@ interface AuthState {
   error: string | null;
 }
 
+// Load persisted state from localStorage or use defaults
+const savedState = loadAuthState();
+
 const initialState: AuthState = {
-  isAuthenticated: false,
-  isAdmin: false,
-  user: null,
+  isAuthenticated: savedState.isAuthenticated || false,
+  isAdmin: savedState.isAdmin || false,
+  user: savedState.user || null,
   loading: false,
   error: null,
 };
@@ -33,6 +63,8 @@ export const authSlice = createSlice({
       state.isAuthenticated = false;
       state.isAdmin = false;
       state.user = null;
+      // Clear persisted state on logout
+      localStorage.removeItem('authState');
     },
   },
   extraReducers: (builder) => {
@@ -52,6 +84,8 @@ export const authSlice = createSlice({
           state.isAuthenticated = true;
           state.isAdmin = action.payload.isAdmin;
           state.user = action.payload.user;
+          // Save auth state to localStorage when login succeeds
+          saveAuthState(state);
           state.error = null;
         } else {
           // Handle case where response is ok but doesn't have expected data

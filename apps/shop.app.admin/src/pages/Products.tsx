@@ -14,6 +14,7 @@ import {
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector, RootState } from '../store';
 import { fetchProducts, updateProduct, createProduct } from '../store/slices/productsSlice';
+import { productService } from '../services/productService';
 
 interface Product {
   id?: string;
@@ -55,9 +56,26 @@ const Products = () => {
     },
   ];
 
-  const handleEdit = (product: Product) => {
-    setEditProduct(product);
-    setOpen(true);
+  const handleEdit = async (product: Product) => {
+    try {
+      // Fetch the full product details to ensure we have the correct field mapping
+      if (product.id) {
+        const productDetails = await productService.getProductById(product.id);
+        // Convert the API product to match our Product interface
+        setEditProduct({
+          id: productDetails.id,
+          name: productDetails.name || '',
+          description: productDetails.description || '',
+          price: productDetails.price || 0,
+          available: true // Default value since API doesn't have this field
+        });
+      } else {
+        setEditProduct(product);
+      }
+      setOpen(true);
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+    }
   };
 
   const handleClose = () => {
