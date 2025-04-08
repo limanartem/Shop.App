@@ -57,6 +57,7 @@ describe('ProductService', () => {
       expect(products[0].description).toBe('Test description');
       expect(products[0].price).toBe(19.99);
       expect(products[0].imageUrls).toEqual(['/test.jpg']);
+      expect(products[0].available).toBe(true); // Added available property
       
       // Check API call details
       expect(global.fetch).toHaveBeenCalledWith(
@@ -95,7 +96,7 @@ describe('ProductService', () => {
       expect(product.description).toBe('Single product description');
       expect(product.price).toBe(42.99);
       expect(product.categoryId).toBe(2);
-      expect(product.available).toBe(true); // Default value
+      expect(product.available).toBe(true); // Added available property
       
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/api/products/42'),
@@ -168,6 +169,7 @@ describe('ProductService', () => {
       expect(sentData.title).toBe('Test Product');
       expect(sentData.description).toBe('Test description');
       expect(sentData.price).toBe(29.99);
+      // Note: available property is not sent to the API as per mapUiToApiProduct function
     });
     
     test('updateProduct updates existing product', async () => {
