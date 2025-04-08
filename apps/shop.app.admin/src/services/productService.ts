@@ -1,3 +1,5 @@
+import { ApiProduct, UiProduct, mapApiToUiProduct, mapUiToApiProduct } from '../models/product';
+
 const API_URL = process.env.REACT_APP_CATALOG_API_URL;
 // CDN URL is used in the component that consumes these image URLs
 
@@ -23,8 +25,12 @@ const uploadImageToCdn = async (imageDataUrl: string, productId: string, index: 
   return fileName;
 };
 
-// Helper function to process image uploads
-const processProductImages = async (product: any): Promise<string[]> => {
+/**
+ * Processes image uploads to CDN and returns array of image URLs
+ * @param product - Product containing image data URLs
+ * @returns Array of processed image URLs
+ */
+const processProductImages = async (product: UiProduct): Promise<string[]> => {
   if (!product.imageUrls || !product.imageUrls.length) {
     return [];
   }
@@ -59,7 +65,11 @@ const getAuthToken = () => {
 };
 
 export const productService = {
-  async getAllProducts() {
+  /**
+   * Fetches all products from the catalog API
+   * @returns Array of products in UI format
+   */
+  async getAllProducts(): Promise<UiProduct[]> {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/api/products`, {
       headers: {
@@ -75,10 +85,19 @@ export const productService = {
       throw new Error('Failed to fetch products');
     }
     
-    return response.json();
+    // Get products in API format
+    const apiProducts: ApiProduct[] = await response.json();
+    
+    // Map to UI format
+    return apiProducts.map(mapApiToUiProduct);
   },
 
-  async getProductById(id: string) {
+  /**
+   * Fetches a single product by ID
+   * @param id - Product ID to fetch
+   * @returns Product in UI format
+   */
+  async getProductById(id: string): Promise<UiProduct> {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/api/products/${id}`, {
       headers: {
@@ -91,53 +110,37 @@ export const productService = {
     }
     
     if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Product not found');
+      }
       throw new Error('Failed to fetch product');
     }
     
-    // Get the API response
-    const apiProduct = await response.json();
+    const apiProduct: ApiProduct = await response.json();
     
-    // Map API field names back to UI field names
-    // Handle different possible casing in the JSON response
-    const imageUrls = apiProduct.PreviewImageUrls || apiProduct.previewImageUrls;
-    let parsedImageUrls = [];
-    
-    // Try to parse the image URLs if they exist
-    if (imageUrls) {
-      try {
-        parsedImageUrls = JSON.parse(imageUrls);
-      } catch (e) {
-        console.warn('Failed to parse image URLs:', e);
-      }
-    }
-    
-    return {
-      id: apiProduct.id || apiProduct.Id,
-      name: apiProduct.title || apiProduct.Title || apiProduct.Name || apiProduct.name, // Handle PascalCase and different field names from .NET
-      description: apiProduct.Description || apiProduct.description,
-      price: apiProduct.Price || apiProduct.price,
-      categoryId: apiProduct.CategoryId || apiProduct.categoryId,
-      imageUrls: parsedImageUrls,
-      available: true, // Default value since this field doesn't exist in the API
-    };
+    // Map API product to UI product
+    return mapApiToUiProduct(apiProduct);
   },
 
-  async createProduct(product: any) {
+  /**
+   * Creates a new product
+   * @param product - Product data from UI
+   * @returns Created product in UI format
+   */
+  async createProduct(product: UiProduct): Promise<UiProduct> {
     const token = getAuthToken();
     
     // Process images first if any exist
     const processedImageUrls = await processProductImages(product);
     
-    // Map UI field names to API field names
-    const apiProduct = {
-      Title: product.name,
-      Description: product.description,
-      Price: product.price,
-      Currency: 'USD', // Default currency since UI doesn't collect it
-      CategoryId: product.categoryId || 1, // Default category if not provided
-      // Handle image uploads
-      PreviewImageUrls: processedImageUrls.length > 0 ? JSON.stringify(processedImageUrls) : null
+    // Create a copy of the product with processed images
+    const productWithImages: UiProduct = {
+      ...product,
+      imageUrls: processedImageUrls
     };
+    
+    // Map UI product to API format
+    const apiProduct = mapUiToApiProduct(productWithImages);
     
     const response = await fetch(`${API_URL}/api/products`, {
       method: 'POST',
@@ -166,22 +169,32 @@ export const productService = {
     return response.json();
   },
 
-  async updateProduct(product: any) {
+  /**
+   * Updates an existing product
+   * @param product - Product data from UI, must include ID
+   * @returns Updated product in UI format
+   */
+  async updateProduct(product: UiProduct): Promise<UiProduct> {
     const token = getAuthToken();
+    
+    // Ensure we have an ID
+    if (!product.id) {
+      throw new Error('Product ID is required');
+    }
     
     // Process images first if any exist
     const processedImageUrls = await processProductImages(product);
     
-    // Map UI field names to API field names
+    // Create a copy of the product with processed images
+    const productWithImages: UiProduct = {
+      ...product,
+      imageUrls: processedImageUrls.length > 0 ? processedImageUrls : product.imageUrls
+    };
+    
+    // Map UI product to API format and add ID
     const apiProduct = {
-      Id: product.id,
-      Title: product.name,
-      Description: product.description,
-      Price: product.price,
-      Currency: 'USD', // Default currency since UI doesn't collect it
-      CategoryId: product.categoryId || 1, // Default category if not provided
-      // Handle image uploads
-      PreviewImageUrls: processedImageUrls.length > 0 ? JSON.stringify(processedImageUrls) : null
+      id: product.id,
+      ...mapUiToApiProduct(productWithImages)
     };
     
     const response = await fetch(`${API_URL}/api/products/${product.id}`, {
@@ -211,8 +224,14 @@ export const productService = {
     return response.json();
   },
   
-  async deleteProduct(id: string) {
+  /**
+   * Deletes a product by ID
+   * @param id - ID of product to delete
+   * @returns true if deletion was successful
+   */
+  async deleteProduct(id: string): Promise<boolean> {
     const token = getAuthToken();
+    
     const response = await fetch(`${API_URL}/api/products/${id}`, {
       method: 'DELETE',
       headers: {

@@ -4,32 +4,8 @@
  */
 import { productService } from '../productService';
 
-/**
- * Interface representing the Product API response format (from .NET API)
- * Used for consistent typing in tests
- */
-interface ApiProduct {
-  Id: string;
-  Title: string;
-  Description?: string;
-  Price: number;
-  CategoryId?: number;
-  PreviewImageUrls?: string;
-}
-
-/**
- * Interface representing the Product format in the UI/frontend
- * Used for request payloads in tests
- */
-interface UiProduct {
-  id?: string;
-  name: string;
-  description?: string;
-  price: number;
-  categoryId?: number;
-  imageUrls?: string[];
-  available: boolean;
-}
+// Import the standardized interfaces from our models
+import { ApiProduct, UiProduct } from '../../models/product';
 
 describe('ProductService', () => {
   beforeEach(() => {
@@ -50,15 +26,15 @@ describe('ProductService', () => {
   
   describe('Basic API Interactions', () => {
     test('getAllProducts fetches products from the API', async () => {
-      // Arrange - Mock API response in .NET format (PascalCase)
+      // Arrange - Mock API response in camelCase format per actual API
       const mockProducts: ApiProduct[] = [
         { 
-          Id: '1', 
-          Title: 'Test Product', 
-          Description: 'Test description', 
-          Price: 19.99, 
-          CategoryId: 1,
-          PreviewImageUrls: JSON.stringify(['/test.jpg']) 
+          id: '1', 
+          title: 'Test Product', 
+          description: 'Test description', 
+          price: 19.99, 
+          categoryId: 1,
+          previewImageUrls: JSON.stringify(['/test.jpg']) 
         }
       ];
       
@@ -75,15 +51,12 @@ describe('ProductService', () => {
       expect(products).toBeDefined();
       expect(products.length).toBe(1);
       
-      // Use type-safe property access
-      const hasId = 'Id' in products[0] || 'id' in products[0];
-      expect(hasId).toBe(true);
-      
-      // Extract id safely to handle different API formats
-      const idValue = ('Id' in products[0]) ? products[0].Id : 
-                     ('id' in products[0]) ? products[0].id : 
-                     'undefined';
-      expect(idValue).toBe('1');
+      // Direct property access with standardized interface
+      expect(products[0].id).toBe('1');
+      expect(products[0].name).toBe('Test Product');
+      expect(products[0].description).toBe('Test description');
+      expect(products[0].price).toBe(19.99);
+      expect(products[0].imageUrls).toEqual(['/test.jpg']);
       
       // Check API call details
       expect(global.fetch).toHaveBeenCalledWith(
@@ -97,13 +70,13 @@ describe('ProductService', () => {
     });
     
     test('getProductById returns a single product', async () => {
-      // Arrange
+      // Arrange - use camelCase that matches the API format
       const mockProduct: ApiProduct = { 
-        Id: '42', 
-        Title: 'Single Product', 
-        Description: 'Single product description', 
-        Price: 42.99, 
-        CategoryId: 2 
+        id: '42', 
+        title: 'Single Product',  // camelCase as per API format
+        description: 'Single product description', 
+        price: 42.99, 
+        categoryId: 2 
       };
       
       (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -115,24 +88,14 @@ describe('ProductService', () => {
       // Act
       const product = await productService.getProductById('42');
       
-      // Assert with type-safe property access
+      // Assert with direct property access since type is now consistent
       expect(product).toBeDefined();
-      
-      // Check that the product has id properties with either format
-      const hasId = 'Id' in product || 'id' in product;
-      expect(hasId).toBe(true);
-      
-      // Extract id using a type-safe approach
-      const idValue = ('Id' in product) ? (product as unknown as ApiProduct).Id : 
-                     ('id' in product) ? (product as {id: string}).id : 
-                     'undefined';
-      expect(idValue).toBe('42');
-      
-      // Extract name/title using a type-safe approach
-      const titleValue = ('Title' in product) ? (product as unknown as ApiProduct).Title : 
-                       ('name' in product) ? (product as {name: string}).name : 
-                       'undefined';
-      expect(titleValue).toBe('Single Product');
+      expect(product.id).toBe('42');
+      expect(product.name).toBe('Single Product');
+      expect(product.description).toBe('Single product description');
+      expect(product.price).toBe(42.99);
+      expect(product.categoryId).toBe(2);
+      expect(product.available).toBe(true); // Default value
       
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/api/products/42'),
@@ -155,31 +118,38 @@ describe('ProductService', () => {
   describe('Product Management Operations', () => {
     test('createProduct sends data to API correctly', async () => {
       // Arrange
-      const newProduct = {
+      const newProduct: UiProduct = {
         name: 'New Product',
         description: 'New description',
         price: 29.99,
         categoryId: 3,
-        imageUrls: ['/test-image.jpg']
+        imageUrls: ['/test-image.jpg'],
+        available: true
       };
       
-      const apiResponse: ApiProduct = {
-        Id: '123',
-        Title: 'New Product',
-        Description: 'New description',
-        Price: 29.99,
-        CategoryId: 3,
-        PreviewImageUrls: JSON.stringify(['/test-image.jpg'])
-      };
+      // We'll create and use the UI format directly
+      // This is consistent with how the service layer returns data
       
       // Capture the sent request data
       let requestBody: string | undefined;
       
       (global.fetch as jest.Mock).mockImplementationOnce((url, options) => {
         requestBody = options.body as string;
+        
+        // Convert to proper UI format for service layer to transform
+        const responseProduct: UiProduct = {
+          id: '123',
+          name: 'New Product',
+          description: 'New description',
+          price: 29.99,
+          categoryId: 3,
+          imageUrls: ['/test-image.jpg'],
+          available: true
+        };
+        
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve(apiResponse),
+          json: () => Promise.resolve(responseProduct),
           status: 201
         } as Response);
       });
@@ -188,19 +158,20 @@ describe('ProductService', () => {
       const result = await productService.createProduct(newProduct);
       
       // Assert
-      const typedResult = result as unknown as ApiProduct;
-      expect(typedResult.Id).toBe('123');
+      expect(result).toBeDefined();
+      expect(result.id).toBe('123');
+      expect(result.name).toBe('New Product');
       
       // Verify request format
       expect(requestBody).toBeDefined();
       const sentData = requestBody ? JSON.parse(requestBody) : {};
-      expect(sentData.Title).toBe('New Product');
-      expect(sentData.Price).toBe(29.99);
+      expect(sentData.title).toBe('New Product');
+      expect(sentData.price).toBe(29.99);
     });
     
     test('updateProduct updates existing product', async () => {
       // Arrange
-      const productToUpdate = {
+      const productToUpdate: UiProduct = {
         id: '1',
         name: 'Updated Product',
         description: 'Updated Description',
@@ -209,13 +180,13 @@ describe('ProductService', () => {
         available: true
       };
       
-      // API response format (.NET uses PascalCase)
-      const apiUpdatedResponse = {
-        Id: '1',
-        Title: 'Updated Product',
-        Description: 'Updated Description',
-        Price: 25.99,
-        CategoryId: 2
+      // API response format in camelCase
+      const apiUpdatedResponse: ApiProduct = {
+        id: '1',
+        title: 'Updated Product',
+        description: 'Updated Description',
+        price: 25.99,
+        categoryId: 2
       };
       
       // Capture request body for verification
@@ -242,8 +213,8 @@ describe('ProductService', () => {
       // Verify request data
       expect(sentBodyData).toBeDefined();
       const sentData = sentBodyData ? JSON.parse(sentBodyData) : {};
-      expect(sentData.Title).toBe('Updated Product');
-      expect(sentData.Price).toBe(25.99);
+      expect(sentData.title).toBe('Updated Product');
+      expect(sentData.price).toBe(25.99);
     });
     
     test('deleteProduct sends delete request', async () => {
@@ -267,10 +238,12 @@ describe('ProductService', () => {
   describe('Image Processing', () => {
     test('processes images during product creation', async () => {
       // Arrange
-      const product = {
-        id: '1',
+      const product: UiProduct = {
         name: 'Test Product',
-        imageUrls: ['/existing-image.jpg', 'data:image/png;base64,abc123']
+        description: 'A test product with images',  // Required field
+        price: 19.99, 
+        imageUrls: ['/existing-image.jpg', 'data:image/png;base64,abc123'],
+        available: true
       };
       
       // Define uploadImageToCdn on the global object
@@ -282,13 +255,15 @@ describe('ProductService', () => {
         writable: true,
       });
       
-      // Mock the API response
+      // Mock the API response in camelCase format with all necessary fields
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({
-          Id: '1',
-          Title: 'Test Product',
-          PreviewImageUrls: JSON.stringify(['/processed-image.jpg'])
+          id: '1',
+          title: 'Test Product',
+          description: 'A test product with images',
+          price: 19.99,
+          previewImageUrls: JSON.stringify(['/processed-image.jpg'])
         }),
         status: 201
       } as Response);
@@ -313,21 +288,25 @@ describe('ProductService', () => {
       
       // Setup response mock - API should accept the product
       (global.fetch as jest.Mock).mockImplementationOnce((url, options) => {
-        // Verify that the request body contains image data
+        // Capture the request body to verify image handling
         const requestBody = JSON.parse(options.body as string);
-        expect(requestBody.Title).toBe('Test Product');
-        expect(requestBody.PreviewImageUrls).toBeDefined();
+        expect(requestBody.title).toBe('Test Product');
+        expect(requestBody.description).toBe('A product with base64 image data');
+        expect(requestBody.previewImageUrls).toBeDefined();
+        
+        // Create response in UI format that service will return
+        const responseProduct: UiProduct = {
+          id: '100',
+          name: 'Test Product',
+          description: 'A product with base64 image data',
+          price: 25.99,
+          imageUrls: ['/cdn/images/100-0.jpg'],
+          available: true
+        };
         
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({
-            Id: '100',
-            Title: 'Test Product',
-            Description: 'A product with base64 image data',
-            Price: 25.99,
-            // The API would typically process images and return URLs
-            PreviewImageUrls: JSON.stringify(['/cdn/images/100-0.jpg'])
-          }),
+          json: () => Promise.resolve(responseProduct),
           status: 201
         } as Response);
       });
@@ -349,13 +328,10 @@ describe('ProductService', () => {
         })
       );
       
-      // Verify the response was processed - using a non-conditional approach
-      const idValue = ('Id' in result) 
-        ? (result as ApiProduct).Id 
-        : ('id' in result)
-          ? (result as {id: string}).id
-          : '';
-      expect(idValue).toBe('100');
+      // Verify the response was processed in consistent UI format
+      expect(result.id).toBe('100'); 
+      expect(result.name).toBe('Test Product');
+      expect(result.description).toBe('A product with base64 image data');
     });
   });
 });

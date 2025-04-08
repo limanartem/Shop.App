@@ -1,14 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { productService } from '../../services/productService';
+import { UiProduct } from '../../models/product';
 
-interface Product {
-  id?: string;
-  name: string;
-  description: string;
-  price: number;
-  available: boolean;
-}
+// Re-export the UI product interface for components
+export type Product = UiProduct;
 
+/**
+ * State shape for the products slice
+ */
 interface ProductsState {
   products: Product[];
   currentProduct: Product | null;
@@ -23,30 +22,32 @@ const initialState: ProductsState = {
   error: null,
 };
 
-export const fetchProducts = createAsyncThunk('products/fetchAll', async () => {
-  const apiProducts = await productService.getAllProducts();
-  
-  // Map API field names to UI field names for each product
-  return apiProducts.map((apiProduct: any) => {
-    // Debug log to see the raw product data
-    console.log('Raw product from API:', apiProduct);
+/**
+ * Fetch all products from the API
+ */
+export const fetchProducts = createAsyncThunk(
+  'products/fetchAll', 
+  async () => {
+    // Service now returns products in UI format directly
+    const products = await productService.getAllProducts();
     
-    return {
-      id: apiProduct.id || apiProduct.Id,
-      name: apiProduct.Title || apiProduct.title, // Handle PascalCase from .NET
-      description: apiProduct.Description || apiProduct.description,
-      price: apiProduct.Price || apiProduct.price,
-      categoryId: apiProduct.categoryId || apiProduct.CategoryId, // Add categoryId field
-      available: true, // Default value since API doesn't have this field
-    };
-  });
-});
+    // Log for debugging purposes only
+    products.forEach(product => {
+      console.log('Raw product from API:', product);
+    });
+    
+    return products;
+  }
+);
 
+/**
+ * Fetch a single product by ID
+ */
 export const fetchProductById = createAsyncThunk(
   'products/fetchById',
   async (id: string) => {
-    const response = await productService.getProductById(id);
-    return response;
+    // Service now returns product in UI format directly
+    return await productService.getProductById(id);
   }
 );
 

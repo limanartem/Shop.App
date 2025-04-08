@@ -3,18 +3,11 @@
  * Following Shop.App admin code style guidelines
  */
 import { configureStore } from '@reduxjs/toolkit';
-import productsReducer, {
-  fetchProducts,
-  fetchProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct
-} from '../productsSlice';
-import categoriesReducer, {
-  fetchCategories
-} from '../categoriesSlice';
+import productsReducer, { fetchProducts, fetchProductById, createProduct, updateProduct, deleteProduct } from '../../slices/productsSlice';
+import categoriesReducer, { fetchCategories } from '../../slices/categoriesSlice';
 import { productService } from '../../../services/productService';
 import { categoryService } from '../../../services/categoryService';
+import { UiProduct } from '../../../models/product';
 
 // Mock the product service
 jest.mock('../../../services/productService', () => ({
@@ -68,20 +61,31 @@ describe('Redux Slices', () => {
         // Arrange
         const store = createProductsStore();
         
-        // Mock API response with PascalCase fields to match .NET API format
-        const mockApiProducts = [
-          { Id: '1', Title: 'Product 1', Description: 'Desc 1', Price: 10, CategoryId: 1 },
-          { Id: '2', Title: 'Product 2', Description: 'Desc 2', Price: 20, CategoryId: 2 }
+        // Mock API response with camelCase fields to match UI format
+        const mockUiProducts: UiProduct[] = [
+          {
+            id: '1',
+            name: 'Product 1',
+            description: 'Desc 1',
+            price: 10,
+            categoryId: 1,
+            available: true
+          },
+          {
+            id: '2',
+            name: 'Product 2',
+            description: 'Desc 2',
+            price: 20,
+            categoryId: 2,
+            available: true
+          }
         ];
         
-        // Expected mapped result with camelCase fields as produced by the slice's mappers
-        const expectedMappedProducts = [
-          { id: '1', name: 'Product 1', description: 'Desc 1', price: 10, categoryId: 1, available: true },
-          { id: '2', name: 'Product 2', description: 'Desc 2', price: 20, categoryId: 2, available: true }
-        ];
+        // Expected mapped products are now the same as mockUiProducts
+        const expectedMappedProducts = [...mockUiProducts];
         
-        // Mock the service to return the API format
-        (productService.getAllProducts as jest.Mock).mockResolvedValue(mockApiProducts);
+        // Mock the service to return products in UI format
+        (productService.getAllProducts as jest.Mock).mockResolvedValue(mockUiProducts);
         
         // Act
         await store.dispatch(fetchProducts());
@@ -128,12 +132,13 @@ describe('Redux Slices', () => {
       test('fetches product by id successfully', async () => {
         // Arrange
         const store = createProductsStore();
-        const mockProduct = { 
-          Id: '42', 
-          Title: 'Single Product', 
-          Description: 'Test description', 
-          Price: 29.99,
-          CategoryId: 1
+        const mockProduct: UiProduct = { 
+          id: '42', 
+          name: 'Single Product', 
+          description: 'Test description', 
+          price: 29.99,
+          categoryId: 1,
+          available: true
         };
         
         (productService.getProductById as jest.Mock).mockResolvedValue(mockProduct);
@@ -157,27 +162,19 @@ describe('Redux Slices', () => {
         const product = state.currentProduct!;
         
         // Determine and extract the ID in a type-safe way
-        const hasId = 'Id' in product || 'id' in product;
+        const hasId = 'id' in product;
         expect(hasId).toBeTruthy();
 
         // Check the ID value based on which property exists
         // This approach avoids conditional expects
-        const productId = ('Id' in product) 
-          ? (product as {Id: string}).Id
-          : ('id' in product)
-            ? (product as {id: string}).id
-            : '';
+        const productId = product.id;
         expect(productId).toBe('42');
         
         // Similarly check name/title in a type-safe way
-        const hasName = 'Title' in product || 'name' in product;
+        const hasName = 'name' in product;
         expect(hasName).toBeTruthy();
         
-        const productName = ('Title' in product)
-          ? (product as {Title: string}).Title
-          : ('name' in product)
-            ? (product as {name: string}).name
-            : '';
+        const productName = product.name;
         expect(productName).toBe('Single Product');
       });
     });
@@ -188,25 +185,17 @@ describe('Redux Slices', () => {
         const store = createProductsStore();
         
         // UI format for the new product to be created
-        const newProduct = {
+        const newProductToCreate: UiProduct = {
           name: 'New Product',
           description: 'New Description',
           price: 15,
-          available: true,
-          categoryId: 1
+          categoryId: 1,
+          available: true
         };
         
-        // API response format (.NET uses PascalCase)
-        const apiCreatedResponse = {
-          Id: '3',
-          Title: 'New Product',
-          Description: 'New Description',
-          Price: 15,
-          CategoryId: 1
-        };
-        
-        // Expected mapped result after slice processing
-        const expectedMappedProduct = {
+        // Define the product to be returned by the service
+        // (service now returns UI format directly)
+        const createdProduct: UiProduct = {
           id: '3',
           name: 'New Product',
           description: 'New Description',
@@ -215,20 +204,23 @@ describe('Redux Slices', () => {
           available: true
         };
         
-        // Mock the API to return the .NET format response
-        (productService.createProduct as jest.Mock).mockResolvedValue(apiCreatedResponse);
+        // Expected mapped product is identical to created product
+        const expectedMappedProduct = createdProduct;
+        
+        // Mock the API to return the UI format response
+        (productService.createProduct as jest.Mock).mockResolvedValue(createdProduct);
         
         // Act
-        await store.dispatch(createProduct(newProduct));
+        await store.dispatch(createProduct(newProductToCreate));
         
         // Assert
         const state = store.getState().products;
         expect(state.loading).toBe(false);
         expect(state.error).toBe(null);
-        expect(productService.createProduct).toHaveBeenCalledWith(newProduct);
+        expect(productService.createProduct).toHaveBeenCalledWith(newProductToCreate);
         
-        // For the subsequent getAllProducts call, we'll also use API format
-        (productService.getAllProducts as jest.Mock).mockResolvedValue([apiCreatedResponse]);
+        // For the subsequent getAllProducts call, we'll also use UI format
+        (productService.getAllProducts as jest.Mock).mockResolvedValue([createdProduct]);
         await store.dispatch(fetchProducts());
         
         const updatedState = store.getState().products;
@@ -238,10 +230,11 @@ describe('Redux Slices', () => {
       test('handles create product error', async () => {
         // Arrange
         const store = createProductsStore();
-        const newProduct = {
+        const newProduct: UiProduct = {
           name: 'New Product',
           description: 'New Description',
           price: 15,
+          categoryId: 1,
           available: true
         };
         
@@ -278,34 +271,8 @@ describe('Redux Slices', () => {
         // Arrange
         const store = createProductsStore();
         
-        // UI format of existing product
-        const existingProduct = {
-          id: '1',
-          name: 'Product 1',
-          description: 'Desc 1',
-          price: 10,
-          available: true,
-          categoryId: 1
-        };
-        
-        // UI format of the updated product
-        const updatedProduct = {
-          ...existingProduct,
-          name: 'Updated Product',
-          price: 20
-        };
-        
-        // API response format (.NET uses PascalCase)
-        const apiUpdatedResponse = {
-          Id: '1',
-          Title: 'Updated Product',
-          Description: 'Desc 1',
-          Price: 20,
-          CategoryId: 1
-        };
-        
-        // Expected mapped product after slice processing
-        const expectedMappedProduct = {
+        // UI format of the product to update
+        const productToUpdate: UiProduct = {
           id: '1',
           name: 'Updated Product',
           description: 'Desc 1',
@@ -314,21 +281,33 @@ describe('Redux Slices', () => {
           available: true
         };
         
-        // Mock the API to return the .NET format response
-        (productService.updateProduct as jest.Mock).mockResolvedValue(apiUpdatedResponse);
+        // Service return (also UI format)
+        const updatedProduct: UiProduct = {
+          id: '1',
+          name: 'Updated Product',
+          description: 'Desc 1',
+          price: 20,
+          categoryId: 1,
+          available: true
+        };
+        
+        // Expected product is same as updated product
+        const expectedMappedProduct = updatedProduct;
+        
+        // Mock the updateProduct service to return UI format
+        (productService.updateProduct as jest.Mock).mockResolvedValue(updatedProduct);
         
         // Act
-        await store.dispatch(updateProduct(updatedProduct));
+        await store.dispatch(updateProduct(productToUpdate));
         
         // Assert
         const state = store.getState().products;
         expect(state.loading).toBe(false);
         expect(state.error).toBe(null);
-        expect(productService.updateProduct).toHaveBeenCalledWith(updatedProduct);
+        expect(productService.updateProduct).toHaveBeenCalledWith(productToUpdate);
         
         // After update, we would typically refetch the products
-        // Use the API format for the mock response
-        (productService.getAllProducts as jest.Mock).mockResolvedValue([apiUpdatedResponse]);
+        (productService.getAllProducts as jest.Mock).mockResolvedValue([updatedProduct]);
         await store.dispatch(fetchProducts());
         
         const updatedState = store.getState().products;
