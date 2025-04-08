@@ -1,9 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import categoriesReducer, {
-  fetchCategories,
-  fetchCategoryById,
-  createCategory,
-  clearSelectedCategory
+  fetchCategories
 } from '../categoriesSlice';
 import { categoryService } from '../../../services/categoryService';
 import { UiCategory } from '../../../models/category';
