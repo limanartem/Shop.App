@@ -7,9 +7,11 @@ import {
   Button,
   Typography,
   Paper,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store';
 import { login } from '../store/slices/authSlice';
 
 const Login = () => {
@@ -18,14 +20,17 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
+  const { loading, error } = useSelector((state: RootState) => state.auth);
 
   const from = location.state?.from?.pathname || '/';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await dispatch(login({ email, password }));
-      navigate(from, { replace: true });
+      const result = await dispatch(login({ email, password }));
+      if (result.meta.requestStatus === 'fulfilled') {
+        navigate(from, { replace: true });
+      }
     } catch (error) {
       console.error('Login failed:', error);
     }
@@ -54,7 +59,12 @@ const Login = () => {
           <Typography component="h1" variant="h5">
             Admin Login
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+          {error && (
+            <Alert severity="error" sx={{ width: '100%', mt: 2 }}>
+              {error}
+            </Alert>
+          )}
+          <Box component="form" onSubmit={handleSubmit} autoComplete="off" sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -62,10 +72,13 @@ const Login = () => {
               id="email"
               label="Email Address"
               name="email"
-              autoComplete="email"
+              autoComplete="off"
               autoFocus
               value={email}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              inputProps={{
+                autoComplete: 'new-email', // Using a non-standard value to trick browsers
+              }}
             />
             <TextField
               margin="normal"
@@ -75,17 +88,21 @@ const Login = () => {
               label="Password"
               type="password"
               id="password"
-              autoComplete="current-password"
+              autoComplete="off"
               value={password}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+              inputProps={{
+                autoComplete: 'new-password', // Using a non-standard value to trick browsers
+              }}
             />
             <Button
               type="submit"
               fullWidth
               variant="contained"
+              disabled={loading}
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              {loading ? <CircularProgress size={24} /> : 'Sign In'}
             </Button>
           </Box>
         </Paper>

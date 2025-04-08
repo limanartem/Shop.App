@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
+import Unauthorized from './pages/Unauthorized';
 import { RootState } from './store';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
     <Routes>
       {/* Public routes */}
       <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
       
       {/* Protected admin routes */}
       <Route element={<RequireAuth><AdminLayout /></RequireAuth>}>
