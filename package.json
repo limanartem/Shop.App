@@ -26,7 +26,11 @@
   },
   "homepage": "https://github.com/limanartem/Shop.App#readme",
   "workspaces": [
-    "apps/*",
+    "apps/shop.app.web",
+    "apps/shop.app.admin",
+    "apps/shop.app.auth.api",
+    "apps/shop.app.catalog.api",
+    "apps/shop.app.shopping-cart.api",
     "packages/*"
   ],
   "devDependencies": {
