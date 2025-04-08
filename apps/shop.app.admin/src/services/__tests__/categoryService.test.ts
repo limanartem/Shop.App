@@ -2,7 +2,8 @@
  * Tests for CategoryService
  * Following Shop.App admin code style guidelines
  */
-import { categoryService, Category } from '../categoryService';
+import { categoryService } from '../categoryService';
+import { ApiCategory, UiCategory } from '../../models/category';
 
 describe('CategoryService', () => {
   beforeEach(() => {
@@ -23,8 +24,8 @@ describe('CategoryService', () => {
   
   describe('getAllCategories', () => {
     test('fetches and maps categories correctly', async () => {
-      // Arrange - Mock API response using .NET format (PascalCase)
-      const mockApiCategories = [
+      // Arrange - Mock API response using camelCase format
+      const mockApiCategories: ApiCategory[] = [
         { 
           id: 1, 
           title: 'Category 1', 
@@ -111,31 +112,99 @@ describe('CategoryService', () => {
       // Assert
       expect(categories).toEqual([]);
     });
+    
+    test('getCategoryById returns category in UI format', async () => {
+      // Arrange
+      const mockApiCategory: ApiCategory = { 
+        id: 1, 
+        title: 'Category 1', 
+        description: 'Test Description', 
+        parentCategoryId: null 
+      };
+      
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockApiCategory),
+        status: 200
+      } as Response);
+      
+      // Act
+      const category = await categoryService.getCategoryById(1);
+      
+      // Assert
+      expect(category).toBeDefined();
+      expect(category.id).toBe(1);
+      expect(category.name).toBe('Category 1');
+      expect(category.description).toBe('Test Description');
+      expect(category.parentCategoryId).toBeNull();
+    });
+    
+    test('createCategory sends correct data format', async () => {
+      // Arrange
+      const newCategory: Partial<UiCategory> = {
+        name: 'New Category',
+        description: 'Test Description',
+        parentCategoryId: 1
+      };
+      
+      const mockApiResponse: ApiCategory = {
+        id: 3,
+        title: 'New Category',
+        description: 'Test Description',
+        parentCategoryId: 1
+      };
+      
+      let requestBody: string | undefined;
+      
+      (global.fetch as jest.Mock).mockImplementationOnce((url, options) => {
+        requestBody = options.body as string;
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockApiResponse),
+          status: 201
+        } as Response);
+      });
+      
+      // Act
+      const result = await categoryService.createCategory(newCategory);
+      
+      // Assert
+      expect(result).toBeDefined();
+      expect(result.id).toBe(3);
+      expect(result.name).toBe('New Category');
+      
+      // Verify request format
+      expect(requestBody).toBeDefined();
+      const sentData = requestBody ? JSON.parse(requestBody) : {};
+      expect(sentData.title).toBe('New Category');
+      expect(sentData.description).toBe('Test Description');
+      expect(sentData.parentCategoryId).toBe(1);
+    });
   });
   
   describe('buildCategoryPaths', () => {
-    test('builds paths for categories correctly', () => {
-      // Arrange
-      const categories: Category[] = [
-        { id: 1, name: 'Root', parentCategoryId: null },
-        { id: 2, name: 'Child', parentCategoryId: 1 },
-        { id: 3, name: 'Grandchild', parentCategoryId: 2 }
+    test('builds category paths correctly', async () => {
+      // Arrange - Create test categories
+      const testCategories: UiCategory[] = [
+        { id: 1, name: 'Electronics', description: '', parentCategoryId: null },
+        { id: 2, name: 'Computers', description: '', parentCategoryId: 1 },
+        { id: 3, name: 'Laptops', description: '', parentCategoryId: 2 }
       ];
       
       // Act
-      const result = categoryService.buildCategoryPaths(categories);
+      const result = categoryService.buildCategoryPaths(testCategories);
       
       // Assert
       expect(result.length).toBe(3);
-      expect(result[0].path).toBe('Root');
-      expect(result[1].path).toBe('Root > Child');
-      expect(result[2].path).toBe('Root > Child > Grandchild');
+      expect(result[0].path).toBe('Electronics');
+      expect(result[1].path).toBe('Electronics > Computers');
+      expect(result[2].path).toBe('Electronics > Computers > Laptops');
     });
     
     test('handles missing parents gracefully', () => {
       // Arrange - Category with non-existent parent
-      const categories: Category[] = [
-        { id: 2, name: 'Orphan', parentCategoryId: 999 }
+      const categories: UiCategory[] = [
+        { id: 2, name: 'Orphan', description: '', parentCategoryId: 999 }
       ];
       
       // Act
@@ -147,7 +216,7 @@ describe('CategoryService', () => {
     
     test('handles empty array', () => {
       // Arrange
-      const categories: Category[] = [];
+      const categories: UiCategory[] = [];
       
       // Act
       const result = categoryService.buildCategoryPaths(categories);

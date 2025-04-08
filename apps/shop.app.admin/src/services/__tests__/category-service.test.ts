@@ -1,4 +1,5 @@
-import { categoryService, Category } from '../categoryService';
+import { categoryService } from '../categoryService';
+import { ApiCategory, UiCategory } from '../../models/category';
 
 // Tests for category service
 
@@ -23,7 +24,7 @@ describe('CategoryService', () => {
   describe('getAllCategories', () => {
     test('fetches and transforms categories from the API', async () => {
       // Arrange
-      const mockCategories = [
+      const mockCategories: ApiCategory[] = [
         { id: 1, title: 'Category 1', parentCategoryId: null },
         { id: 2, title: 'Category 2', parentCategoryId: 1 },
         { id: 3, title: 'Category 3', parentCategoryId: 1 },
@@ -93,10 +94,10 @@ describe('CategoryService', () => {
   describe('buildCategoryPaths', () => {
     test('builds correct paths for categories with simple hierarchy', () => {
       // Arrange
-      const categories: Category[] = [
-        { id: 1, name: 'Electronics', parentCategoryId: null },
-        { id: 2, name: 'Smartphones', parentCategoryId: 1 },
-        { id: 3, name: 'Laptops', parentCategoryId: 1 },
+      const categories: UiCategory[] = [
+        { id: 1, name: 'Electronics', description: '', parentCategoryId: null },
+        { id: 2, name: 'Smartphones', description: '', parentCategoryId: 1 },
+        { id: 3, name: 'Laptops', description: '', parentCategoryId: 1 },
       ];
 
       // Act
@@ -111,11 +112,11 @@ describe('CategoryService', () => {
 
     test('builds correct paths for multi-level hierarchy', () => {
       // Arrange
-      const categories: Category[] = [
-        { id: 1, name: 'Electronics', parentCategoryId: null },
-        { id: 2, name: 'Smartphones', parentCategoryId: 1 },
-        { id: 3, name: 'Apple', parentCategoryId: 2 },
-        { id: 4, name: 'iPhone', parentCategoryId: 3 },
+      const categories: UiCategory[] = [
+        { id: 1, name: 'Electronics', description: '', parentCategoryId: null },
+        { id: 2, name: 'Smartphones', description: '', parentCategoryId: 1 },
+        { id: 3, name: 'iPhone', description: '', parentCategoryId: 2 },
+        { id: 4, name: 'Android', description: '', parentCategoryId: 2 },
       ];
 
       // Act
@@ -125,16 +126,16 @@ describe('CategoryService', () => {
       expect(result.length).toBe(4);
       expect(result[0].path).toBe('Electronics');
       expect(result[1].path).toBe('Electronics > Smartphones');
-      expect(result[2].path).toBe('Electronics > Smartphones > Apple');
-      expect(result[3].path).toBe('Electronics > Smartphones > Apple > iPhone');
+      expect(result[2].path).toBe('Electronics > Smartphones > iPhone');
+      expect(result[3].path).toBe('Electronics > Smartphones > Android');
     });
 
     test('handles categories with missing parent', () => {
       // Arrange
-      const categories: Category[] = [
-        { id: 1, name: 'Electronics', parentCategoryId: null },
-        { id: 2, name: 'Smartphones', parentCategoryId: 1 },
-        { id: 3, name: 'Orphaned Category', parentCategoryId: 999 }, // Parent doesn't exist
+      const categories: UiCategory[] = [
+        { id: 1, name: 'Electronics', description: '', parentCategoryId: null },
+        { id: 2, name: 'Smartphones', description: '', parentCategoryId: 1 },
+        { id: 3, name: 'Orphaned Category', description: '', parentCategoryId: 999 }, // Parent doesn't exist
       ];
 
       // Act
@@ -149,7 +150,7 @@ describe('CategoryService', () => {
 
     test('preserves original category properties', () => {
       // Arrange
-      const categories: Category[] = [
+      const categories: UiCategory[] = [
         { id: 1, name: 'Category 1', description: 'Desc 1', parentCategoryId: null },
         { id: 2, name: 'Category 2', description: 'Desc 2', parentCategoryId: 1 },
       ];

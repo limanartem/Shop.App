@@ -1,18 +1,26 @@
 import { configureStore } from '@reduxjs/toolkit';
 import categoriesReducer, {
-  fetchCategories
+  fetchCategories,
+  fetchCategoryById,
+  createCategory,
+  clearSelectedCategory
 } from '../categoriesSlice';
 import { categoryService } from '../../../services/categoryService';
+import { UiCategory } from '../../../models/category';
 
 // Define types for the mock service
 interface MockCategoryService {
   getAllCategories: jest.Mock;
+  getCategoryById: jest.Mock;
+  createCategory: jest.Mock;
 }
 
 // Mock the category service
 jest.mock('../../../services/categoryService', () => ({
   categoryService: {
-    getAllCategories: jest.fn()
+    getAllCategories: jest.fn(),
+    getCategoryById: jest.fn(),
+    createCategory: jest.fn()
   }
 }));
 
@@ -42,6 +50,7 @@ describe('Categories Slice', () => {
       expect(state.categories).toEqual([]);
       expect(state.loading).toBe(false);
       expect(state.error).toBe(null);
+      expect(state.selectedCategory).toBe(null);
     });
   });
 
@@ -49,9 +58,9 @@ describe('Categories Slice', () => {
     test('fetches categories successfully', async () => {
       // Arrange
       const store = createTestStore();
-      const mockCategories = [
-        { id: 1, name: 'Category 1', path: 'Category 1' },
-        { id: 2, name: 'Category 2', parentCategoryId: 1, path: 'Category 1 > Category 2' }
+      const mockCategories: UiCategory[] = [
+        { id: 1, name: 'Category 1', description: '', path: 'Category 1' },
+        { id: 2, name: 'Category 2', description: '', parentCategoryId: 1, path: 'Category 1 > Category 2' }
       ];
       
       // Type cast to access the mock function
@@ -91,9 +100,9 @@ describe('Categories Slice', () => {
     test('sets loading state correctly', async () => {
       // Arrange
       const store = createTestStore();
-      const mockCategories = [
-        { id: 1, name: 'Category 1' },
-        { id: 2, name: 'Category 2', parentCategoryId: 1 }
+      const mockCategories: UiCategory[] = [
+        { id: 1, name: 'Category 1', description: '' },
+        { id: 2, name: 'Category 2', description: '', parentCategoryId: 1 }
       ];
       
       // Use a delayed promise to check loading state
