@@ -18,6 +18,95 @@ namespace Shop.App.Catalog.Api.Services
       this.context = context;
       this.cacheService = cacheService;
     }
+    
+    /// <summary>
+    /// Gets a product by ID.
+    /// </summary>
+    /// <param name="id">The product ID.</param>
+    /// <returns>The requested product or null if not found.</returns>
+    public async Task<Product?> GetProductByIdAsync(Guid id)
+    {
+      return await context.Products
+        .Include(p => p.Category)
+        .FirstOrDefaultAsync(p => p.Id == id);
+    }
+    
+    /// <summary>
+    /// Creates a new product.
+    /// </summary>
+    /// <param name="product">The product to create.</param>
+    /// <returns>The created product.</returns>
+    public async Task<Product> CreateProductAsync(Product product)
+    {
+      // Ensure new GUID if none provided
+      if (product.Id == Guid.Empty)
+      {
+        product.Id = Guid.NewGuid();
+      }
+      
+      await context.Products.AddAsync(product);
+      await context.SaveChangesAsync();
+      
+      // Clear cache to ensure fresh data
+      await cacheService.ClearProductCache();
+      
+      return product;
+    }
+    
+    /// <summary>
+    /// Updates an existing product.
+    /// </summary>
+    /// <param name="id">The ID of the product to update.</param>
+    /// <param name="product">The updated product data.</param>
+    /// <returns>The updated product, or null if not found.</returns>
+    public async Task<Product?> UpdateProductAsync(Guid id, Product product)
+    {
+      var existingProduct = await context.Products.FindAsync(id);
+      
+      if (existingProduct == null)
+      {
+        return null;
+      }
+      
+      // Update properties
+      existingProduct.Title = product.Title;
+      existingProduct.Description = product.Description;
+      existingProduct.Price = product.Price;
+      existingProduct.Currency = product.Currency;
+      existingProduct.CategoryId = product.CategoryId;
+      existingProduct.PreviewImageUrls = product.PreviewImageUrls;
+      
+      context.Products.Update(existingProduct);
+      await context.SaveChangesAsync();
+      
+      // Clear cache to ensure fresh data
+      await cacheService.ClearProductCache();
+      
+      return existingProduct;
+    }
+    
+    /// <summary>
+    /// Deletes a product.
+    /// </summary>
+    /// <param name="id">The ID of the product to delete.</param>
+    /// <returns>True if the product was deleted, false if not found.</returns>
+    public async Task<bool> DeleteProductAsync(Guid id)
+    {
+      var product = await context.Products.FindAsync(id);
+      
+      if (product == null)
+      {
+        return false;
+      }
+      
+      context.Products.Remove(product);
+      await context.SaveChangesAsync();
+      
+      // Clear cache to ensure fresh data
+      await cacheService.ClearProductCache();
+      
+      return true;
+    }
 
     /// <summary>
     /// Retrieves all categories.

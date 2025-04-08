@@ -3,6 +3,7 @@ using Shop.App.Catalog.Api.Services;
 using Shop.App.Catalog.Api.Interfaces;
 using Microsoft.AspNetCore.Diagnostics;
 using Shop.App.Catalog;
+using Shop.App.Catalog.Api.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,10 @@ builder.Services.AddCors(options =>
         .AllowAnyMethod();
   });
 });
+
+// Add authentication and authorization services
+builder.Services.AddHttpClient();
+builder.Services.AddAuthorization();
 
 builder.Services.AddDbContext<AppDbContext>();
 builder.Services.AddScoped<ICatalogService, CatalogService>();
@@ -51,11 +56,14 @@ app.UseExceptionHandler(exceptionHandlerApp =>
 
 app.UseStatusCodePages();
 
-// Configure product routes
-ProductRoutes.Configure(app);
-
 // Apply CORS policy
 app.UseCors("myAppCors");
+
+// Apply JWT authentication middleware
+app.UseJwtAuth();
+
+// Configure product routes
+ProductRoutes.Configure(app);
 
 app.Run();
 

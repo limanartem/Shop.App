@@ -17,4 +17,10 @@ public interface ICacheService
   /// <param name="getCategories">A function that returns a task that represents the asynchronous operation of getting the categories.</param>
   /// <returns>A task that represents the asynchronous operation of retrieving the categories.</returns>
   Task<IEnumerable<Category>> Categories(Func<IEnumerable<Category>> getCategories);
+  
+  /// <summary>
+  /// Clears product cache to ensure fresh data is retrieved on next request.
+  /// </summary>
+  /// <returns>A task that represents the asynchronous operation of clearing the product cache.</returns>
+  Task ClearProductCache();
 }

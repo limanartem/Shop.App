@@ -1,5 +1,7 @@
 using Shop.App.Catalog.Api.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Shop.App.Catalog.Api.Models;
+using Shop.App.Catalog.Api.Auth;
 
 namespace Shop.App.Catalog
 {
@@ -11,9 +13,26 @@ namespace Shop.App.Catalog
     /// <param name="app">The WebApplication instance.</param>
     public static void Configure(WebApplication app)
     {
+      // Public routes
       app.MapGet("/products", GetProductsHandler());
       app.MapPost("/products/search", SearchProductsHandler());
       app.MapGet("/productCategories", GetCategoriesHandler());
+      
+      // Admin routes - protected with authentication
+      app.MapGet("/api/products", GetProductsHandler())
+        .WithMetadata(new AdminAuthorizeAttribute());
+        
+      app.MapGet("/api/products/{id}", GetProductByIdHandler())
+        .WithMetadata(new AdminAuthorizeAttribute());
+        
+      app.MapPost("/api/products", CreateProductHandler())
+        .WithMetadata(new AdminAuthorizeAttribute());
+        
+      app.MapPut("/api/products/{id}", UpdateProductHandler())
+        .WithMetadata(new AdminAuthorizeAttribute());
+        
+      app.MapDelete("/api/products/{id}", DeleteProductHandler())
+        .WithMetadata(new AdminAuthorizeAttribute());
     }
 
     private static RequestDelegate GetCategoriesHandler() =>
@@ -34,13 +53,154 @@ namespace Shop.App.Catalog
               category.Id,
               Title = category.Name,
               category.ParentCategoryId
-            }).ToList()
+            })
         );
       };
-
-    private static Func<HttpContext, Guid[], Task> SearchProductsHandler() =>
-      async (HttpContext context, Guid[] ids) =>
+      
+    // Admin API handlers
+    
+    private static RequestDelegate GetProductByIdHandler() =>
+      async (HttpContext context) =>
+      {
+        if (!Guid.TryParse(context.Request.RouteValues["id"]?.ToString(), out var productId))
         {
+          context.Response.StatusCode = StatusCodes.Status400BadRequest;
+          await context.Response.WriteAsJsonAsync(new { message = "Invalid product ID format" });
+          return;
+        }
+        
+        var catalogService = context.RequestServices.GetService<ICatalogService>();
+        if (catalogService == null)
+        {
+          throw new NullReferenceException($"Not able to resolve {typeof(ICatalogService)} from service container");
+        }
+
+        var product = await catalogService.GetProductByIdAsync(productId);
+        
+        if (product == null)
+        {
+          context.Response.StatusCode = StatusCodes.Status404NotFound;
+          await context.Response.WriteAsJsonAsync(new { message = "Product not found" });
+          return;
+        }
+
+        await context.Response.WriteAsJsonAsync(product);
+      };
+      
+    private static RequestDelegate CreateProductHandler() =>
+      async (HttpContext context) =>
+      {
+        try
+        {
+          var catalogService = context.RequestServices.GetService<ICatalogService>();
+          if (catalogService == null)
+          {
+            throw new NullReferenceException($"Not able to resolve {typeof(ICatalogService)} from service container");
+          }
+          
+          var productData = await context.Request.ReadFromJsonAsync<Product>();
+          if (productData == null)
+          {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new { message = "Invalid product data" });
+            return;
+          }
+          
+          var createdProduct = await catalogService.CreateProductAsync(productData);
+          
+          context.Response.StatusCode = StatusCodes.Status201Created;
+          await context.Response.WriteAsJsonAsync(createdProduct);
+        }
+        catch (Exception ex)
+        {
+          context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+          await context.Response.WriteAsJsonAsync(new { message = $"Error creating product: {ex.Message}" });
+        }
+      };
+      
+    private static RequestDelegate UpdateProductHandler() =>
+      async (HttpContext context) =>
+      {
+        try
+        {
+          if (!Guid.TryParse(context.Request.RouteValues["id"]?.ToString(), out var productId))
+          {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new { message = "Invalid product ID format" });
+            return;
+          }
+          
+          var catalogService = context.RequestServices.GetService<ICatalogService>();
+          if (catalogService == null)
+          {
+            throw new NullReferenceException($"Not able to resolve {typeof(ICatalogService)} from service container");
+          }
+          
+          var productData = await context.Request.ReadFromJsonAsync<Product>();
+          if (productData == null)
+          {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new { message = "Invalid product data" });
+            return;
+          }
+          
+          var updatedProduct = await catalogService.UpdateProductAsync(productId, productData);
+          
+          if (updatedProduct == null)
+          {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsJsonAsync(new { message = "Product not found" });
+            return;
+          }
+          
+          await context.Response.WriteAsJsonAsync(updatedProduct);
+        }
+        catch (Exception ex)
+        {
+          context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+          await context.Response.WriteAsJsonAsync(new { message = $"Error updating product: {ex.Message}" });
+        }
+      };
+      
+    private static RequestDelegate DeleteProductHandler() =>
+      async (HttpContext context) =>
+      {
+        try
+        {
+          if (!Guid.TryParse(context.Request.RouteValues["id"]?.ToString(), out var productId))
+          {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new { message = "Invalid product ID format" });
+            return;
+          }
+          
+          var catalogService = context.RequestServices.GetService<ICatalogService>();
+          if (catalogService == null)
+          {
+            throw new NullReferenceException($"Not able to resolve {typeof(ICatalogService)} from service container");
+          }
+          
+          var result = await catalogService.DeleteProductAsync(productId);
+          
+          if (!result)
+          {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsJsonAsync(new { message = "Product not found" });
+            return;
+          }
+          
+          context.Response.StatusCode = StatusCodes.Status204NoContent;
+        }
+        catch (Exception ex)
+        {
+          context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+          await context.Response.WriteAsJsonAsync(new { message = $"Error deleting product: {ex.Message}" });
+        }
+      };
+      
+    private static RequestDelegate SearchProductsHandler() =>
+      async (HttpContext context) =>
+      {
           try
           {
             var catalogService = context.RequestServices.GetService<ICatalogService>();
@@ -48,8 +208,17 @@ namespace Shop.App.Catalog
             {
               throw new NullReferenceException($"Not able to resolve {typeof(ICatalogService)} from service container");
             }
-
-            var products = catalogService.Products(ids);
+            
+            // Parse product IDs from request body
+            var requestData = await context.Request.ReadFromJsonAsync<SearchProductsRequest>();
+            if (requestData?.ProductIds == null || !requestData.ProductIds.Any())
+            {
+              context.Response.StatusCode = StatusCodes.Status400BadRequest;
+              await context.Response.WriteAsJsonAsync(new { message = "Product IDs are required" });
+              return;
+            }
+            
+            var products = catalogService.Products(requestData.ProductIds);
 
             await context.Response.WriteAsJsonAsync(
               products?

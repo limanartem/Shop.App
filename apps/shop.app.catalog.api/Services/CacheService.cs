@@ -14,6 +14,7 @@ public class CacheService : ICacheService
 {
   private const int CATEGORIES_CACHE_TTL_SECONDS = 60 * 60; // 1 hour in seconds
   public const string CATEGORIES_CACHE_KEY = "CATEGORIES";
+  public const string PRODUCTS_CACHE_KEY = "PRODUCTS";
   private readonly IDatabase _database;
   private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
   {
@@ -24,6 +25,15 @@ public class CacheService : ICacheService
   public CacheService(ICacheDatabaseProvider redis)
   {
     _database = redis.GetDatabase();
+  }
+  
+  /// <summary>
+  /// Clears product cache to ensure fresh data is retrieved on next request.
+  /// </summary>
+  /// <returns>A task that represents the asynchronous operation of clearing the product cache.</returns>
+  public async Task ClearProductCache()
+  {
+    await _database.KeyDeleteAsync(PRODUCTS_CACHE_KEY);
   }
 
   /// <summary>
