@@ -55,6 +55,7 @@ export const productService = {
       price: apiProduct.Price || apiProduct.price,
       categoryId: apiProduct.CategoryId || apiProduct.categoryId,
       previewImageUrls: apiProduct.PreviewImageUrls || apiProduct.previewImageUrls,
+      available: true, // Default value since this field doesn't exist in the API
       // Include any other fields that might be needed
     };
   },
