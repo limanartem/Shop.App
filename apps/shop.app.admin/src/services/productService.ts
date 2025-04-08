@@ -1,5 +1,56 @@
 const API_URL = process.env.REACT_APP_CATALOG_API_URL;
-const AUTH_API_URL = process.env.REACT_APP_AUTH_API_URL;
+// CDN URL is used in the component that consumes these image URLs
+
+// Helper function to upload image to the CDN
+const uploadImageToCdn = async (imageDataUrl: string, productId: string, index: number): Promise<string> => {
+  // For this prototype, we're using a simplified approach where we'll just return
+  // the filename that would be created on the CDN
+  // In a real implementation, you would make an API call to upload the image
+  // and get back the URL where it's stored
+  
+  // This simulates the process of transforming a base64 image to a CDN URL
+  const fileName = `/shop-assets/products/thumbnails/${productId}-${index}.png`;
+  
+  // In a real implementation, you would do something like:
+  // const response = await fetch(`${API_URL}/api/upload`, {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({ image: imageDataUrl, productId })
+  // });
+  // const data = await response.json();
+  // return data.url;
+  
+  return fileName;
+};
+
+// Helper function to process image uploads
+const processProductImages = async (product: any): Promise<string[]> => {
+  if (!product.imageUrls || !product.imageUrls.length) {
+    return [];
+  }
+  
+  const cdnUrls = [];
+  
+  for (let i = 0; i < product.imageUrls.length; i++) {
+    const imageUrl = product.imageUrls[i];
+    
+    // If it's already a CDN URL, keep it as is
+    if (!imageUrl.startsWith('data:')) {
+      cdnUrls.push(imageUrl);
+      continue;
+    }
+    
+    // If it's a new image (data URL), upload it
+    try {
+      const uploadedUrl = await uploadImageToCdn(imageUrl, product.id || 'temp', i);
+      cdnUrls.push(uploadedUrl);
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+    }
+  }
+  
+  return cdnUrls;
+};
 
 // Helper function to get auth token
 const getAuthToken = () => {
@@ -48,20 +99,34 @@ export const productService = {
     
     // Map API field names back to UI field names
     // Handle different possible casing in the JSON response
+    const imageUrls = apiProduct.PreviewImageUrls || apiProduct.previewImageUrls;
+    let parsedImageUrls = [];
+    
+    // Try to parse the image URLs if they exist
+    if (imageUrls) {
+      try {
+        parsedImageUrls = JSON.parse(imageUrls);
+      } catch (e) {
+        console.warn('Failed to parse image URLs:', e);
+      }
+    }
+    
     return {
       id: apiProduct.id || apiProduct.Id,
-      name: apiProduct.Title || apiProduct.title, // Handle PascalCase from .NET
+      name: apiProduct.title || apiProduct.Title || apiProduct.Name || apiProduct.name, // Handle PascalCase and different field names from .NET
       description: apiProduct.Description || apiProduct.description,
       price: apiProduct.Price || apiProduct.price,
       categoryId: apiProduct.CategoryId || apiProduct.categoryId,
-      previewImageUrls: apiProduct.PreviewImageUrls || apiProduct.previewImageUrls,
+      imageUrls: parsedImageUrls,
       available: true, // Default value since this field doesn't exist in the API
-      // Include any other fields that might be needed
     };
   },
 
   async createProduct(product: any) {
     const token = getAuthToken();
+    
+    // Process images first if any exist
+    const processedImageUrls = await processProductImages(product);
     
     // Map UI field names to API field names
     const apiProduct = {
@@ -70,8 +135,8 @@ export const productService = {
       Price: product.price,
       Currency: 'USD', // Default currency since UI doesn't collect it
       CategoryId: product.categoryId || 1, // Default category if not provided
-      // Include any other fields that might be needed
-      PreviewImageUrls: product.previewImageUrls || null
+      // Handle image uploads
+      PreviewImageUrls: processedImageUrls.length > 0 ? JSON.stringify(processedImageUrls) : null
     };
     
     const response = await fetch(`${API_URL}/api/products`, {
@@ -104,6 +169,9 @@ export const productService = {
   async updateProduct(product: any) {
     const token = getAuthToken();
     
+    // Process images first if any exist
+    const processedImageUrls = await processProductImages(product);
+    
     // Map UI field names to API field names
     const apiProduct = {
       Id: product.id,
@@ -112,8 +180,8 @@ export const productService = {
       Price: product.price,
       Currency: 'USD', // Default currency since UI doesn't collect it
       CategoryId: product.categoryId || 1, // Default category if not provided
-      // Include any other fields that might be needed
-      PreviewImageUrls: product.previewImageUrls || null
+      // Handle image uploads
+      PreviewImageUrls: processedImageUrls.length > 0 ? JSON.stringify(processedImageUrls) : null
     };
     
     const response = await fetch(`${API_URL}/api/products/${product.id}`, {

@@ -27,6 +27,7 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector, RootState } from '../store';
 import { fetchProducts, updateProduct, createProduct, fetchProductById, deleteProduct } from '../store/slices/productsSlice';
 import { fetchCategories } from '../store/slices/categoriesSlice';
+import ImageUpload from '../components/ImageUpload';
 
 interface Product {
   id?: string;
@@ -35,7 +36,10 @@ interface Product {
   price: number;
   available: boolean;
   categoryId?: number;
+  imageUrls?: string[];
 }
+
+const CDN_URL = process.env.REACT_APP_CDN_URL || 'http://localhost:3005/public';
 
 const Products = () => {
   const [open, setOpen] = useState(false);
@@ -142,6 +146,7 @@ const Products = () => {
       price: 0,
       available: true,
       categoryId: categories.length > 0 ? categories[0].id : undefined,
+      imageUrls: [],
     });
     setOpen(true);
   };
@@ -284,6 +289,14 @@ const Products = () => {
               </Select>
               <FormHelperText>Select a product category</FormHelperText>
             </FormControl>
+            
+            <ImageUpload
+              initialImages={editProduct?.imageUrls || []}
+              onChange={(images) => setEditProduct(editProduct ? { ...editProduct, imageUrls: images } : null)}
+              maxImages={5}
+              cdnUrl={CDN_URL}
+            />
+            
             <Box sx={{ mt: 2 }}>
               <Typography variant="body2" color="textSecondary">
                 Available
