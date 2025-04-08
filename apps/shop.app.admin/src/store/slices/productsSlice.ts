@@ -27,14 +27,19 @@ export const fetchProducts = createAsyncThunk('products/fetchAll', async () => {
   const apiProducts = await productService.getAllProducts();
   
   // Map API field names to UI field names for each product
-  return apiProducts.map((apiProduct: any) => ({
-    id: apiProduct.id || apiProduct.Id,
-    name: apiProduct.Title || apiProduct.title, // Handle PascalCase from .NET
-    description: apiProduct.Description || apiProduct.description,
-    price: apiProduct.Price || apiProduct.price,
-    available: true, // Default value since API doesn't have this field
-    // Include any other fields that might be needed
-  }));
+  return apiProducts.map((apiProduct: any) => {
+    // Debug log to see the raw product data
+    console.log('Raw product from API:', apiProduct);
+    
+    return {
+      id: apiProduct.id || apiProduct.Id,
+      name: apiProduct.Title || apiProduct.title, // Handle PascalCase from .NET
+      description: apiProduct.Description || apiProduct.description,
+      price: apiProduct.Price || apiProduct.price,
+      categoryId: apiProduct.categoryId || apiProduct.CategoryId, // Add categoryId field
+      available: true, // Default value since API doesn't have this field
+    };
+  });
 });
 
 export const fetchProductById = createAsyncThunk(

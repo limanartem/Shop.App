@@ -15,12 +15,18 @@ import {
   Tooltip,
   Alert,
   Snackbar,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  FormHelperText,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { useAppDispatch, useAppSelector, RootState } from '../store';
 import { fetchProducts, updateProduct, createProduct, fetchProductById, deleteProduct } from '../store/slices/productsSlice';
+import { fetchCategories } from '../store/slices/categoriesSlice';
 
 interface Product {
   id?: string;
@@ -28,6 +34,7 @@ interface Product {
   description: string;
   price: number;
   available: boolean;
+  categoryId?: number;
 }
 
 const Products = () => {
@@ -37,10 +44,12 @@ const Products = () => {
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const dispatch = useAppDispatch();
-  const { products, currentProduct, loading, error } = useAppSelector((state: RootState) => state.products);
+  const { products, currentProduct, loading } = useAppSelector((state: RootState) => state.products);
+  const { categories } = useAppSelector((state: RootState) => state.categories);
 
   useEffect(() => {
     dispatch(fetchProducts());
+    dispatch(fetchCategories());
   }, [dispatch]);
 
   // Update editProduct when currentProduct changes
@@ -56,6 +65,20 @@ const Products = () => {
     { field: 'description', headerName: 'Description', width: 300 },
     { field: 'price', headerName: 'Price', width: 130 },
     { field: 'available', headerName: 'Available', width: 130, type: 'boolean' },
+    { 
+      field: 'categoryId', 
+      headerName: 'Category', 
+      width: 250, // Wider to accommodate paths
+      valueGetter: (params) => {
+        const categoryId = params.value;
+        
+        // Convert both to numbers for comparison to avoid type mismatches
+        const category = categories.find(cat => Number(cat.id) === Number(categoryId));
+        
+        // Use the category path if available, otherwise fall back to the name
+        return category ? (category.path || category.name) : 'None';
+      }
+    },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -118,6 +141,7 @@ const Products = () => {
       description: '',
       price: 0,
       available: true,
+      categoryId: categories.length > 0 ? categories[0].id : undefined,
     });
     setOpen(true);
   };
@@ -228,14 +252,38 @@ const Products = () => {
               label="Price"
               type="number"
               fullWidth
-              value={editProduct?.price || ''}
+              value={editProduct?.price || 0}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setEditProduct(editProduct ? {
-                  ...editProduct,
-                  price: parseFloat(e.target.value) || 0,
-                } : null)
+                setEditProduct(editProduct ? { ...editProduct, price: parseFloat(e.target.value) || 0 } : null)
               }
             />
+            <FormControl fullWidth margin="dense">
+              <InputLabel id="category-select-label">Category</InputLabel>
+              <Select
+                labelId="category-select-label"
+                value={editProduct?.categoryId || ''}
+                label="Category"
+                onChange={(e) =>
+                  setEditProduct(editProduct ? { ...editProduct, categoryId: e.target.value as number } : null)
+                }
+                sx={{ textIndent: 0 }} // Ensure proper text alignment
+              >
+                {categories.map((category) => (
+                  <MenuItem 
+                    key={category.id} 
+                    value={category.id}
+                    // Indent based on hierarchy level (count the number of '>' characters)
+                    sx={{ 
+                      pl: category.path ? (category.path.split('>').length - 1) * 2 + 2 : 2,
+                      fontWeight: !category.parentCategoryId ? 'bold' : 'normal' // Bold for top-level categories
+                    }}
+                  >
+                    {category.name}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>Select a product category</FormHelperText>
+            </FormControl>
             <Box sx={{ mt: 2 }}>
               <Typography variant="body2" color="textSecondary">
                 Available
