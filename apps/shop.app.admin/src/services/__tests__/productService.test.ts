@@ -34,7 +34,7 @@ describe('ProductService', () => {
           description: 'Test description', 
           price: 19.99, 
           categoryId: 1,
-          previewImageUrls: JSON.stringify(['/test.jpg']) 
+          previewImageUrls: JSON.stringify(['/test.jpg'])
         }
       ];
       
@@ -117,13 +117,13 @@ describe('ProductService', () => {
   
   describe('Product Management Operations', () => {
     test('createProduct sends data to API correctly', async () => {
-      // Arrange
+      // Test product with all required fields
       const newProduct: UiProduct = {
-        name: 'New Product',
-        description: 'New description',
+        name: 'Test Product',
+        description: 'Test description',
         price: 29.99,
-        categoryId: 3,
-        imageUrls: ['/test-image.jpg'],
+        categoryId: 2,
+        imageUrls: ['/test1.jpg', '/test2.jpg'],
         available: true
       };
       
@@ -139,11 +139,11 @@ describe('ProductService', () => {
         // Convert to proper UI format for service layer to transform
         const responseProduct: UiProduct = {
           id: '123',
-          name: 'New Product',
-          description: 'New description',
+          name: 'Test Product',
+          description: 'Test description',
           price: 29.99,
-          categoryId: 3,
-          imageUrls: ['/test-image.jpg'],
+          categoryId: 2,
+          imageUrls: ['/test1.jpg', '/test2.jpg'],
           available: true
         };
         
@@ -160,32 +160,35 @@ describe('ProductService', () => {
       // Assert
       expect(result).toBeDefined();
       expect(result.id).toBe('123');
-      expect(result.name).toBe('New Product');
+      expect(result.name).toBe('Test Product');
       
       // Verify request format
       expect(requestBody).toBeDefined();
       const sentData = requestBody ? JSON.parse(requestBody) : {};
-      expect(sentData.title).toBe('New Product');
+      expect(sentData.title).toBe('Test Product');
+      expect(sentData.description).toBe('Test description');
       expect(sentData.price).toBe(29.99);
     });
     
     test('updateProduct updates existing product', async () => {
       // Arrange
+      // Product with ID for update
       const productToUpdate: UiProduct = {
-        id: '1',
+        id: '42',
         name: 'Updated Product',
-        description: 'Updated Description',
-        price: 25.99,
-        categoryId: 2,
+        description: 'Updated description',
+        price: 39.99,
+        categoryId: 3,
+        imageUrls: ['/updated.jpg'],
         available: true
       };
       
       // API response format in camelCase
       const apiUpdatedResponse: ApiProduct = {
-        id: '1',
+        id: '42',
         title: 'Updated Product',
         description: 'Updated Description',
-        price: 25.99,
+        price: 39.99,
         categoryId: 2
       };
       
@@ -206,7 +209,7 @@ describe('ProductService', () => {
       
       // Assert
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/products/1'),
+        expect.stringContaining('/products/42'),
         expect.objectContaining({ method: 'PUT' })
       );
       
@@ -214,7 +217,7 @@ describe('ProductService', () => {
       expect(sentBodyData).toBeDefined();
       const sentData = sentBodyData ? JSON.parse(sentBodyData) : {};
       expect(sentData.title).toBe('Updated Product');
-      expect(sentData.price).toBe(25.99);
+      expect(sentData.price).toBe(39.99);
     });
     
     test('deleteProduct sends delete request', async () => {
