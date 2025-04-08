@@ -92,16 +92,34 @@ export const productsSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch products';
       })
+      .addCase(createProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(createProduct.fulfilled, (state, action) => {
+        state.loading = false;
         state.products.push(action.payload);
       })
+      .addCase(createProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to create product';
+      })
+      .addCase(updateProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(updateProduct.fulfilled, (state, action) => {
+        state.loading = false;
         const index = state.products.findIndex(
           (p) => p.id === action.payload.id
         );
         if (index !== -1) {
           state.products[index] = action.payload;
         }
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to update product';
       })
       .addCase(fetchProductById.pending, (state) => {
         state.loading = true;

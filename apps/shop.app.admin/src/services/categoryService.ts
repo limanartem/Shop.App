@@ -44,7 +44,7 @@ export const categoryService = {
         id: apiCategory.id || apiCategory.Id,
         name: apiCategory.title || apiCategory.Title || apiCategory.Name || apiCategory.name, // Handle all possible cases
         description: apiCategory.Description || apiCategory.description,
-        parentCategoryId: apiCategory.parentCategoryId || apiCategory.ParentCategoryId,
+        parentCategoryId: apiCategory.parentCategoryId === null ? null : (apiCategory.parentCategoryId || apiCategory.ParentCategoryId),
       };
       
       // Debug: Log the mapped category
