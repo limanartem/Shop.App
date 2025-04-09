@@ -16,9 +16,26 @@ describe('Product Creation', () => {
     // Login before testing product functionality
     await LoginPage.open();
     await LoginPage.waitForPageLoad();
+    console.log('Login page loaded, current URL:', await browser.getUrl());
+    
     await LoginPage.login(
       testConfig.adminCredentials.email,
       testConfig.adminCredentials.password
+    );
+    
+    console.log('Login completed, current URL:', await browser.getUrl());
+    
+    // Wait for redirect after login
+    await browser.waitUntil(
+      async () => {
+        const url = await browser.getUrl();
+        console.log('Current URL during wait:', url);
+        return url.includes('/dashboard') || url.includes('/products');
+      },
+      {
+        timeout: 10000,
+        timeoutMsg: 'Expected URL to change after login'
+      }
     );
   });
 
@@ -26,8 +43,46 @@ describe('Product Creation', () => {
    * Before each test, navigate to the products page
    */
   beforeEach(async () => {
-    await ProductsPage.open();
+    // Navigate directly to the products page
+    await browser.url('http://localhost:3006/products');
     await ProductsPage.waitForPageLoad();
+    
+    // Take a screenshot to see if we're on the products page
+    await takeScreenshot('products-page-navigation');
+    
+    // Debug: Log the current URL to see where we actually are
+    const currentUrl = await browser.getUrl();
+    console.log('Current URL before test:', currentUrl);
+    
+    // Check if we're actually on the products page or if we got redirected to login
+    if (currentUrl.includes('/login')) {
+      console.log('Redirected to login page, trying to login again');
+      await LoginPage.login(
+        testConfig.adminCredentials.email,
+        testConfig.adminCredentials.password
+      );
+      
+      // Navigate to products page again after login
+      await browser.url('http://localhost:3006/products');
+      await ProductsPage.waitForPageLoad();
+      console.log('After re-login, current URL:', await browser.getUrl());
+    }
+    
+    // Wait for the products page to be fully loaded with its elements
+    await browser.waitUntil(
+      async () => {
+        try {
+          const addButton = await $('[data-testid="add-product-button"]');
+          return await addButton.isDisplayed();
+        } catch (error) {
+          return false;
+        }
+      },
+      {
+        timeout: 10000,
+        timeoutMsg: 'Add product button not displayed after timeout'
+      }
+    );
   });
 
   /**

@@ -56,15 +56,15 @@ const Login = () => {
             width: '100%',
           }}
         >
-          <Typography component="h1" variant="h5">
+          <Typography component="h1" variant="h5" data-testid="login-title">
             Admin Login
           </Typography>
           {error && (
-            <Alert severity="error" sx={{ width: '100%', mt: 2 }}>
+            <Alert severity="error" sx={{ width: '100%', mt: 2 }} data-testid="login-error-alert">
               {error}
             </Alert>
           )}
-          <Box component="form" onSubmit={handleSubmit} autoComplete="off" sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit} autoComplete="off" sx={{ mt: 1 }} data-testid="login-form">
             <TextField
               margin="normal"
               required
@@ -78,6 +78,7 @@ const Login = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
               inputProps={{
                 autoComplete: 'new-email', // Using a non-standard value to trick browsers
+                'data-testid': 'login-email-input'
               }}
             />
             <TextField
@@ -93,6 +94,7 @@ const Login = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
               inputProps={{
                 autoComplete: 'new-password', // Using a non-standard value to trick browsers
+                'data-testid': 'login-password-input'
               }}
             />
             <Button
@@ -101,8 +103,9 @@ const Login = () => {
               variant="contained"
               disabled={loading}
               sx={{ mt: 3, mb: 2 }}
+              data-testid="login-submit-button"
             >
-              {loading ? <CircularProgress size={24} /> : 'Sign In'}
+              {loading ? <CircularProgress size={24} data-testid="login-loading-indicator" /> : 'Sign In'}
             </Button>
           </Box>
         </Paper>

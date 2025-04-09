@@ -94,6 +94,7 @@ const Products = () => {
               size="small"
               color="primary"
               onClick={() => handleEdit(params.row)}
+              data-testid={`edit-product-${params.row.id}`}
             >
               <EditIcon fontSize="small" />
             </IconButton>
@@ -103,6 +104,7 @@ const Products = () => {
               size="small"
               color="error"
               onClick={() => handleDeleteConfirm(params.row.id)}
+              data-testid={`delete-product-${params.row.id}`}
             >
               <DeleteIcon fontSize="small" />
             </IconButton>
@@ -188,9 +190,9 @@ const Products = () => {
 
   return (
     <Box sx={{ height: 600, width: '100%' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="h4">Products</Typography>
-        <Button variant="contained" onClick={handleNew}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }} data-testid="products-header">
+        <Typography variant="h4" data-testid="products-title">Products</Typography>
+        <Button variant="contained" onClick={handleNew} data-testid="add-product-button">
           Add New Product
         </Button>
       </Box>
@@ -201,17 +203,18 @@ const Products = () => {
         pageSizeOptions={[5, 10, 25]}
         checkboxSelection
         disableRowSelectionOnClick
+        data-testid="products-grid"
       />
       
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteConfirmOpen} onClose={handleDeleteCancel}>
+      <Dialog open={deleteConfirmOpen} onClose={handleDeleteCancel} data-testid="delete-confirmation-dialog">
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to delete this product? This action cannot be undone.</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteCancel}>Cancel</Button>
-          <Button onClick={handleDeleteConfirmed} color="error" variant="contained">
+          <Button onClick={handleDeleteCancel} data-testid="delete-cancel-button">Cancel</Button>
+          <Button onClick={handleDeleteConfirmed} color="error" variant="contained" data-testid="delete-confirm-button">
             Delete
           </Button>
         </DialogActions>
@@ -223,11 +226,11 @@ const Products = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>
+      <Dialog open={open} onClose={handleClose} data-testid="product-form-dialog">
+        <DialogTitle data-testid="product-form-title">
           {editProduct?.id ? 'Edit Product' : 'New Product'}
         </DialogTitle>
-        <Box component="form" onSubmit={handleSave}>
+        <Box component="form" onSubmit={handleSave} data-testid="product-form">
           <DialogContent>
             <TextField
               autoFocus
@@ -239,6 +242,9 @@ const Products = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setEditProduct(editProduct ? { ...editProduct, name: e.target.value } : null)
               }
+              inputProps={{
+                'data-testid': 'product-name-input'
+              } as React.InputHTMLAttributes<HTMLInputElement>}
             />
             <TextField
               margin="dense"
@@ -251,6 +257,9 @@ const Products = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setEditProduct(editProduct ? { ...editProduct, description: e.target.value } : null)
               }
+              inputProps={{
+                'data-testid': 'product-description-input'
+              } as React.InputHTMLAttributes<HTMLInputElement>}
             />
             <TextField
               margin="dense"
@@ -261,6 +270,9 @@ const Products = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setEditProduct(editProduct ? { ...editProduct, price: parseFloat(e.target.value) || 0 } : null)
               }
+              inputProps={{
+                'data-testid': 'product-price-input'
+              } as React.InputHTMLAttributes<HTMLInputElement>}
             />
             <FormControl fullWidth margin="dense">
               <InputLabel id="category-select-label">Category</InputLabel>
@@ -272,6 +284,9 @@ const Products = () => {
                   setEditProduct(editProduct ? { ...editProduct, categoryId: e.target.value as number } : null)
                 }
                 sx={{ textIndent: 0 }} // Ensure proper text alignment
+                inputProps={{
+                  'data-testid': 'product-category-select'
+                } as React.InputHTMLAttributes<HTMLInputElement>}
               >
                 {categories.map((category) => (
                   <MenuItem 
@@ -302,12 +317,16 @@ const Products = () => {
                 Available
               </Typography>
               <FormControlLabel
+                data-testid="product-available-label"
                 control={
                   <Checkbox
                     checked={editProduct?.available || false}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setEditProduct(editProduct ? { ...editProduct, available: e.target.checked } : null)
                     }
+                    inputProps={{
+                      'data-testid': 'product-available-checkbox'
+                    } as React.InputHTMLAttributes<HTMLInputElement>}
                   />
                 }
                 label=""
@@ -315,8 +334,8 @@ const Products = () => {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit">Save</Button>
+            <Button onClick={handleClose} data-testid="product-form-cancel-button">Cancel</Button>
+            <Button type="submit" data-testid="product-form-save-button">Save</Button>
           </DialogActions>
         </Box>
       </Dialog>

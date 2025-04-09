@@ -12,40 +12,25 @@ class ProductsPage extends BasePage {
   constructor() {
     super('/products');
   }
+  
+  /**
+   * Opens the products page directly
+   */
+  async open(): Promise<void> {
+    // Navigate directly to the products page with the full URL
+    await browser.url('http://localhost:3006/products');
+    console.log('Navigated to products page, current URL:', await browser.getUrl());
+  }
 
   // Selectors
   /**
    * Add new product button
    */
   /**
-   * Try multiple selectors for the add new button
-   * This approach is more resilient to UI changes
+   * Get the add new product button using data-testid
    */
-  async findAddNewButton(): Promise<WebdriverIO.Element | null> {
-    const possibleSelectors = [
-      'button[type="button"]',
-      'button.MuiButton-contained',
-      'button.MuiButton-root',
-      'button.MuiButtonBase-root',
-      'button:nth-of-type(1)',
-      'a[href*="/products/new"]',
-      'a[href*="/products/add"]',
-      'a.MuiButton-root'
-    ];
-    
-    for (const selector of possibleSelectors) {
-      try {
-        const element = await $(selector);
-        const isExisting = await element.isExisting();
-        if (isExisting) {
-          return element;
-        }
-      } catch (error) {
-        // Continue to next selector
-      }
-    }
-    
-    return null;
+  get addNewButton() {
+    return $('[data-testid="add-product-button"]');
   }
 
   /**
@@ -129,105 +114,33 @@ class ProductsPage extends BasePage {
    * Click the Add New Product button
    */
   async clickAddNewProduct(): Promise<void> {
-    const button = await this.findAddNewButton();
-    if (button) {
-      await button.click();
-    } else {
-      // Try to navigate directly to the new product page
-      await browser.url(`${this.path}/new`);
-    }
+    // Wait for the button to be visible before clicking
+    await this.addNewButton.waitForDisplayed({ timeout: 10000 });
+    await this.addNewButton.click();
   }
 
   /**
-   * Find form input by various selectors
-   * @param fieldType - Type of field to find
-   * @returns The found element or null
+   * Get form field by type using data-testid
+   * @param fieldType - Type of field to get
+   * @returns The form field element
    */
-  async findFormField(fieldType: string): Promise<WebdriverIO.Element | null> {
-    const selectors: Record<string, string[]> = {
-      name: [
-        'input[name="name"]',
-        'input#name',
-        'input[placeholder*="name"]',
-        'input[type="text"]:nth-of-type(1)'
-      ],
-      description: [
-        'textarea[name="description"]',
-        'textarea#description',
-        'textarea',
-        'div[contenteditable="true"]'
-      ],
-      price: [
-        'input[name="price"]',
-        'input#price',
-        'input[type="number"]',
-        'input[placeholder*="price"]'
-      ],
-      available: [
-        'input[name="available"]',
-        'input#available',
-        'input[type="checkbox"]',
-        'input.MuiCheckbox-input'
-      ],
-      category: [
-        'select[name="categoryId"]',
-        'select#categoryId',
-        'select',
-        '.MuiSelect-select'
-      ],
-      save: [
-        'button[type="submit"]',
-        'button*=Save',
-        'button.MuiButton-containedPrimary',
-        'button:not([type="button"])'
-      ],
-      cancel: [
-        'button*=Cancel',
-        'button[type="button"]:not([type="submit"])',
-        'button.MuiButton-outlined'
-      ]
+  getFormField(fieldType: string) {
+    const testIdMap: Record<string, string> = {
+      name: 'product-name-input',
+      description: 'product-description-input',
+      price: 'product-price-input',
+      available: 'product-available-checkbox',
+      category: 'product-category-select',
+      save: 'product-form-save-button',
+      cancel: 'product-form-cancel-button'
     };
     
-    const fieldSelectors = selectors[fieldType] || [];
-    
-    for (const selector of fieldSelectors) {
-      try {
-        const element = await $(selector);
-        const isExisting = await element.isExisting();
-        if (isExisting) {
-          return element;
-        }
-      } catch (error) {
-        // Continue to next selector
-      }
+    const testId = testIdMap[fieldType];
+    if (!testId) {
+      throw new Error(`Unknown form field type: ${fieldType}`);
     }
     
-    // If we couldn't find the field with specific selectors,
-    // try a more generic approach based on labels
-    try {
-      // Find label that contains the field type text
-      const labelElement = await $(`label*=${fieldType}`);
-      if (await labelElement.isExisting()) {
-        // Try to find the input associated with this label
-        const labelId = await labelElement.getAttribute('for');
-        if (labelId) {
-          const inputElement = await $(`#${labelId}`);
-          if (await inputElement.isExisting()) {
-            return inputElement;
-          }
-        }
-        // If no 'for' attribute, try finding the input as a sibling or child
-        const parentElement = await labelElement.parentElement();
-        const inputElement = await parentElement.$('input, textarea, select');
-        if (await inputElement.isExisting()) {
-          return inputElement;
-        }
-      }
-    } catch (error) {
-      // Ignore errors in the generic approach
-    }
-    
-    return null;
+    return $(`[data-testid="${testId}"]`);
   }
 
   /**
@@ -235,74 +148,45 @@ class ProductsPage extends BasePage {
    * @param product - Product data
    */
   async fillProductForm(product: Product): Promise<void> {
-    try {
-      // Take a screenshot of the form before filling
-      await browser.saveScreenshot('./screenshots/product-form-before.png');
-      
-      // Find and fill the name field
-      const nameField = await this.findFormField('name');
-      if (nameField) {
-        await nameField.setValue(product.name);
-      } else {
-        console.log('Could not find name field');
+    console.log('Filling product form with data:', JSON.stringify(product));
+    
+    // Wait for the form dialog to be visible
+    const formDialog = await $('[data-testid="product-form-dialog"]');
+    await formDialog.waitForDisplayed({ timeout: 10000 });
+    
+    // Fill in the name field
+    const nameField = await $('[data-testid="product-name-input"]');
+    await nameField.waitForDisplayed({ timeout: 5000 });
+    await nameField.setValue(product.name);
+    
+    // Fill in the description field
+    const descField = await $('[data-testid="product-description-input"]');
+    await descField.waitForDisplayed({ timeout: 5000 });
+    await descField.setValue(product.description);
+    
+    // Fill in the price field
+    const priceField = await $('[data-testid="product-price-input"]');
+    await priceField.waitForDisplayed({ timeout: 5000 });
+    await priceField.setValue(product.price.toString());
+    
+    // Handle checkbox for available status
+    const availableLabel = await $('[data-testid="product-available-label"]');
+    await availableLabel.waitForDisplayed({ timeout: 5000 });
+    
+    // Click the label to toggle the checkbox
+    if (product.available !== undefined) {
+      const checkbox = await availableLabel.$('input');
+      const isChecked = await checkbox.isSelected();
+      if (isChecked !== product.available) {
+        await availableLabel.click();
       }
-      
-      // Find and fill the description field
-      const descriptionField = await this.findFormField('description');
-      if (descriptionField) {
-        await descriptionField.setValue(product.description);
-      } else {
-        console.log('Could not find description field');
-      }
-      
-      // Find and fill the price field
-      const priceField = await this.findFormField('price');
-      if (priceField) {
-        await priceField.setValue(product.price.toString());
-      } else {
-        console.log('Could not find price field');
-      }
-      
-      // Handle checkbox for available status
-      const availableField = await this.findFormField('available');
-      if (availableField) {
-        const isChecked = await availableField.isSelected();
-        if (isChecked !== product.available) {
-          await availableField.click();
-        }
-      } else {
-        console.log('Could not find available checkbox');
-      }
-      
-      // Select category if provided
-      if (product.categoryId) {
-        const categoryField = await this.findFormField('category');
-        if (categoryField) {
-          try {
-            await categoryField.selectByAttribute('value', product.categoryId.toString());
-          } catch (error) {
-            console.log('Could not select category, may not be available');
-            // Try clicking on the select to open dropdown
-            await categoryField.click();
-            // Try to find and click the option
-            try {
-              const option = await $(`option[value="${product.categoryId}"], li*=${product.categoryId}`);
-              await option.click();
-            } catch (error) {
-              console.log('Could not select category option');
-            }
-          }
-        } else {
-          console.log('Could not find category select');
-        }
-      }
-      
-      // Take a screenshot of the form after filling
-      await browser.saveScreenshot('./screenshots/product-form-after.png');
-    } catch (error) {
-      console.log('Error filling product form:', error);
-      // Take a screenshot of the error state
-      await browser.saveScreenshot('./screenshots/product-form-error.png');
+    }
+    
+    // Select category if provided
+    if (product.categoryId) {
+      const categoryField = await $('[data-testid="product-category-select"]');
+      await categoryField.waitForDisplayed({ timeout: 5000 });
+      await categoryField.selectByAttribute('value', product.categoryId.toString());
     }
   }
 
@@ -310,26 +194,19 @@ class ProductsPage extends BasePage {
    * Save the product form
    */
   async saveProduct(): Promise<void> {
-    try {
-      const saveButton = await this.findFormField('save');
-      if (saveButton) {
-        await saveButton.click();
-      } else {
-        console.log('Could not find save button, trying alternatives');
-        // Try to find any primary button
-        const primaryButton = await $('button.MuiButton-contained, button.primary, button[type="submit"]');
-        if (await primaryButton.isExisting()) {
-          await primaryButton.click();
-        } else {
-          // Try pressing Enter key as last resort
-          await browser.keys(['Enter']);
-        }
-      }
-    } catch (error) {
-      console.log('Error saving product:', error);
-      // Try pressing Enter key as last resort
-      await browser.keys(['Enter']);
-    }
+    console.log('Saving product form');
+    
+    // Find and click the save button using data-testid
+    const saveButton = await $('[data-testid="product-form-save-button"]');
+    await saveButton.waitForClickable({ timeout: 5000 });
+    await saveButton.click();
+  }
+
+  /**
+   * Cancel the product form
+   */
+  async cancelProduct(): Promise<void> {
+    await this.getFormField('cancel').click();
   }
 
   /**
@@ -340,12 +217,17 @@ class ProductsPage extends BasePage {
   async getProductByName(name: string): Promise<WebdriverIO.Element | null> {
     try {
       // Try different approaches to find products
-      // First, try to find the data grid
+      // First, try to find the data grid using data-testid
       try {
-        await this.dataGrid.waitForDisplayed({ timeout: 5000 });
+        await $('[data-testid="products-grid"]').waitForDisplayed({ timeout: 5000 });
       } catch (error) {
-        // If data grid isn't found, look for any table or list element
-        await $('table, ul, div[role="grid"]').waitForDisplayed({ timeout: 5000 });
+        // If data grid with testid isn't found, try the old selector
+        try {
+          await this.dataGrid.waitForDisplayed({ timeout: 5000 });
+        } catch (error) {
+          // If data grid isn't found, look for any table or list element
+          await $('table, ul, div[role="grid"]').waitForDisplayed({ timeout: 5000 });
+        }
       }
       
       // Get all product rows using multiple possible selectors
@@ -370,29 +252,28 @@ class ProductsPage extends BasePage {
    * @param name - Product name
    */
   async editProduct(name: string): Promise<void> {
-    try {
-      const productRow = await this.getProductByName(name);
-      if (!productRow) {
-        // If product not found, try navigating directly to edit page
-        // This assumes a URL structure like /products/edit/[name]
-        await browser.url(`${this.path}/edit/${encodeURIComponent(name)}`);
-        return;
-      }
-      
-      // Try multiple approaches to find the edit button
-      try {
-        // Try to find and click the edit button in the row
-        const editButton = await productRow.$('button[aria-label="edit"], button:nth-child(1), a[href*="edit"], svg[data-testid="EditIcon"]');
-        await editButton.click();
-      } catch (error) {
-        // If edit button not found, try clicking the row itself (might open details)
-        await productRow.click();
-      }
-    } catch (error) {
-      console.log('Error editing product:', error);
-      // Try navigating directly to edit page as fallback
-      await browser.url(`${this.path}/edit/${encodeURIComponent(name)}`);
+    console.log(`Finding and editing product: ${name}`);
+    
+    // Find the product row
+    const productRow = await this.getProductByName(name);
+    if (!productRow) {
+      throw new Error(`Product with name "${name}" not found`);
     }
+    
+    // Get the product ID from the row
+    const rowText = await productRow.getText();
+    const idMatch = rowText.match(/^([a-zA-Z0-9-]+)\s/);
+    if (!idMatch || !idMatch[1]) {
+      throw new Error(`Could not extract product ID from row text: ${rowText}`);
+    }
+    
+    const productId = idMatch[1];
+    console.log(`Product ID: ${productId}`);
+    
+    // Click the edit button using data-testid
+    const editButton = await $(`[data-testid="edit-product-${productId}"]`);
+    await editButton.waitForClickable({ timeout: 5000 });
+    await editButton.click();
   }
 
   /**
@@ -407,8 +288,42 @@ class ProductsPage extends BasePage {
         return;
       }
       
+      // Get the product ID from the row if possible
+      let productId = '';
+      try {
+        // Try to extract ID from the row
+        const rowText = await productRow.getText();
+        const idMatch = rowText.match(/^([a-zA-Z0-9-]+)\s/);
+        if (idMatch && idMatch[1]) {
+          productId = idMatch[1];
+        }
+      } catch (error) {
+        // Ignore errors in ID extraction
+      }
+      
       // Try multiple approaches to find the delete button
       try {
+        // First try using data-testid if we have the product ID
+        if (productId) {
+          try {
+            const deleteButton = await $(`[data-testid="delete-product-${productId}"]`);
+            if (await deleteButton.isExisting()) {
+              await deleteButton.click();
+              
+              // Try to confirm deletion using data-testid
+              try {
+                const confirmButton = await $('[data-testid="delete-confirm-button"]');
+                await confirmButton.click();
+                return;
+              } catch (error) {
+                // Continue with other approaches
+              }
+            }
+          } catch (error) {
+            // Continue with other approaches
+          }
+        }
+        
         // Find and click the delete button in the row
         const deleteButton = await productRow.$('button[aria-label="delete"], button:nth-child(2), svg[data-testid="DeleteIcon"]');
         await deleteButton.click();

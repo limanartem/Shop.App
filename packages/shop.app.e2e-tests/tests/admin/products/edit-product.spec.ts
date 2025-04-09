@@ -22,13 +22,30 @@ describe('Product Editing', () => {
       // Login before testing product functionality
       await LoginPage.open();
       await LoginPage.waitForPageLoad();
+      console.log('Login page loaded, current URL:', await browser.getUrl());
+      
       await LoginPage.login(
         testConfig.adminCredentials.email,
         testConfig.adminCredentials.password
       );
       
-      // Navigate to products page
-      await ProductsPage.open();
+      console.log('Login completed, current URL:', await browser.getUrl());
+      
+      // Wait for redirect after login
+      await browser.waitUntil(
+        async () => {
+          const url = await browser.getUrl();
+          console.log('Current URL during wait:', url);
+          return url.includes('/dashboard') || url.includes('/products');
+        },
+        {
+          timeout: 10000,
+          timeoutMsg: 'Expected URL to change after login'
+        }
+      );
+      
+      // Navigate directly to products page
+      await browser.url('http://localhost:3006/products');
       await ProductsPage.waitForPageLoad();
       await browser.pause(1000); // Wait for page to fully load
       
@@ -74,8 +91,46 @@ describe('Product Editing', () => {
    * Before each test, navigate to the products page
    */
   beforeEach(async () => {
-    await ProductsPage.open();
+    // Navigate directly to the products page
+    await browser.url('http://localhost:3006/products');
     await ProductsPage.waitForPageLoad();
+    
+    // Take a screenshot to see if we're on the products page
+    await takeScreenshot('products-page-navigation-edit');
+    
+    // Debug: Log the current URL to see where we actually are
+    const currentUrl = await browser.getUrl();
+    console.log('Current URL before test:', currentUrl);
+    
+    // Check if we're actually on the products page or if we got redirected to login
+    if (currentUrl.includes('/login')) {
+      console.log('Redirected to login page, trying to login again');
+      await LoginPage.login(
+        testConfig.adminCredentials.email,
+        testConfig.adminCredentials.password
+      );
+      
+      // Navigate to products page again after login
+      await browser.url('http://localhost:3006/products');
+      await ProductsPage.waitForPageLoad();
+      console.log('After re-login, current URL:', await browser.getUrl());
+    }
+    
+    // Wait for the products page to be fully loaded with its elements
+    await browser.waitUntil(
+      async () => {
+        try {
+          const productsGrid = await $('[data-testid="products-grid"]');
+          return await productsGrid.isDisplayed();
+        } catch (error) {
+          return false;
+        }
+      },
+      {
+        timeout: 10000,
+        timeoutMsg: 'Products grid not displayed after timeout'
+      }
+    );
   });
   
   /**
@@ -94,6 +149,23 @@ describe('Product Editing', () => {
         return;
       }
       
+      // Take a screenshot after clicking edit
+      await takeScreenshot('after-edit-button-click');
+      
+      // Wait for the form dialog to appear
+      // Take a screenshot before waiting for dialog
+      await takeScreenshot('before-wait-for-dialog');
+      
+      // Wait for the product form dialog to be displayed
+      const formDialog = await $('[data-testid="product-form-dialog"]');
+      await formDialog.waitForDisplayed({
+        timeout: 10000,
+        timeoutMsg: 'Product form dialog not displayed after timeout'
+      });
+      
+      // Take a screenshot after dialog is found
+      await takeScreenshot('dialog-found');
+      
       // Update product details
       const updatedProduct = {
         name: updatedProductName,
@@ -102,15 +174,45 @@ describe('Product Editing', () => {
         available: false
       };
       
-      await browser.pause(1000); // Wait for form to appear
+      // Wait longer for the form dialog to be fully loaded
+      await browser.pause(2000);
+      
+      // Take a screenshot before filling the form
+      await takeScreenshot('before-fill-form');
+      
+      // Now fill the form
       await ProductsPage.fillProductForm(updatedProduct);
+      
+      // Take a screenshot after filling the form
+      await takeScreenshot('after-filling-form');
+      
+      // Save the product using the page object method
       await ProductsPage.saveProduct();
       
-      // Take a screenshot after product update
-      await takeScreenshot('product-updated');
+      // Take a screenshot after save
+      await takeScreenshot('after-save');
       
-      // If we get here without errors, the test passes
-      expect(true).to.be.true;
+      // Wait for the dialog to disappear, indicating successful save
+      await browser.waitUntil(
+        async () => {
+          try {
+            const dialog = await $('[data-testid="product-form-dialog"]');
+            return !(await dialog.isDisplayed());
+          } catch (error) {
+            // If we get an error finding the element, it's probably gone
+            return true;
+          }
+        },
+        {
+          timeout: 10000,
+          timeoutMsg: 'Product form dialog did not close after saving',
+          interval: 500
+        }
+      );
+      
+      // Verify the product was updated
+      const updatedProductRow = await ProductsPage.getProductByName(updatedProductName);
+      expect(updatedProductRow).to.not.be.null;
     } catch (error) {
       console.log('Error in edit product test:', error);
       // Take a screenshot of the error state

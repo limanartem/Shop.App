@@ -17,28 +17,28 @@ class LoginPage extends BasePage {
    * Email input field
    */
   get emailInput() {
-    return $('input[name="email"]');
+    return $('[data-testid="login-email-input"]');
   }
 
   /**
    * Password input field
    */
   get passwordInput() {
-    return $('input[name="password"]');
+    return $('[data-testid="login-password-input"]');
   }
 
   /**
    * Sign in button
    */
   get signInButton() {
-    return $('button[type="submit"]');
+    return $('[data-testid="login-submit-button"]');
   }
 
   /**
    * Error alert message
    */
   get errorAlert() {
-    return $('.MuiAlert-root');
+    return $('[data-testid="login-error-alert"]');
   }
 
   /**
