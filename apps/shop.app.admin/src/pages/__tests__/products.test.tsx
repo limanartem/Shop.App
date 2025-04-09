@@ -3,39 +3,9 @@
  * Following Shop.App admin code style guidelines
  */
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
-import Products from '../Products';
-import productsReducer from '../../store/slices/productsSlice';
-import categoriesReducer from '../../store/slices/categoriesSlice';
 
-// Mock the Redux store
-const createMockStore = (initialState = {}) => {
-  return configureStore({
-    reducer: {
-      products: productsReducer,
-      categories: categoriesReducer
-    },
-    preloadedState: initialState
-  });
-};
-
-// Default initial state for the store
-const defaultInitialState = {
-  products: {
-    products: [],
-    currentProduct: null,
-    loading: false,
-    error: null
-  },
-  categories: {
-    categories: [],
-    loading: false,
-    error: null
-  }
-};
+// Note: We've removed imports that aren't currently used
+// These would be restored when implementing the actual tests
 
 // Mock the dispatch function
 const mockDispatch = jest.fn();
@@ -123,46 +93,7 @@ describe('Products Component', () => {
   test('placeholder test', () => {
     expect(true).toBe(true);
   });
-  const mockProducts = [
-    { 
-      id: '1', 
-      name: 'Test Product 1', 
-      description: 'Description 1', 
-      price: 19.99, 
-      available: true,
-      categoryId: 1 
-    },
-    { 
-      id: '2', 
-      name: 'Test Product 2', 
-      description: 'Description 2', 
-      price: 29.99, 
-      available: false,
-      categoryId: 2 
-    }
-  ];
-
-  const mockCategories = [
-    { id: 1, name: 'Category 1', parentCategoryId: null, path: 'Category 1' },
-    { id: 2, name: 'Category 2', parentCategoryId: 1, path: 'Category 1 > Category 2' }
-  ];
-
-  const initialState = {
-    products: {
-      products: mockProducts,
-      currentProduct: null,
-      loading: false,
-      error: null
-    },
-    categories: {
-      categories: mockCategories,
-      loading: false,
-      error: null
-    }
-  };
-
-
-
+  
   beforeEach(() => {
     jest.clearAllMocks();
   });
