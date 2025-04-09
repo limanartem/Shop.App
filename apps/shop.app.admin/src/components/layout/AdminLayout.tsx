@@ -13,23 +13,33 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Tooltip,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
   Dashboard as DashboardIcon,
   ShoppingCart as OrdersIcon,
   Inventory as ProductsIcon,
+  Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../store/slices/authSlice';
 
 const drawerWidth = 240;
 
 function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleLogout = (): void => {
+    dispatch(logout());
+    navigate('/login');
   };
 
   const menuItems = [
@@ -81,9 +91,14 @@ function AdminLayout() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Shop Administration
           </Typography>
+          <Tooltip title="Logout">
+            <IconButton color="inherit" onClick={handleLogout} aria-label="logout">
+              <LogoutIcon />
+            </IconButton>
+          </Tooltip>
         </Toolbar>
       </AppBar>
       <Box
