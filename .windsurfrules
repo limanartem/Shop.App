@@ -30,3 +30,11 @@
 - Prefer immutability for data:
 - Use readonly for immutable properties.
 - Use as const for literals that never change.
+
+# Test Driven Development
+- Write tests before the code.
+- Write tests for the code.
+
+# Tasks implementation
+- When working on the task tracked in the .md file always keep track of the progress when completing some step of the overall task.
+- Use the .md file to track the progress of the task.
