@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2019",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "types": ["node", "webdriverio", "@wdio/globals", "mocha", "@wdio/mocha-framework", "chai"]
+  },
+  "include": [
+    "./tests/**/*.ts",
+    "./src/**/*.ts"
+  ]
+}
