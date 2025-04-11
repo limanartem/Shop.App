@@ -71,6 +71,19 @@ export interface UpdateOrderStatusRequest {
   status: Status;
 }
 
+/**
+ * Represents a status history entry for an order
+ */
+export interface OrderStatusHistoryEntry {
+  status: Status;
+  timestamp: Date;
+  updatedBy: string;
+  note?: string;
+}
+
+/**
+ * Represents an order in the system
+ */
 export interface Order<TItem extends OrderItem = OrderItem> extends Document {
   items: TItem[];
   shipping: OrderShippingInfo;
@@ -79,11 +92,16 @@ export interface Order<TItem extends OrderItem = OrderItem> extends Document {
   createdAt: Date;
   updatedAt: Date;
   status: Status;
+  statusHistory?: OrderStatusHistoryEntry[];
 }
 
+/**
+ * Interface for updating an order's status
+ */
 export interface UpdateOrder extends UpdateOrderStatusRequest {
   updatedAt: Date;
   updatedBy: string;
+  note?: string;
 }
 
 export const CreateOrderRequestPayloadSchema = Joi.object({

@@ -6,7 +6,8 @@ import {
   CreateOrderRequest,
   UpdateOrder,
   UpdateOrderStatusRequest,
-  OrderItem
+  OrderItem,
+  OrderStatusHistoryEntry
 } from './orders-model';
 import { ProductItem, ProductCategory } from './catalog-model';
 
@@ -19,6 +20,7 @@ export {
   UpdateOrderStatusRequest,
   ProductItem,
   ProductCategory,
-  UpdateOrder ,
-  OrderItem
+  UpdateOrder,
+  OrderItem,
+  OrderStatusHistoryEntry
 };

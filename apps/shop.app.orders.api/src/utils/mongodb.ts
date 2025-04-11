@@ -16,7 +16,7 @@ export declare type WithClearId<TSchema> = WithId<TSchema> &
     id: InferIdType<TSchema>;
   };
 
-enum DB_COLLECTION {
+export enum DB_COLLECTION {
   ORDERS = 'orders',
   PAYMENT = 'payment',
 }
@@ -126,14 +126,31 @@ export const updateDocument = async (
  * @param collection - The collection in which the document should be inserted. Defaults to DB_COLLECTION.ORDERS.
  * @returns A promise that resolves to an object containing the ID of the inserted document.
  */
-export const insertDocument = async <T extends object>(
+export const insertDocument = async <T>(
   data: T,
   collection: DB_COLLECTION = DB_COLLECTION.ORDERS,
-): Promise<{ id: string }> =>
-  usingClient(async (client) => {
-    console.log(`Connecting to db ${MONGODB_URL} with ${MONGO_DB_USERNAME} user...`);
-    console.log(`Inserting new item in ${collection} collection...`, data);
-    const result = await client.db().collection(collection).insertOne(data);
-
+): Promise<{ id: string }> => {
+  return await usingClient(async (client) => {
+    const db = client.db();
+    const result = await db.collection(collection).insertOne(data as any);
     return { id: result.insertedId.toString() };
   });
+};
+
+/**
+ * Counts documents in the MongoDB collection based on the provided criteria.
+ * 
+ * @template DocumentType - The type of the documents to count.
+ * @param criteria - The filter criteria to apply when counting documents.
+ * @param collection - The name of the MongoDB collection to count documents from.
+ * @returns A promise that resolves to the count of matching documents.
+ */
+export const countDocuments = async <DocumentType extends Document = Document>(
+  criteria: Filter<WithId<Document>>,
+  collection: DB_COLLECTION = DB_COLLECTION.ORDERS,
+): Promise<number> => {
+  return await usingClient(async (client) => {
+    const db = client.db();
+    return await db.collection(collection).countDocuments(criteria);
+  });
+};

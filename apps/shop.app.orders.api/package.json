@@ -41,7 +41,7 @@
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
-    "mongodb": "^6.2.0",
+    "mongodb": "^6.15.0",
     "redis": "^4.6.10",
     "supertokens-node": "^16.5.0",
     "uuid": "^9.0.1",

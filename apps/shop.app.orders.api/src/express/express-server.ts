@@ -34,7 +34,7 @@ export const start = () => {
   useLogging(app);
 
   app.use(cookeParser());
-  app.use('/', ordersRouterFactory());
+  app.use('/api', ordersRouterFactory());
   app.use('/', csrfRouterFactory());
   app.use(authErrorHandler());
   useGraphql(app);

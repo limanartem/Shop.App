@@ -1,5 +1,12 @@
 import type { Response } from 'express';
-import { createOrder, getOrderExpanded, getOrdersExpanded, updateOrder } from '../../domain/orders';
+import { 
+  createOrder, 
+  getOrderExpanded, 
+  getOrdersExpanded, 
+  updateOrder,
+  getOrderStatusHistory,
+  getAllOrders
+} from '../../domain/orders';
 import { SessionRequest } from 'supertokens-node/framework/express';
 import { CreateOrderRequest, Order, CreateOrderRequestPayloadSchema } from '../../model';
 import { StatusCodes } from 'http-status-codes';
@@ -10,6 +17,7 @@ import {
   Status,
   UpdateOrderStatusRequest,
   UpdateOrderStatusRequestPayloadSchema,
+  OrderStatusHistoryEntry
 } from '../../model/orders-model';
 import { ORDER_CHANGED, pubsub } from '../graphql/resolvers';
 import { WithId } from 'mongodb';
@@ -147,9 +155,72 @@ export async function getOrdersHandler(req: SessionRequest, res: Response) {
     throw new Error('Undefined session');
   }
 
-  const userId = req.session.getUserId();
+  const userId = req.session.getUserId() || '';
+  const { search, status, from, to, sortField, sortDirection, page, limit } = req.query as {
+    search?: string;
+    status?: string;
+    from?: string;
+    to?: string;
+    sortField?: string;
+    sortDirection?: 'asc' | 'desc';
+    page?: string;
+    limit?: string;
+  };
 
-  const orders = await getOrdersExpanded(userId);
+  // Convert query parameters to filter options
+  const filterOptions = {
+    search,
+    status,
+    dateRange: from || to ? { from, to } : undefined,
+    sortOptions: sortField ? { 
+      field: sortField, 
+      direction: (sortDirection as 'asc' | 'desc') || 'desc' 
+    } : undefined,
+    pagination: page ? { page: parseInt(page, 10) || 0, limit: parseInt(limit || '10', 10) || 10 } : undefined
+  };
+
+  const orders = await getOrdersExpanded(userId || '', filterOptions);
+
+  res.json({ orders });
+}
+
+/**
+ * Retrieves all orders for admin users with filtering and pagination.
+ * This endpoint is restricted to admin users only.
+ * 
+ * @param req - The request object containing the session information.
+ * @param res - The response object used to send the JSON response.
+ * @throws Error if the session is undefined.
+ */
+export async function getAdminOrdersHandler(req: SessionRequest, res: Response) {
+  if (req.session == null) {
+    throw new Error('Undefined session');
+  }
+
+  const { search, status, from, to, sortField, sortDirection, page, limit } = req.query as {
+    search?: string;
+    status?: string;
+    from?: string;
+    to?: string;
+    sortField?: string;
+    sortDirection?: 'asc' | 'desc';
+    page?: string;
+    limit?: string;
+  };
+
+  // Convert query parameters to filter options
+  const filterOptions = {
+    search,
+    status,
+    dateRange: from || to ? { from, to } : undefined,
+    sortOptions: sortField ? { 
+      field: sortField, 
+      direction: (sortDirection as 'asc' | 'desc') || 'desc' 
+    } : undefined,
+    pagination: page ? { page: parseInt(page, 10) || 0, limit: parseInt(limit || '10', 10) || 10 } : undefined
+  };
+
+  const orders = await getAllOrders(filterOptions);
 
   res.json({ orders });
 }
@@ -166,19 +237,54 @@ export async function getOrderHandler(req: SessionRequest, res: Response) {
     throw new Error('Undefined session');
   }
 
-  const userId = req.session.getUserId();
+  const userId = req.session.getUserId() || '';
   const orderId = req.params.id;
 
   if (!orderId) {
     throw new Error('Invalid order id');
   }
 
-  const order = await getOrderExpanded(orderId, userId);
+  // For admin users, we don't need to check the userId
+  // The verifyAdminOrOwner middleware already ensures the user has permission
+  const order = await getOrderExpanded(orderId, userId || '');
 
   if (order != null) {
     res.json(order);
   } else {
-    res.status(StatusCodes.NOT_FOUND).send();
+    res.status(StatusCodes.NOT_FOUND).json({
+      error: 'Not Found',
+      message: `Order with ID ${orderId} not found`
+    });
+  }
+}
+
+/**
+ * Retrieves the status history for a given order ID.
+ *
+ * @param req - The request object containing the session information.
+ * @param res - The response object used to send the order status history.
+ * @throws Error if the session is undefined or the order ID is invalid.
+ */
+export async function getOrderStatusHistoryHandler(req: SessionRequest, res: Response) {
+  if (req.session == null) {
+    throw new Error('Undefined session');
+  }
+
+  const orderId = req.params.id;
+
+  if (!orderId) {
+    throw new Error('Invalid order id');
+  }
+
+  try {
+    const history = await getOrderStatusHistory(orderId || '');
+    res.json({ history });
+  } catch (error) {
+    console.error('Error fetching order status history:', error);
+    res.status(StatusCodes.NOT_FOUND).json({
+      error: 'Not Found',
+      message: `Order history for ID ${orderId} not found`
+    });
   }
 }
 
@@ -195,7 +301,7 @@ export async function postOrdersHandler(req: SessionRequest, res: Response) {
     throw new Error('Undefined session');
   }
 
-  const userId = req.session.getUserId();
+  const userId = req.session.getUserId() || '';
 
   if (req.body == null) {
     throw new Error('Invalid order payload');

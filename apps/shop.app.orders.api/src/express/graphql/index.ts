@@ -46,7 +46,7 @@ export const useGraphql = async (app: Express) => {
   ); */
 
   app.use(
-    '/graphql',
+    '/api/graphql',
     verifySession(),
     createHandler<SessionContext>({
       schema: graphqlSchema(),
@@ -58,5 +58,5 @@ export const useGraphql = async (app: Express) => {
     }),
   );
 
-  app.get('/playground', expressPlayground({ endpoint: '/graphql' }));
+  app.get('/api/playground', expressPlayground({ endpoint: '/api/graphql' }));
 };
