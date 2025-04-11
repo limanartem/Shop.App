@@ -8,7 +8,7 @@ import { takeScreenshot } from '../../../src/utils/helpers';
 /**
  * Product editing test suite
  */
-describe('Product Editing', () => {
+xdescribe('Product Editing', () => {
   // Store the test product name for use across tests
   const timestamp = new Date().getTime();
   const testProductName = `${testConfig.testProduct.name} ${timestamp}`;

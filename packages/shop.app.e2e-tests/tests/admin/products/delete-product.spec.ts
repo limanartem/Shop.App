@@ -12,7 +12,7 @@ describe('Product Deletion', () => {
   // Store the test product name for use across tests
   const timestamp = new Date().getTime();
   const testProductName = `Delete Test Product ${timestamp}`;
-  
+
   /**
    * Before all tests, login and create a test product
    */
@@ -21,39 +21,54 @@ describe('Product Deletion', () => {
       // Login before testing product functionality
       await LoginPage.open();
       await LoginPage.waitForPageLoad();
+      console.log('Login page loaded, current URL:', await browser.getUrl());
+
       await LoginPage.login(
         testConfig.adminCredentials.email,
-        testConfig.adminCredentials.password
+        testConfig.adminCredentials.password,
       );
-      
+
+      // Wait for redirect after login
+      await browser.waitUntil(
+        async () => {
+          const url = await browser.getUrl();
+          console.log('Current URL during wait:', url);
+          return url.includes('/dashboard') || url.includes('/products');
+        },
+        {
+          timeout: 10000,
+          timeoutMsg: 'Expected URL to change after login',
+        },
+      );
+
       // Navigate to products page
       await ProductsPage.open();
       await ProductsPage.waitForPageLoad();
       await browser.pause(1000); // Wait for page to fully load
-      
+
       // Take a screenshot of the products page
       await takeScreenshot('delete-test-products-page');
-      
+
       // Try to create a test product
       try {
         const testProduct = {
           name: testProductName,
           description: `Product to be deleted ${timestamp}`,
           price: testConfig.testProduct.price,
-          available: true
+          available: true,
         };
-        
+
         // Try to click the Add New button
         await ProductsPage.clickAddNewProduct();
         await browser.pause(1000); // Wait for form to appear
-        
+
         // Take a screenshot of the form
         await takeScreenshot('delete-test-product-form');
-        
+
         // Try to fill the form and save
         await ProductsPage.fillProductForm(testProduct);
         await ProductsPage.saveProduct();
-        
+
         // Take a screenshot after product creation
         await takeScreenshot('delete-test-product-created');
       } catch (error) {
@@ -67,7 +82,7 @@ describe('Product Deletion', () => {
       await takeScreenshot('delete-test-before-hook-error');
     }
   });
-  
+
   /**
    * Before each test, navigate to the products page
    */
@@ -75,7 +90,7 @@ describe('Product Deletion', () => {
     await ProductsPage.open();
     await ProductsPage.waitForPageLoad();
   });
-  
+
   /**
    * Test deleting a product
    */
@@ -83,7 +98,7 @@ describe('Product Deletion', () => {
     try {
       // Take a screenshot before attempting deletion
       await takeScreenshot('before-delete-product');
-      
+
       // Try to delete the test product
       try {
         await ProductsPage.deleteProduct(testProductName);
@@ -94,10 +109,10 @@ describe('Product Deletion', () => {
         expect(deletedProductRow).to.be.null;
         return;
       }
-      
+
       // Take a screenshot after product deletion
       await takeScreenshot('product-deleted');
-      
+
       // If we get here without errors, the test passes
       expect(true).to.be.true;
     } catch (error) {
@@ -107,7 +122,7 @@ describe('Product Deletion', () => {
       throw error;
     }
   });
-  
+
   /**
    * Test creating and deleting multiple products
    */
@@ -116,27 +131,27 @@ describe('Product Deletion', () => {
       // Create multiple test products
       const productCount = 2; // Reduced from 3 to 2 for faster test execution
       const productNames: string[] = [];
-      
+
       // Take a screenshot before batch operations
       await takeScreenshot('before-batch-operations');
-      
+
       // Try to create multiple products
       for (let i = 0; i < productCount; i++) {
         try {
           const productName = `Batch Delete Test ${timestamp}-${i}`;
           productNames.push(productName);
-          
+
           const testProduct = {
             name: productName,
             description: `Batch delete test product ${i}`,
             price: 10 + i,
-            available: true
+            available: true,
           };
-          
+
           // Try to click the Add New button
           await ProductsPage.clickAddNewProduct();
           await browser.pause(1000); // Wait for form to appear
-          
+
           // Try to fill the form and save
           await ProductsPage.fillProductForm(testProduct);
           await ProductsPage.saveProduct();
@@ -147,10 +162,10 @@ describe('Product Deletion', () => {
           continue;
         }
       }
-      
+
       // Take a screenshot after product creation
       await takeScreenshot('after-batch-creation');
-      
+
       // Try to delete each product
       for (const productName of productNames) {
         try {
@@ -162,10 +177,10 @@ describe('Product Deletion', () => {
           continue;
         }
       }
-      
+
       // Take a screenshot after batch deletion
       await takeScreenshot('after-batch-deletion');
-      
+
       // If we get here without fatal errors, the test passes
       expect(true).to.be.true;
     } catch (error) {
