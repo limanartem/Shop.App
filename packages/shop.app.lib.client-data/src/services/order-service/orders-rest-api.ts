@@ -7,9 +7,9 @@ function init(env: Record<string, string>, getAccessToken: GetAccessTokenFunc) {
   const apiUrl = `http://${REACT_APP_ORDERS_API_HOST}`;
 
   const getOrdersAsync = async (): Promise<OrdersResponse> => {
-    console.log(`Fetching orders from ${apiUrl}/orders`);
+    console.log(`Fetching orders from ${apiUrl}/api/orders`);
 
-    const response = await fetch(`${apiUrl}/orders`, {
+    const response = await fetch(`${apiUrl}/api/orders`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${await getAccessToken()}`,
@@ -25,9 +25,9 @@ function init(env: Record<string, string>, getAccessToken: GetAccessTokenFunc) {
   };
 
   const getOrderAsync = async (id: string): Promise<Order | undefined> => {
-    console.log(`Fetching order from ${apiUrl}/orders/${id}`);
+    console.log(`Fetching order from ${apiUrl}/api/orders/${id}`);
 
-    const response = await fetch(`${apiUrl}/orders/${id}`, {
+    const response = await fetch(`${apiUrl}/api/orders/${id}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${await getAccessToken()}`,
@@ -43,9 +43,9 @@ function init(env: Record<string, string>, getAccessToken: GetAccessTokenFunc) {
   };
 
   const createOrdersAsync = async (order: CreateOrder): Promise<{ id: string }> => {
-    console.log(`Creation new orders using POST ${apiUrl}/orders`);
+    console.log(`Creation new orders using POST ${apiUrl}/api/orders`);
 
-    const response = await fetch(`${apiUrl}/orders`, {
+    const response = await fetch(`${apiUrl}/api/orders`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${await getAccessToken()}`,

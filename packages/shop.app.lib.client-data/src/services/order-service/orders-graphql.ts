@@ -6,7 +6,7 @@ import { GetAccessTokenFunc } from '..';
 
 function init(env: Record<string, string>, getAccessToken: GetAccessTokenFunc) {
   const { REACT_APP_ORDERS_API_HOST } = env;
-  const graphQlUrl = `http://${REACT_APP_ORDERS_API_HOST}/graphql`;
+  const graphQlUrl = `http://${REACT_APP_ORDERS_API_HOST}/api/graphql`;
 
   const fragments = {
     ORDER: `fragment orderFields on Order { 
