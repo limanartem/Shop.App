@@ -3,14 +3,25 @@
  * Following Shop.App admin code style guidelines
  */
 import { configureStore } from '@reduxjs/toolkit';
-import ordersReducer, { fetchOrders, updateOrderStatus } from '../ordersSlice';
+import ordersReducer, {
+  fetchOrders,
+  updateOrderStatus,
+  fetchOrderById,
+  setOrderFilters,
+  clearOrderFilters,
+  setOrderSorting,
+  setSelectedOrder,
+  OrderFilters
+} from '../ordersSlice';
 import { orderService } from '../../../services/orderService';
+import { GridSortModel } from '@mui/x-data-grid';
 
 // Mock the order service
 jest.mock('../../../services/orderService', () => ({
   orderService: {
     getAllOrders: jest.fn(),
-    updateOrderStatus: jest.fn()
+    updateOrderStatus: jest.fn(),
+    getOrderById: jest.fn()
   }
 }));
 
@@ -18,6 +29,7 @@ jest.mock('../../../services/orderService', () => ({
 interface MockOrderService {
   getAllOrders: jest.Mock;
   updateOrderStatus: jest.Mock;
+  getOrderById: jest.Mock;
 }
 
 describe('Orders Slice', () => {
@@ -48,6 +60,129 @@ describe('Orders Slice', () => {
       expect(state.orders).toEqual([]);
       expect(state.loading).toBe(false);
       expect(state.error).toBe(null);
+      expect(state.filters).toEqual({});
+      expect(state.sorting).toEqual([{ field: 'createdAt', sort: 'desc' }]);
+      expect(state.selectedOrder).toBe(null);
+    });
+  });
+  
+  describe('Reducers', () => {
+    test('setOrderFilters updates filters state', () => {
+      // Arrange
+      const store = createTestStore();
+      const filters: OrderFilters = {
+        searchTerm: 'test',
+        status: 'pending',
+        dateRange: {
+          from: '2025-04-01',
+          to: '2025-04-30'
+        }
+      };
+      
+      // Act
+      store.dispatch(setOrderFilters(filters));
+      
+      // Assert
+      const state = store.getState().orders;
+      expect(state.filters).toEqual(filters);
+    });
+    
+    test('setOrderFilters merges with existing filters', () => {
+      // Arrange
+      const store = createTestStore();
+      
+      // Set initial filters
+      store.dispatch(setOrderFilters({ searchTerm: 'initial' }));
+      
+      // Add more filters
+      store.dispatch(setOrderFilters({ status: 'pending' }));
+      
+      // Assert
+      const state = store.getState().orders;
+      expect(state.filters).toEqual({
+        searchTerm: 'initial',
+        status: 'pending'
+      });
+    });
+    
+    test('clearOrderFilters resets filters to empty object', () => {
+      // Arrange
+      const store = createTestStore();
+      
+      // Set some filters
+      store.dispatch(setOrderFilters({
+        searchTerm: 'test',
+        status: 'pending'
+      }));
+      
+      // Act
+      store.dispatch(clearOrderFilters());
+      
+      // Assert
+      const state = store.getState().orders;
+      expect(state.filters).toEqual({});
+    });
+    
+    test('setOrderSorting updates sorting state', () => {
+      // Arrange
+      const store = createTestStore();
+      const sorting: GridSortModel = [
+        { field: 'totalAmount', sort: 'asc' }
+      ];
+      
+      // Act
+      store.dispatch(setOrderSorting(sorting));
+      
+      // Assert
+      const state = store.getState().orders;
+      expect(state.sorting).toEqual(sorting);
+    });
+    
+    test('setSelectedOrder updates selectedOrder state', () => {
+      // Arrange
+      const store = createTestStore();
+      const order = {
+        id: 'order1',
+        userId: 'user1',
+        customerEmail: 'customer@example.com',
+        status: 'pending',
+        totalAmount: 39.98,
+        items: [],
+        createdAt: '2025-04-01T10:00:00Z',
+        updatedAt: '2025-04-01T10:00:00Z'
+      };
+      
+      // Act
+      store.dispatch(setSelectedOrder(order));
+      
+      // Assert
+      const state = store.getState().orders;
+      expect(state.selectedOrder).toEqual(order);
+    });
+    
+    test('setSelectedOrder can clear selected order', () => {
+      // Arrange
+      const store = createTestStore();
+      const order = {
+        id: 'order1',
+        userId: 'user1',
+        customerEmail: 'customer@example.com',
+        status: 'pending',
+        totalAmount: 39.98,
+        items: [],
+        createdAt: '2025-04-01T10:00:00Z',
+        updatedAt: '2025-04-01T10:00:00Z'
+      };
+      
+      // Set an order first
+      store.dispatch(setSelectedOrder(order));
+      
+      // Act - Clear the selection
+      store.dispatch(setSelectedOrder(null));
+      
+      // Assert
+      const state = store.getState().orders;
+      expect(state.selectedOrder).toBe(null);
     });
   });
   
@@ -163,7 +298,111 @@ describe('Orders Slice', () => {
       });
     });
     
+    describe('fetchOrderById', () => {
+      test('fetchOrderById.pending sets loading state', async () => {
+        // Arrange
+        const store = createTestStore();
+        
+        // Mock pending state
+        store.dispatch({
+          type: fetchOrderById.pending.type
+        });
+        
+        // Assert
+        const state = store.getState().orders;
+        expect(state.loading).toBe(true);
+        expect(state.error).toBe(null);
+      });
+      
+      test('fetchOrderById.fulfilled updates selectedOrder state', async () => {
+        // Arrange
+        const store = createTestStore();
+        const mockOrder = {
+          id: 'order1',
+          userId: 'user1',
+          customerEmail: 'customer@example.com',
+          status: 'pending',
+          totalAmount: 39.98,
+          items: [],
+          createdAt: '2025-04-01T10:00:00Z',
+          updatedAt: '2025-04-01T10:00:00Z'
+        };
+        
+        // Act - Dispatch fulfilled action
+        store.dispatch({
+          type: fetchOrderById.fulfilled.type,
+          payload: mockOrder
+        });
+        
+        // Assert
+        const state = store.getState().orders;
+        expect(state.loading).toBe(false);
+        expect(state.selectedOrder).toEqual(mockOrder);
+      });
+      
+      test('fetchOrderById.rejected sets error state', async () => {
+        // Arrange
+        const store = createTestStore();
+        const errorMessage = 'Failed to fetch order details';
+        
+        // Act - Dispatch rejected action
+        store.dispatch({
+          type: fetchOrderById.rejected.type,
+          error: { message: errorMessage }
+        });
+        
+        // Assert
+        const state = store.getState().orders;
+        expect(state.loading).toBe(false);
+        expect(state.error).toBe(errorMessage);
+      });
+      
+      test('fetchOrderById thunk dispatches fulfilled action on successful fetch', async () => {
+        // Arrange
+        const store = createTestStore();
+        const orderId = 'order1';
+        const mockOrder = {
+          id: orderId,
+          userId: 'user1',
+          customerEmail: 'customer@example.com',
+          status: 'pending',
+          totalAmount: 39.98,
+          items: [],
+          createdAt: '2025-04-01T10:00:00Z',
+          updatedAt: '2025-04-01T10:00:00Z'
+        };
+        
+        // Type cast to access the mock function
+        const mockOrderService = orderService as unknown as MockOrderService;
+        mockOrderService.getOrderById.mockResolvedValue(mockOrder);
+        
+        // Act
+        await store.dispatch(fetchOrderById(orderId));
+        
+        // Assert
+        const state = store.getState().orders;
+        expect(state.selectedOrder).toEqual(mockOrder);
+        expect(mockOrderService.getOrderById).toHaveBeenCalledTimes(1);
+        expect(mockOrderService.getOrderById).toHaveBeenCalledWith(orderId);
+      });
+    });
+    
     describe('updateOrderStatus', () => {
+      test('updateOrderStatus.pending sets loading state', async () => {
+        // Arrange
+        const store = createTestStore();
+        
+        // Mock pending state
+        store.dispatch({
+          type: updateOrderStatus.pending.type
+        });
+        
+        // Assert
+        const state = store.getState().orders;
+        expect(state.loading).toBe(true);
+        expect(state.error).toBe(null);
+      });
+      
       test('updateOrderStatus.fulfilled updates specific order in state', async () => {
         // Arrange
         const store = createTestStore();
@@ -225,31 +464,80 @@ describe('Orders Slice', () => {
         // Arrange
         const store = createTestStore();
         const initialOrders = [
-          { id: 'order1', status: 'Processing' },
-          { id: 'order2', status: 'Shipped' }
+          { id: 'order1', status: 'Processing' }
         ];
-        
-        // Set initial state with orders
-        store.dispatch({
-          type: fetchOrders.fulfilled.type,
-          payload: initialOrders
-        });
-        
         const orderId = 'order1';
-        const newStatus = 'Delivered';
-        const updatedOrder = { id: orderId, status: newStatus };
         
-        // Type cast to access the mock function
-        const mockOrderService = orderService as unknown as MockOrderService;
-        mockOrderService.updateOrderStatus.mockResolvedValue(updatedOrder);
+        // Set initial selected order
+        store.dispatch(setSelectedOrder({
+          id: orderId,
+          userId: 'user1',
+          customerEmail: 'customer@example.com',
+          status: 'Processing',
+          totalAmount: 39.98,
+          items: [],
+          createdAt: '2025-04-01T10:00:00Z',
+          updatedAt: '2025-04-01T10:00:00Z'
+        }));
         
-        // Act
-        await store.dispatch(updateOrderStatus({ orderId, status: newStatus }));
+        const updatedOrder = {
+          id: orderId,
+          userId: 'user1',
+          customerEmail: 'customer@example.com',
+          status: 'Delivered',
+          totalAmount: 39.98,
+          items: [],
+          createdAt: '2025-04-01T10:00:00Z',
+          updatedAt: '2025-04-02T10:00:00Z'
+        };
+        
+        // Act - Dispatch fulfilled action for updateOrderStatus
+        store.dispatch({
+          type: updateOrderStatus.fulfilled.type,
+          payload: updatedOrder
+        });
         
         // Assert
         const state = store.getState().orders;
-        expect(state.orders[0]).toEqual(updatedOrder);
-        expect(mockOrderService.updateOrderStatus).toHaveBeenCalledWith(orderId, newStatus);
+        expect(state.selectedOrder).toEqual(updatedOrder);
+      });
+      
+      test('updateOrderStatus.rejected sets error state', async () => {
+        // Arrange
+        const store = createTestStore();
+        const errorMessage = 'Failed to update order status';
+        
+        // Act - Dispatch rejected action
+        store.dispatch({
+          type: updateOrderStatus.rejected.type,
+          error: { message: errorMessage }
+        });
+        
+        // Assert
+        const state = store.getState().orders;
+        expect(state.loading).toBe(false);
+        expect(state.error).toBe(errorMessage);
+      });
+      
+      test('updateOrderStatus thunk calls service and dispatches actions', async () => {
+        // Arrange
+        const store = createTestStore();
+        const orderId = 'order1';
+        const status = 'Delivered';
+        const mockUpdatedOrder = { id: orderId, status };
+        
+        // Type cast to access the mock function
+        const mockOrderService = orderService as unknown as MockOrderService;
+        mockOrderService.updateOrderStatus.mockResolvedValue(mockUpdatedOrder);
+        
+        // Act
+        await store.dispatch(updateOrderStatus({ orderId, status }));
+        
+        // Assert
+        expect(mockOrderService.updateOrderStatus).toHaveBeenCalledWith(orderId, status);
+        
+        const state = store.getState().orders;
+        expect(state.error).toBe(null);
       });
       
       test('updateOrderStatus thunk dispatches rejected action on update failure', async () => {
